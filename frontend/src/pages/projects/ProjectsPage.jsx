@@ -26,7 +26,7 @@ const ProjectsPage = () => {
         const fetchProjects = async () => {
             try {
                 setProjectsLoading(true);
-                const response = await apiClient.get('/api/projects');
+                const response = await apiClient.get('/projects');
                 setProjects(response.data || []);
             } catch (error) {
                 console.error('Failed to fetch projects:', error);
@@ -55,14 +55,14 @@ const ProjectsPage = () => {
             
             if (editingProject) {
                 // Update existing project
-                await apiClient.put(`/api/projects/${editingProject.id}`, projectData);
+                await apiClient.put(`/projects/${editingProject.id}`, projectData);
             } else {
                 // Create new project
-                await apiClient.post('/api/projects', projectData);
+                await apiClient.post('/projects', projectData);
             }
 
             // Refresh projects list
-            const response = await apiClient.get('/api/projects');
+            const response = await apiClient.get('/projects');
             setProjects(response.data || []);
 
             setFormData({
@@ -102,10 +102,10 @@ const ProjectsPage = () => {
 
         try {
             setProjectsLoading(true);
-            await apiClient.delete(`/api/projects/${id}`);
+            await apiClient.delete(`/projects/${id}`);
             
             // Refresh projects list
-            const response = await apiClient.get('/api/projects');
+            const response = await apiClient.get('/projects');
             setProjects(response.data || []);
         } catch (error) {
             console.error('Failed to delete project:', error);

@@ -22,7 +22,7 @@ const AcademicPage = () => {
         const fetchRecords = async () => {
             try {
                 setAcademicsLoading(true);
-                const response = await apiClient.get('/api/academic/records');
+                const response = await apiClient.get('/academic/records');
                 setAcademicRecords(response.data.records || []);
             } catch (error) {
                 console.error('Failed to fetch academic records:', error);
@@ -45,10 +45,10 @@ const AcademicPage = () => {
                 additionalInfo: record.additionalInfo || record.subjects ? { subjects: record.subjects || record.additionalInfo?.subjects } : null
             }));
 
-            await apiClient.post('/api/academic/records', { records: recordsToSave });
+            await apiClient.post('/academic/records', { records: recordsToSave });
             
             // Refresh records from server
-            const response = await apiClient.get('/api/academic/records');
+            const response = await apiClient.get('/academic/records');
             setAcademicRecords(response.data.records || []);
         } catch (error) {
             console.error('Failed to save academic records:', error);
@@ -167,10 +167,10 @@ const AcademicPage = () => {
 
         try {
             setAcademicsLoading(true);
-            await apiClient.delete(`/api/academic/records/${id}`);
+            await apiClient.delete(`/academic/records/${id}`);
             
             // Refresh records from server
-            const response = await apiClient.get('/api/academic/records');
+            const response = await apiClient.get('/academic/records');
             setAcademicRecords(response.data.records || []);
         } catch (error) {
             console.error('Failed to delete record:', error);

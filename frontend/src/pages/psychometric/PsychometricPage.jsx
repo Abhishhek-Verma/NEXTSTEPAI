@@ -16,7 +16,7 @@ const PsychometricPage = () => {
     useEffect(() => {
         const fetchResults = async () => {
             try {
-                const response = await apiClient.get('/api/psychometric/results');
+                const response = await apiClient.get('/psychometric/results');
                 if (response.data && response.data.takenAt) {
                     setPsychometric(response.data);
                 }
@@ -233,7 +233,7 @@ const PsychometricPage = () => {
             setPsychLoading(true);
             
             // Save to database
-            await apiClient.post('/api/psychometric/results', testResults);
+            await apiClient.post('/psychometric/results', testResults);
             
             // Update local store
             setPsychometric(testResults);
