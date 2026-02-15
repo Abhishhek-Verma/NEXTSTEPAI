@@ -1,11 +1,65 @@
+import apiClient from '../../api/client';
+
 export const roadmapSlice = (set, get) => ({
     roadmap: {
         id: null,
         title: '',
+        targetRole: '',
+        description: '',
         generatedAt: null,
         items: [],
         loading: false,
         error: null,
+    },
+
+    // Fetch roadmap from backend
+    fetchRoadmap: async () => {
+        try {
+            set((state) => ({ roadmap: { ...state.roadmap, loading: true, error: null } }));
+            const response = await apiClient.get('/roadmap');
+            set((state) => ({
+                roadmap: {
+                    ...state.roadmap,
+                    ...response.data.roadmap,
+                    loading: false,
+                },
+            }));
+        } catch (error) {
+            console.error('Failed to fetch roadmap:', error);
+            set((state) => ({
+                roadmap: {
+                    ...state.roadmap,
+                    loading: false,
+                    error: error.message || 'Failed to fetch roadmap',
+                },
+            }));
+        }
+    },
+
+    // Generate new roadmap via AI
+    generateRoadmap: async (targetRole) => {
+        try {
+            set((state) => ({ roadmap: { ...state.roadmap, loading: true, error: null } }));
+            const response = await apiClient.post('/roadmap/generate', { targetRole });
+            set((state) => ({
+                roadmap: {
+                    ...state.roadmap,
+                    ...response.data.roadmap,
+                    loading: false,
+                },
+            }));
+            return response.data.roadmap;
+        } catch (error) {
+            console.error('Failed to generate roadmap:', error);
+            set((state) => ({
+                roadmap: {
+                    ...state.roadmap,
+                    loading: false,
+                    error: error.message || 'Failed to generate roadmap',
+                },
+            }));
+            throw error;
+        }
     },
 
     setRoadmap: (roadmap) =>
@@ -21,15 +75,26 @@ export const roadmapSlice = (set, get) => ({
             },
         })),
 
-    updateRoadmapItem: (id, updates) =>
-        set((state) => ({
-            roadmap: {
-                ...state.roadmap,
-                items: state.roadmap.items.map((item) =>
-                    item.id === id ? { ...item, ...updates } : item
-                ),
-            },
-        })),
+    // Update roadmap item (with API call)
+    updateRoadmapItem: async (id, updates) => {
+        try {
+            // Update locally first for responsiveness
+            set((state) => ({
+                roadmap: {
+                    ...state.roadmap,
+                    items: state.roadmap.items.map((item) =>
+                        item.id === id ? { ...item, ...updates } : item
+                    ),
+                },
+            }));
+
+            // Then sync to backend
+            await apiClient.put(`/roadmap/items/${id}`, updates);
+        } catch (error) {
+            console.error('Failed to update roadmap item:', error);
+            // Optionally revert the change or show error
+        }
+    },
 
     deleteRoadmapItem: (id) =>
         set((state) => ({
@@ -44,15 +109,31 @@ export const roadmapSlice = (set, get) => ({
             roadmap: { ...state.roadmap, items },
         })),
 
-    toggleItemComplete: (id) =>
-        set((state) => ({
-            roadmap: {
-                ...state.roadmap,
-                items: state.roadmap.items.map((item) =>
-                    item.id === id ? { ...item, completed: !item.completed } : item
-                ),
-            },
-        })),
+    // Toggle item complete (with API call)
+    toggleItemComplete: async (id) => {
+        try {
+            const state = get();
+            const item = state.roadmap.items.find((i) => i.id === id);
+            if (!item) return;
+
+            const newCompleted = !item.completed;
+
+            // Update locally first
+            set((state) => ({
+                roadmap: {
+                    ...state.roadmap,
+                    items: state.roadmap.items.map((item) =>
+                        item.id === id ? { ...item, completed: newCompleted } : item
+                    ),
+                },
+            }));
+
+            // Sync to backend
+            await apiClient.put(`/roadmap/items/${id}`, { completed: newCompleted });
+        } catch (error) {
+            console.error('Failed to toggle item completion:', error);
+        }
+    },
 
     exportRoadmapJSON: () => {
         const roadmap = get().roadmap;

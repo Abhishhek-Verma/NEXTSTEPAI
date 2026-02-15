@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     DndContext,
@@ -108,6 +108,8 @@ const RoadmapPage = () => {
     const navigate = useNavigate();
     const {
         roadmap,
+        fetchRoadmap,
+        generateRoadmap,
         addRoadmapItem,
         updateRoadmapItem,
         deleteRoadmapItem,
@@ -119,11 +121,18 @@ const RoadmapPage = () => {
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
+    const [showGenerateModal, setShowGenerateModal] = useState(false);
+    const [targetRole, setTargetRole] = useState('');
     const [formData, setFormData] = useState({
         taskType: 'learn',
         description: '',
         dueDate: '',
     });
+
+    // Fetch roadmap on mount
+    useEffect(() => {
+        fetchRoadmap();
+    }, []);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -182,40 +191,19 @@ const RoadmapPage = () => {
         }
     };
 
-    const handleGenerateRoadmap = () => {
-        // Mock AI-generated roadmap
-        const mockTasks = [
-            {
-                taskType: 'learn',
-                description: 'Master React Advanced Patterns (Hooks, Context, Custom Hooks)',
-                dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            },
-            {
-                taskType: 'build',
-                description: 'Build a full-stack project: Real-time chat application',
-                dueDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            },
-            {
-                taskType: 'learn',
-                description: 'Study System Design fundamentals (Scalability, Databases, Caching)',
-                dueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            },
-            {
-                taskType: 'apply',
-                description: 'Apply to 10 companies: Google, Microsoft, Amazon, etc.',
-                dueDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            },
-        ];
+    const handleGenerateRoadmap = async () => {
+        if (!targetRole || targetRole.trim() === '') {
+            alert('Please enter a target role');
+            return;
+        }
 
-        mockTasks.forEach((task, index) => {
-            addRoadmapItem({
-                ...task,
-                sequenceNo: roadmap.items.length + index + 1,
-                completed: false,
-            });
-        });
-
-        alert('AI Roadmap generated! (Mock data)');
+        try {
+            await generateRoadmap(targetRole);
+            setShowGenerateModal(false);
+            setTargetRole('');
+        } catch (error) {
+            alert('Failed to generate roadmap. Please try again.');
+        }
     };
 
     const completedCount = roadmap.items.filter((item) => item.completed).length;
@@ -272,10 +260,46 @@ const RoadmapPage = () => {
                     <Button onClick={() => setShowAddForm(!showAddForm)} className="flex-1">
                         ➕ Add Task Manually
                     </Button>
-                    <Button onClick={handleGenerateRoadmap} variant="outline" className="flex-1">
+                    <Button onClick={() => setShowGenerateModal(true)} variant="outline" className="flex-1">
                         🤖 Generate AI Roadmap
                     </Button>
                 </div>
+
+                {/* Generate Roadmap Modal */}
+                {showGenerateModal && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                                Generate AI Roadmap
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-400 mb-4">
+                                Enter your target role and we'll create a personalized learning roadmap for you.
+                            </p>
+                            <Input
+                                label="Target Role"
+                                placeholder="e.g., Full Stack Developer, Data Scientist"
+                                value={targetRole}
+                                onChange={(e) => setTargetRole(e.target.value)}
+                                className="mb-4"
+                            />
+                            <div className="flex gap-3">
+                                <Button onClick={handleGenerateRoadmap} className="flex-1" disabled={roadmap.loading}>
+                                    {roadmap.loading ? 'Generating...' : 'Generate'}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setShowGenerateModal(false);
+                                        setTargetRole('');
+                                    }}
+                                    className="flex-1"
+                                >
+                                    Cancel
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Add/Edit Form */}
                 {showAddForm && (

@@ -18,16 +18,9 @@ export const users = pgTable('users', {
 export const academicRecords = pgTable('academic_records', {
     id: serial('id').primaryKey(),
     userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-    degree: varchar('degree', { length: 100 }),
-    institution: varchar('institution', { length: 255 }),
-    major: varchar('major', { length: 100 }),
     semester: integer('semester'),
     gpa: decimal('gpa', { precision: 3, scale: 2 }),
-    maxGpa: decimal('max_gpa', { precision: 3, scale: 2 }).default('4.00'),
-    startDate: varchar('start_date', { length: 50 }),
-    endDate: varchar('end_date', { length: 50 }),
-    isCurrentlyEnrolled: boolean('is_currently_enrolled').default(false),
-    additionalInfo: jsonb('additional_info'),
+    details: text('details'), // Additional information about courses, achievements, etc.
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -35,28 +28,10 @@ export const academicRecords = pgTable('academic_records', {
 // Coding Profiles table
 export const codingProfiles = pgTable('coding_profiles', {
     id: serial('id').primaryKey(),
-    userId: integer('user_id').notNull().unique().references(() => users.id, { onDelete: 'cascade' }),
-    
-    // GitHub
-    githubUsername: varchar('github_username', { length: 100 }),
-    githubProfileUrl: text('github_profile_url'),
-    githubMetrics: jsonb('github_metrics'),
-    
-    // LeetCode
-    leetcodeUsername: varchar('leetcode_username', { length: 100 }),
-    leetcodeProfileUrl: text('leetcode_profile_url'),
-    leetcodeMetrics: jsonb('leetcode_metrics'),
-    
-    // Codeforces
-    codeforcesHandle: varchar('codeforces_handle', { length: 100 }),
-    codeforcesProfileUrl: text('codeforces_profile_url'),
-    codeforcesMetrics: jsonb('codeforces_metrics'),
-    
-    // CodeChef
-    codechefHandle: varchar('codechef_handle', { length: 100 }),
-    codechefProfileUrl: text('codechef_profile_url'),
-    codechefMetrics: jsonb('codechef_metrics'),
-    
+    userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    platform: varchar('platform', { length: 50 }), // github, leetcode, codeforces, codechef
+    profileUrl: text('profile_url'),
+    metrics: jsonb('metrics'), // Store all platform-specific metrics
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -67,14 +42,11 @@ export const projects = pgTable('projects', {
     userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
-    technologies: jsonb('technologies'),
-    githubUrl: text('github_url'),
+    repoUrl: text('repo_url'), // Match schema diagram
     liveUrl: text('live_url'),
     imageUrl: text('image_url'),
-    status: varchar('status', { length: 50 }).default('completed'), // completed, in-progress, planned
-    startDate: varchar('start_date', { length: 50 }),
-    endDate: varchar('end_date', { length: 50 }),
-    featured: boolean('featured').default(false),
+    status: varchar('status', { length: 50 }).default('in-progress'), // in-progress, completed
+    completedAt: timestamp('completed_at'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -82,12 +54,9 @@ export const projects = pgTable('projects', {
 // Psychometric Tests table
 export const psychometricTests = pgTable('psychometric_tests', {
     id: serial('id').primaryKey(),
-    userId: integer('user_id').notNull().unique().references(() => users.id, { onDelete: 'cascade' }),
+    userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
     testName: varchar('test_name', { length: 255 }).default('Career Traits Assessment'),
     traits: jsonb('traits'),
-    score: integer('score').default(0),
-    progress: integer('progress').default(0),
-    responses: jsonb('responses'),
     takenAt: timestamp('taken_at'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
@@ -96,12 +65,10 @@ export const psychometricTests = pgTable('psychometric_tests', {
 // Career Recommendations table
 export const recommendations = pgTable('recommendations', {
     id: serial('id').primaryKey(),
-    userId: integer('user_id').notNull().unique().references(() => users.id, { onDelete: 'cascade' }),
-    roles: jsonb('roles'),
-    skills: jsonb('skills'),
-    companies: jsonb('companies'),
-    savedRoles: jsonb('saved_roles'),
-    generatedAt: timestamp('generated_at').defaultNow(),
+    userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    recType: varchar('rec_type', { length: 100 }), // role, skill, course, certification, etc.
+    content: text('content'),
+    score: decimal('score', { precision: 5, scale: 2 }),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -111,9 +78,6 @@ export const roadmaps = pgTable('roadmaps', {
     id: serial('id').primaryKey(),
     userId: integer('user_id').notNull().unique().references(() => users.id, { onDelete: 'cascade' }),
     title: varchar('title', { length: 255 }).notNull(),
-    description: text('description'),
-    targetRole: varchar('target_role', { length: 255 }),
-    items: jsonb('items'),
     generatedAt: timestamp('generated_at').defaultNow(),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
@@ -134,15 +98,72 @@ export const onboardingData = pgTable('onboarding_data', {
     updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+// Skills table - normalized skill management
+export const skills = pgTable('skills', {
+    id: serial('id').primaryKey(),
+    skillName: varchar('skill_name', { length: 100 }).notNull().unique(),
+    category: varchar('category', { length: 50 }), // technical, soft-skills, tools, languages, etc.
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Student Skills junction table
+export const studentSkills = pgTable('student_skills', {
+    id: serial('id').primaryKey(),
+    studentId: integer('student_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    skillId: integer('skill_id').notNull().references(() => skills.id, { onDelete: 'cascade' }),
+    proficiencyLevel: integer('proficiency_level').default(1), // 1-5 scale
+    lastPracticed: timestamp('last_practiced'),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Project Skills junction table
+export const projectSkills = pgTable('project_skills', {
+    id: serial('id').primaryKey(),
+    projectId: integer('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+    skillId: integer('skill_id').notNull().references(() => skills.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Recommendation Skills junction table
+export const recommendationSkills = pgTable('recommendation_skills', {
+    id: serial('id').primaryKey(),
+    recommendationId: integer('recommendation_id').notNull().references(() => recommendations.id, { onDelete: 'cascade' }),
+    skillId: integer('skill_id').notNull().references(() => skills.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Roadmap Items table - normalized roadmap tasks
+export const roadmapItems = pgTable('roadmap_items', {
+    id: serial('id').primaryKey(),
+    roadmapId: integer('roadmap_id').notNull().references(() => roadmaps.id, { onDelete: 'cascade' }),
+    sequenceNo: integer('sequence_no').notNull(),
+    taskType: varchar('task_type', { length: 50 }), // course, project, certification, skill, etc.
+    description: text('description'),
+    completed: boolean('completed').default(false),
+    dueDate: timestamp('due_date'),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Companies table - normalized company data
+export const companies = pgTable('companies', {
+    id: serial('id').primaryKey(),
+    companyId: integer('company_id').notNull().unique(),
+    name: varchar('name', { length: 255 }).notNull(),
+    domain: varchar('domain', { length: 100 }),
+    notes: text('notes'),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
     academicRecords: many(academicRecords),
-    codingProfile: one(codingProfiles),
+    codingProfiles: many(codingProfiles),
     projects: many(projects),
-    psychometricTest: one(psychometricTests),
-    recommendations: one(recommendations),
+    psychometricTests: many(psychometricTests),
+    recommendations: many(recommendations),
     roadmap: one(roadmaps),
     onboarding: one(onboardingData),
+    studentSkills: many(studentSkills),
 }));
 
 export const academicRecordsRelations = relations(academicRecords, ({ one }) => ({
@@ -159,9 +180,79 @@ export const codingProfilesRelations = relations(codingProfiles, ({ one }) => ({
     }),
 }));
 
-export const projectsRelations = relations(projects, ({ one }) => ({
+export const psychometricTestsRelations = relations(psychometricTests, ({ one }) => ({
+    user: one(users, {
+        fields: [psychometricTests.userId],
+        references: [users.id],
+    }),
+}));
+
+export const projectsRelations = relations(projects, ({ one, many }) => ({
     user: one(users, {
         fields: [projects.userId],
         references: [users.id],
+    }),
+    projectSkills: many(projectSkills),
+}));
+
+export const skillsRelations = relations(skills, ({ many }) => ({
+    studentSkills: many(studentSkills),
+    projectSkills: many(projectSkills),
+    recommendationSkills: many(recommendationSkills),
+}));
+
+export const studentSkillsRelations = relations(studentSkills, ({ one }) => ({
+    student: one(users, {
+        fields: [studentSkills.studentId],
+        references: [users.id],
+    }),
+    skill: one(skills, {
+        fields: [studentSkills.skillId],
+        references: [skills.id],
+    }),
+}));
+
+export const projectSkillsRelations = relations(projectSkills, ({ one }) => ({
+    project: one(projects, {
+        fields: [projectSkills.projectId],
+        references: [projects.id],
+    }),
+    skill: one(skills, {
+        fields: [projectSkills.skillId],
+        references: [skills.id],
+    }),
+}));
+
+export const recommendationsRelations = relations(recommendations, ({ one, many }) => ({
+    user: one(users, {
+        fields: [recommendations.userId],
+        references: [users.id],
+    }),
+    recommendationSkills: many(recommendationSkills),
+}));
+
+export const recommendationSkillsRelations = relations(recommendationSkills, ({ one }) => ({
+    recommendation: one(recommendations, {
+        fields: [recommendationSkills.recommendationId],
+        references: [recommendations.id],
+    }),
+    skill: one(skills, {
+        fields: [recommendationSkills.skillId],
+        references: [skills.id],
+    }),
+}));
+
+export const roadmapsRelations = relations(roadmaps, ({ one, many }) => ({
+    user: one(users, {
+        fields: [roadmaps.userId],
+        references: [users.id],
+    }),
+    roadmapItems: many(roadmapItems),
+}));
+
+export const roadmapItemsRelations = relations(roadmapItems, ({ one }) => ({
+    roadmap: one(roadmaps, {
+        fields: [roadmapItems.roadmapId],
+        references: [roadmaps.id],
     }),
 }));

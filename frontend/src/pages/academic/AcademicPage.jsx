@@ -42,7 +42,7 @@ const AcademicPage = () => {
             const recordsToSave = updatedRecordsList.map(record => ({
                 semester: parseInt(record.semester) || null,
                 gpa: parseFloat(record.gpa) || null,
-                additionalInfo: record.additionalInfo || record.subjects ? { subjects: record.subjects || record.additionalInfo?.subjects || [] } : null
+                details: record.details || (record.subjects && record.subjects.length > 0 ? { subjects: record.subjects } : null)
             }));
 
             console.log('Saving records:', recordsToSave);

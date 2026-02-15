@@ -14,6 +14,7 @@ import AnalyzePage from "./pages/analyze/AnalyzePage";
 import RecommendationsPage from "./pages/recommendations/RecommendationsPage";
 import RoadmapPage from "./pages/roadmap/RoadmapPage";
 import ProjectsPage from "./pages/projects/ProjectsPage";
+import SkillsPage from "./pages/skills/SkillsPage";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
@@ -105,6 +106,14 @@ const AppRoutes = () => {
               element={
                 <ProtectedRoute>
                   <ProjectsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/skills"
+              element={
+                <ProtectedRoute>
+                  <SkillsPage />
                 </ProtectedRoute>
               }
             />

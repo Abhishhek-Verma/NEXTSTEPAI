@@ -10,23 +10,37 @@ const router = express.Router();
 // Get recommendations for the authenticated user
 router.get('/', requireAuth, async (req, res) => {
     try {
-        let [userRecs] = await db
+        const userRecs = await db
             .select()
             .from(recommendations)
-            .where(eq(recommendations.userId, req.user.id));
+            .where(eq(recommendations.userId, req.user.id))
+            .orderBy(recommendations.score);
 
-        // If no recommendations exist, return empty structure
-        if (!userRecs) {
-            userRecs = {
-                roles: [],
-                skills: [],
-                companies: [],
-                savedRoles: [],
-                generatedAt: null,
-            };
-        }
+        // Group by type for frontend compatibility
+        const grouped = {
+            roles: userRecs.filter(r => r.recType === 'role').map(r => ({
+                id: r.id,
+                ...JSON.parse(r.content),
+                score: r.score,
+                generatedAt: r.generatedAt,
+            })),
+            skills: userRecs.filter(r => r.recType === 'skill').map(r => ({
+                id: r.id,
+                ...JSON.parse(r.content),
+                score: r.score,
+                generatedAt: r.generatedAt,
+            })),
+            companies: userRecs.filter(r => r.recType === 'company').map(r => ({
+                id: r.id,
+                ...JSON.parse(r.content),
+                score: r.score,
+                generatedAt: r.generatedAt,
+            })),
+            savedRoles: [], // Note: savedRoles removed from schema
+            generatedAt: userRecs.length > 0 ? userRecs[0].generatedAt : null,
+        };
 
-        res.json({ recommendations: userRecs });
+        res.json({ recommendations: grouped });
     } catch (error) {
         console.error('Error fetching recommendations:', error);
         res.status(500).json({ error: 'Failed to fetch recommendations' });
@@ -70,36 +84,53 @@ router.post('/generate', requireAuth, async (req, res) => {
         // Generate AI-powered recommendations
         const aiRecommendations = await generateRecommendations(userData);
         
-        const recsData = {
-            userId: req.user.id,
-            roles: aiRecommendations.roles || [],
-            skills: aiRecommendations.skills || [],
-            companies: aiRecommendations.companies || [],
-            savedRoles: [],
-            generatedAt: new Date(),
-            updatedAt: new Date(),
-        };
-
-        // Check if recommendations exist
-        const [existing] = await db
-            .select()
-            .from(recommendations)
+        // Delete existing recommendations for this user
+        await db
+            .delete(recommendations)
             .where(eq(recommendations.userId, req.user.id));
 
-        let userRecs;
-        if (existing) {
-            // Update existing recommendations (preserve savedRoles)
-            recsData.savedRoles = existing.savedRoles || [];
-            [userRecs] = await db
-                .update(recommendations)
-                .set(recsData)
-                .where(eq(recommendations.userId, req.user.id))
-                .returning();
-        } else {
-            // Insert new recommendations
-            [userRecs] = await db
+        // Insert new recommendations as individual rows
+        const recsToInsert = [];
+        const generatedAt = new Date();
+
+        // Add role recommendations
+        (aiRecommendations.roles || []).forEach((role, index) => {
+            recsToInsert.push({
+                userId: req.user.id,
+                recType: 'role',
+                content: JSON.stringify(role),
+                score: role.score || (100 - index * 5), // Higher score for earlier items
+                generatedAt,
+            });
+        });
+
+        // Add skill recommendations
+        (aiRecommendations.skills || []).forEach((skill, index) => {
+            recsToInsert.push({
+                userId: req.user.id,
+                recType: 'skill',
+                content: JSON.stringify(skill),
+                score: skill.score || (100 - index * 5),
+                generatedAt,
+            });
+        });
+
+        // Add company recommendations
+        (aiRecommendations.companies || []).forEach((company, index) => {
+            recsToInsert.push({
+                userId: req.user.id,
+                recType: 'company',
+                content: JSON.stringify(company),
+                score: company.score || (100 - index * 5),
+                generatedAt,
+            });
+        });
+
+        let userRecs = [];
+        if (recsToInsert.length > 0) {
+            userRecs = await db
                 .insert(recommendations)
-                .values(recsData)
+                .values(recsToInsert)
                 .returning();
         }
 
@@ -110,63 +141,7 @@ router.post('/generate', requireAuth, async (req, res) => {
     }
 });
 
-// Save a role
-router.post('/save-role', requireAuth, async (req, res) => {
-    try {
-        const { roleId } = req.body;
-
-        const [userRecs] = await db
-            .select()
-            .from(recommendations)
-            .where(eq(recommendations.userId, req.user.id));
-
-        if (!userRecs) {
-            return res.status(404).json({ error: 'No recommendations found' });
-        }
-
-        const savedRoles = userRecs.savedRoles || [];
-        if (!savedRoles.includes(roleId)) {
-            savedRoles.push(roleId);
-        }
-
-        await db
-            .update(recommendations)
-            .set({ savedRoles, updatedAt: new Date() })
-            .where(eq(recommendations.userId, req.user.id));
-
-        res.json({ message: 'Role saved successfully' });
-    } catch (error) {
-        console.error('Error saving role:', error);
-        res.status(500).json({ error: 'Failed to save role' });
-    }
-});
-
-// Unsave a role
-router.delete('/save-role/:roleId', requireAuth, async (req, res) => {
-    try {
-        const { roleId } = req.params;
-
-        const [userRecs] = await db
-            .select()
-            .from(recommendations)
-            .where(eq(recommendations.userId, req.user.id));
-
-        if (!userRecs) {
-            return res.status(404).json({ error: 'No recommendations found' });
-        }
-
-        const savedRoles = (userRecs.savedRoles || []).filter(id => id !== roleId);
-
-        await db
-            .update(recommendations)
-            .set({ savedRoles, updatedAt: new Date() })
-            .where(eq(recommendations.userId, req.user.id));
-
-        res.json({ message: 'Role unsaved successfully' });
-    } catch (error) {
-        console.error('Error unsaving role:', error);
-        res.status(500).json({ error: 'Failed to unsave role' });
-    }
-});
+// NOTE: Save/unsave role functionality removed - savedRoles not in normalized schema
+// If needed, create a separate savedRoles table with userId, recommendationId
 
 export default router;

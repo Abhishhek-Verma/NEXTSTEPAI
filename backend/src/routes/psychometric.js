@@ -10,24 +10,20 @@ const router = express.Router();
 // Get psychometric test results for the authenticated user
 router.get('/results', requireAuth, async (req, res) => {
     try {
-        let [test] = await db
+        const tests = await db
             .select()
             .from(psychometricTests)
-            .where(eq(psychometricTests.userId, req.user.id));
+            .where(eq(psychometricTests.userId, req.user.id))
+            .orderBy(psychometricTests.takenAt);
 
-        // If no test exists, return empty structure
-        if (!test) {
-            test = {
-                testName: 'Career Traits Assessment',
-                traits: {},
-                score: 0,
-                progress: 0,
-                responses: {},
-                takenAt: null,
-            };
-        }
+        // For backward compatibility, return most recent test as 'test'
+        const test = tests.length > 0 ? tests[tests.length - 1] : {
+            testName: 'Career Traits Assessment',
+            traits: {},
+            takenAt: null,
+        };
 
-        res.json({ test });
+        res.json({ test, tests }); // Return both current test and history
     } catch (error) {
         console.error('Error fetching psychometric results:', error);
         res.status(500).json({ error: 'Failed to fetch psychometric results' });
@@ -35,40 +31,20 @@ router.get('/results', requireAuth, async (req, res) => {
 });
 
 // Save/update psychometric test results
-router.post('/results', requireAuth, validate(psychometricSchema), async (req, res) => {
+router.post('/results', requireAuth, async (req, res) => {
     try {
         const testData = {
             userId: req.user.id,
             testName: req.body.testName || 'Career Traits Assessment',
             traits: req.body.traits || {},
-            score: Math.round(req.body.score || 0), // Convert to integer
-            progress: Math.round(req.body.progress || 0), // Convert to integer
-            responses: req.body.responses || {},
-            takenAt: req.body.progress === 100 ? new Date() : null,
-            updatedAt: new Date(),
+            takenAt: new Date(),
         };
 
-        // Check if test exists
-        const [existing] = await db
-            .select()
-            .from(psychometricTests)
-            .where(eq(psychometricTests.userId, req.user.id));
-
-        let test;
-        if (existing) {
-            // Update existing test
-            [test] = await db
-                .update(psychometricTests)
-                .set(testData)
-                .where(eq(psychometricTests.userId, req.user.id))
-                .returning();
-        } else {
-            // Insert new test
-            [test] = await db
-                .insert(psychometricTests)
-                .values(testData)
-                .returning();
-        }
+        // Always insert new test (allow multiple test attempts)
+        const [test] = await db
+            .insert(psychometricTests)
+            .values(testData)
+            .returning();
 
         res.json({ message: 'Psychometric results saved successfully', test });
     } catch (error) {

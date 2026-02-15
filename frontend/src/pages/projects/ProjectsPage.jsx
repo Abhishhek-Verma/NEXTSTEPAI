@@ -9,7 +9,10 @@ import apiClient from '../../api/client';
 const ProjectsPage = () => {
     const navigate = useNavigate();
     const { projects, setProjects, setProjectsLoading, setProjectsError } = useStore();
-    const projectsList = projects.list || [];
+    
+    // Ensure projectsList is always an array
+    const projectsList = Array.isArray(projects?.list) ? projects.list : [];
+    
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingProject, setEditingProject] = useState(null);
     const [formData, setFormData] = useState({
@@ -28,14 +31,16 @@ const ProjectsPage = () => {
                 setProjectsLoading(true);
                 const response = await apiClient.get('/projects');
                 setProjects(response.data || []);
+                setProjectsLoading(false);
             } catch (error) {
                 console.error('Failed to fetch projects:', error);
                 setProjectsError(error.message || 'Failed to load projects');
+                setProjectsLoading(false);
             }
         };
 
         fetchProjects();
-    }, []);
+    }, [setProjects, setProjectsError, setProjectsLoading]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -47,7 +52,7 @@ const ProjectsPage = () => {
             liveUrl: formData.liveUrl || null,
             technologies: formData.techStack.split(',').map((tech) => tech.trim()).filter(Boolean),
             status: formData.status,
-            endDate: formData.status === 'completed' ? new Date().toISOString() : null,
+            completedAt: formData.status === 'completed' ? new Date().toISOString() : null,
         };
 
         try {
@@ -64,6 +69,7 @@ const ProjectsPage = () => {
             // Refresh projects list
             const response = await apiClient.get('/projects');
             setProjects(response.data || []);
+            setProjectsLoading(false);
 
             setFormData({
                 title: '',
@@ -78,6 +84,7 @@ const ProjectsPage = () => {
         } catch (error) {
             console.error('Failed to save project:', error);
             setProjectsError(error.message || 'Failed to save project');
+            setProjectsLoading(false);
             alert('Failed to save project. Please try again.');
         }
     };
@@ -89,7 +96,7 @@ const ProjectsPage = () => {
             repoUrl: project.githubUrl || '',
             liveUrl: project.liveUrl || '',
             techStack: project.technologies ? project.technologies.join(', ') : '',
-            status: project.status || (project.endDate ? 'completed' : 'in-progress'),
+            status: project.status || (project.completedAt ? 'completed' : 'in-progress'),
         });
         setEditingProject(project);
         setShowAddForm(true);
@@ -107,9 +114,11 @@ const ProjectsPage = () => {
             // Refresh projects list
             const response = await apiClient.get('/projects');
             setProjects(response.data || []);
+            setProjectsLoading(false);
         } catch (error) {
             console.error('Failed to delete project:', error);
             setProjectsError(error.message || 'Failed to delete project');
+            setProjectsLoading(false);
             alert('Failed to delete project. Please try again.');
         }
     };
@@ -119,7 +128,7 @@ const ProjectsPage = () => {
         completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
     };
 
-    const completedProjects = projectsList.filter((p) => p.status === 'completed' || p.endDate).length;
+    const completedProjects = projectsList.filter((p) => p.status === 'completed' || p.completedAt).length;
     const inProgressProjects = projectsList.length - completedProjects;
 
     return (
@@ -296,10 +305,10 @@ const ProjectsPage = () => {
                                         </h3>
                                         <span
                                             className={`px-2 py-1 text-xs font-medium rounded ${
-                                                statusColors[project.status === 'completed' || project.endDate ? 'completed' : 'in-progress']
+                                                statusColors[project.status === 'completed' || project.completedAt ? 'completed' : 'in-progress']
                                             }`}
                                         >
-                                            {project.status === 'completed' || project.endDate ? '✅ Done' : '🔄 WIP'}
+                                            {project.status === 'completed' || project.completedAt ? '✅ Done' : '🔄 WIP'}
                                         </span>
                                     </div>
 
@@ -345,9 +354,9 @@ const ProjectsPage = () => {
                                         )}
                                     </div>
 
-                                    {project.endDate && (
+                                    {project.completedAt && (
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                                            Completed: {new Date(project.endDate).toLocaleDateString()}
+                                            Completed: {new Date(project.completedAt).toLocaleDateString()}
                                         </p>
                                     )}
 

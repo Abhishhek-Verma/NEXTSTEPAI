@@ -14,6 +14,7 @@ import recommendationsRoutes from './routes/recommendations.js';
 import roadmapRoutes from './routes/roadmap.js';
 import onboardingRoutes from './routes/onboarding.js';
 import userRoutes from './routes/user.js';
+import skillsRoutes from './routes/skills.js';
 
 // Load environment variables
 dotenv.config();
@@ -80,6 +81,7 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/psychometric', psychometricRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/roadmap', roadmapRoutes);
+app.use('/api/skills', skillsRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 
 // 404 handler

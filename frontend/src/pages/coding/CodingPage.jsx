@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../../store';
 import Button from '../../components/ui/Button';
@@ -11,6 +11,12 @@ const CodingPage = () => {
     const [activeTab, setActiveTab] = useState('github');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [manualValues, setManualValues] = useState({});
+
+    // Clear manual input fields when switching tabs
+    useEffect(() => {
+        setManualValues({});
+    }, [activeTab]);
 
     const platforms = [
         {
@@ -27,9 +33,9 @@ const CodingPage = () => {
                 { key: 'profileUrl', label: 'Profile URL', placeholder: 'https://github.com/johndoe' },
             ],
             metrics: [
-                { key: 'commitsPerWeek', label: 'Commits', icon: '📊' },
-                { key: 'stars', label: 'Total Stars', icon: '⭐' },
-                { key: 'prs', label: 'Pull Requests', icon: '🔀' },
+                { key: 'totalRepos', label: 'Total Repositories', icon: '📁' },
+                { key: 'totalCommits', label: 'Total Commits', icon: '📊' },
+                { key: 'totalStars', label: 'Total Stars', icon: '⭐' },
             ],
         },
         {
@@ -46,8 +52,9 @@ const CodingPage = () => {
                 { key: 'profileUrl', label: 'Profile URL', placeholder: 'https://leetcode.com/johndoe' },
             ],
             metrics: [
-                { key: 'problemsSolved', label: 'Problems Solved', icon: '✅' },
+                { key: 'problemsSolved', label: 'Total Questions Solved', icon: '✅' },
                 { key: 'contestRating', label: 'Contest Rating', icon: '🏆' },
+                { key: 'contestsAttended', label: 'Contests Attended', icon: '🎯' },
             ],
         },
         {
@@ -64,8 +71,9 @@ const CodingPage = () => {
                 { key: 'profileUrl', label: 'Profile URL', placeholder: 'https://codeforces.com/profile/johndoe' },
             ],
             metrics: [
-                { key: 'rating', label: 'Rating', icon: '📈' },
-                { key: 'contests', label: 'Contests', icon: '🎯' },
+                { key: 'problemsSolved', label: 'Total Questions Solved', icon: '✅' },
+                { key: 'rating', label: 'Current Rating', icon: '📈' },
+                { key: 'contests', label: 'Contests Participated', icon: '🎯' },
             ],
         },
         {
@@ -82,8 +90,9 @@ const CodingPage = () => {
                 { key: 'profileUrl', label: 'Profile URL', placeholder: 'https://codechef.com/users/johndoe' },
             ],
             metrics: [
-                { key: 'rating', label: 'Rating', icon: '⭐' },
-                { key: 'contests', label: 'Contests', icon: '🏅' },
+                { key: 'problemsSolved', label: 'Total Questions Solved', icon: '✅' },
+                { key: 'rating', label: 'Current Rating', icon: '⭐' },
+                { key: 'contests', label: 'Contests Participated', icon: '🏅' },
             ],
         },
     ];
@@ -150,37 +159,42 @@ const CodingPage = () => {
         switch (platform) {
             case 'github':
                 return {
-                    commitsPerWeek: data.contributions?.contributionScore || 0,
-                    stars: data.totalStars || 0,
-                    prs: data.contributions?.eventTypes?.PullRequestEvent || 0,
-                    repos: data.publicRepos || 0,
+                    totalRepos: data.totalRepos || data.publicRepos || 0,
+                    totalCommits: data.totalCommits || 0,
+                    totalStars: data.totalStars || 0,
                     followers: data.followers || 0,
-                    languages: data.topLanguages?.map(l => l.language).join(', ') || ''
+                    topLanguages: data.topLanguages?.map(l => l.language).join(', ') || '',
+                    lastFetched: data.lastFetched
                 };
             case 'leetcode':
                 return {
                     problemsSolved: data.problemsSolved?.total || 0,
                     contestRating: data.contestStats?.rating || 0,
+                    contestsAttended: data.contestStats?.attended || 0,
                     easy: data.problemsSolved?.easy || 0,
                     medium: data.problemsSolved?.medium || 0,
                     hard: data.problemsSolved?.hard || 0,
-                    acceptanceRate: data.acceptanceRate || 0
+                    acceptanceRate: data.acceptanceRate || 0,
+                    lastFetched: data.lastFetched
                 };
             case 'codeforces':
                 return {
+                    problemsSolved: data.stats?.problemsSolved || 0,
                     rating: data.rating || 0,
                     contests: data.stats?.contestsParticipated || 0,
                     maxRating: data.maxRating || 0,
-                    problemsSolved: data.stats?.problemsSolved || 0,
-                    rank: data.rank || 'Unrated'
+                    rank: data.rank || 'Unrated',
+                    lastFetched: data.lastFetched
                 };
             case 'codechef':
                 return {
+                    problemsSolved: data.problemsSolved ?? null,
                     rating: data.rating || 0,
-                    contests: data.contestsParticipated || 0,
+                    contests: data.contestsParticipated ?? null,
                     stars: data.stars || 0,
-                    problemsSolved: data.problemsSolved || 0,
-                    rank: data.rank || 'Unrated'
+                    rank: data.rank || 'Unrated',
+                    lastFetched: data.lastFetched,
+                    note: data.note
                 };
             default:
                 return data;
@@ -302,24 +316,105 @@ const CodingPage = () => {
 
                         {/* Metrics Section */}
                         <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                                Metrics (Optional - Auto-fetched or Manual)
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {activePlatform.metrics.map((metric) => (
-                                    <div key={metric.key} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            {metric.icon} {metric.label}
-                                        </label>
-                                        <Input
-                                            type="number"
-                                            value={platformData.metrics?.[metric.key] || ''}
-                                            onChange={(e) => handleMetricChange(metric.key, e.target.value)}
-                                            placeholder="0"
-                                        />
-                                    </div>
-                                ))}
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    Metrics (Auto-fetched from API)
+                                </h3>
+                                {platformData.metrics?.lastFetched && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                        Last updated: {new Date(platformData.metrics.lastFetched).toLocaleDateString()} at {new Date(platformData.metrics.lastFetched).toLocaleTimeString()}
+                                    </span>
+                                )}
                             </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {activePlatform.metrics.map((metric) => {
+                                    const value = platformData.metrics?.[metric.key];
+                                    const displayValue = value !== null && value !== undefined ? value : 'N/A';
+                                    const isUnavailable = value === null || value === undefined;
+                                    const manualKey = `${activeTab}_${metric.key}`;
+                                    const isEditing = manualValues[manualKey] !== undefined;
+                                    
+                                    return (
+                                        <div key={metric.key} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                {metric.icon} {metric.label}
+                                            </label>
+                                            
+                                            {!isUnavailable ? (
+                                                // Show fetched value
+                                                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                                                    {displayValue}
+                                                </div>
+                                            ) : isEditing ? (
+                                                // Show manual input field
+                                                <div className="space-y-2">
+                                                    <input
+                                                        type="number"
+                                                        value={manualValues[manualKey] || ''}
+                                                        onChange={(e) => setManualValues({
+                                                            ...manualValues,
+                                                            [manualKey]: e.target.value
+                                                        })}
+                                                        placeholder="Enter value"
+                                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500"
+                                                    />
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                handleMetricChange(metric.key, parseInt(manualValues[manualKey]) || 0);
+                                                                setManualValues({
+                                                                    ...manualValues,
+                                                                    [manualKey]: undefined
+                                                                });
+                                                            }}
+                                                            className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                        >
+                                                            ✓ Save
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setManualValues({
+                                                                ...manualValues,
+                                                                [manualKey]: undefined
+                                                            })}
+                                                            className="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                // Show N/A with "Add Manually" button
+                                                <div>
+                                                    <div className="text-2xl font-bold text-gray-400 dark:text-gray-500">
+                                                        N/A
+                                                    </div>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                        Data unavailable
+                                                    </p>
+                                                    <button
+                                                        onClick={() => setManualValues({
+                                                            ...manualValues,
+                                                            [manualKey]: ''
+                                                        })}
+                                                        className="mt-2 px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                    >
+                                                        ➕ Add Manually
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            
+                            {/* API Note */}
+                            {platformData.metrics?.note && (
+                                <div className="mt-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                                    <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                                        ℹ️ {platformData.metrics.note}
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

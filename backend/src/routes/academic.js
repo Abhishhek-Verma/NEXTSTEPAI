@@ -23,7 +23,7 @@ router.get('/records', requireAuth, async (req, res) => {
 });
 
 // Save/update academic records
-router.post('/records', requireAuth, validate(academicRecordSchema), async (req, res) => {
+router.post('/records', requireAuth, async (req, res) => {
     try {
         const { records: newRecords } = req.body;
 
@@ -34,16 +34,9 @@ router.post('/records', requireAuth, validate(academicRecordSchema), async (req,
         if (newRecords && newRecords.length > 0) {
             const recordsToInsert = newRecords.map(record => ({
                 userId: req.user.id,
-                degree: record.degree || null,
-                institution: record.institution || null,
-                major: record.major || null,
                 semester: record.semester || null,
                 gpa: record.gpa ? String(record.gpa) : null,
-                maxGpa: record.maxGpa ? String(record.maxGpa) : '4.00',
-                startDate: record.startDate || null,
-                endDate: record.endDate || null,
-                isCurrentlyEnrolled: record.isCurrentlyEnrolled || false,
-                additionalInfo: record.additionalInfo || null,
+                details: record.details || null,
             }));
 
             await db.insert(academicRecords).values(recordsToInsert);

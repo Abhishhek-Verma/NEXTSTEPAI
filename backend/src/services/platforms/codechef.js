@@ -40,9 +40,32 @@ export async function fetchCodeChefProfile(handle) {
         const countryMatch = html.match(/<span class="user-country-name">([^<]+)<\/span>/);
         const country = countryMatch ? countryMatch[1].trim() : null;
         
-        // Extract problems solved
-        const problemsMatch = html.match(/<h3>(\d+)<\/h3>\s*<p>Problems Solved<\/p>/i);
-        const problemsSolved = problemsMatch ? parseInt(problemsMatch[1]) : 0;
+        // Extract problems solved - try multiple patterns due to changing HTML structure
+        let problemsSolved = null;
+        
+        // Pattern 1: Original pattern
+        let problemsMatch = html.match(/<h3>(\d+)<\/h3>\s*<p>Problems Solved<\/p>/i);
+        if (problemsMatch) {
+            problemsSolved = parseInt(problemsMatch[1]);
+        } else {
+            // Pattern 2: Try with different spacing
+            problemsMatch = html.match(/<h3[^>]*>(\d+)<\/h3>\s*<p[^>]*>Problems?\s*Solved<\/p>/i);
+            if (problemsMatch) {
+                problemsSolved = parseInt(problemsMatch[1]);
+            } else {
+                // Pattern 3: Try with class-based selector
+                problemsMatch = html.match(/problems?[_-]?solved[^>]*>(\d+)/i);
+                if (problemsMatch) {
+                    problemsSolved = parseInt(problemsMatch[1]);
+                } else {
+                    // Pattern 4: Look for fully solved section
+                    problemsMatch = html.match(/fully[\s-]solved[^>]*>(\d+)/i);
+                    if (problemsMatch) {
+                        problemsSolved = parseInt(problemsMatch[1]);
+                    }
+                }
+            }
+        }
         
         // Determine rank based on rating
         let rank = 'Unrated';
@@ -61,9 +84,32 @@ export async function fetchCodeChefProfile(handle) {
             div3: { rating: 0, stars: 0, highestRating: 0 }
         };
         
-        // Try to extract more detailed contest stats
-        const contestsMatch = html.match(/contest-participated-count[^>]*>(\d+)/);
-        const contestsParticipated = contestsMatch ? parseInt(contestsMatch[1]) : 0;
+        // Try to extract more detailed contest stats - try multiple patterns
+        let contestsParticipated = null;
+        
+        // Pattern 1: Original pattern
+        let contestsMatch = html.match(/contest-participated-count[^>]*>(\d+)/i);
+        if (contestsMatch) {
+            contestsParticipated = parseInt(contestsMatch[1]);
+        } else {
+            // Pattern 2: Try with different class names
+            contestsMatch = html.match(/contests?[_-]?participated[^>]*>(\d+)/i);
+            if (contestsMatch) {
+                contestsParticipated = parseInt(contestsMatch[1]);
+            } else {
+                // Pattern 3: Look for contest count in different format
+                contestsMatch = html.match(/<h3>(\d+)<\/h3>\s*<p[^>]*>Contests[^<]*<\/p>/i);
+                if (contestsMatch) {
+                    contestsParticipated = parseInt(contestsMatch[1]);
+                } else {
+                    // Pattern 4: Try finding in profile stats
+                    contestsMatch = html.match(/contest[s]?[^>]{0,50}>(\d+)/i);
+                    if (contestsMatch) {
+                        contestsParticipated = parseInt(contestsMatch[1]);
+                    }
+                }
+            }
+        }
         
         return {
             handle,
@@ -77,7 +123,9 @@ export async function fetchCodeChefProfile(handle) {
             divisions,
             profileUrl,
             lastFetched: new Date().toISOString(),
-            note: 'Limited data due to CodeChef API restrictions. Some fields may be approximate.'
+            note: (problemsSolved === null || contestsParticipated === null)
+                ? 'Limited data available. Some metrics could not be fetched from CodeChef and can be added manually.'
+                : 'Limited data due to CodeChef API restrictions. Some fields may be approximate.'
         };
     } catch (error) {
         console.error('CodeChef Scraping Error:', error.message);
@@ -90,8 +138,8 @@ export async function fetchCodeChefProfile(handle) {
             stars: 0,
             rank: 'Unrated',
             country: null,
-            problemsSolved: 0,
-            contestsParticipated: 0,
+            problemsSolved: null,
+            contestsParticipated: null,
             divisions: {
                 div1: { rating: 0, stars: 0, highestRating: 0 },
                 div2: { rating: 0, stars: 0, highestRating: 0 },
@@ -100,7 +148,7 @@ export async function fetchCodeChefProfile(handle) {
             profileUrl: `https://www.codechef.com/users/${handle}`,
             lastFetched: new Date().toISOString(),
             error: error.message,
-            note: 'Failed to fetch profile data. Please verify the username is correct.'
+            note: 'Failed to fetch profile data. Some metrics may be unavailable and can be added manually.'
         };
     }
 }

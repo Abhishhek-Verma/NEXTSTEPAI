@@ -21,6 +21,37 @@ export async function fetchGitHubProfile(username) {
         }
         const repos = await reposResponse.json();
         
+        // Calculate total commits across all repos (approximation based on default branch)
+        let totalCommits = 0;
+        const commitPromises = repos.slice(0, 30).map(async (repo) => {
+            try {
+                // Get commits count for each repo
+                const commitsUrl = `${baseUrl}/repos/${username}/${repo.name}/commits?author=${username}&per_page=1`;
+                const commitsResponse = await fetch(commitsUrl);
+                
+                if (commitsResponse.ok) {
+                    // GitHub returns the total count in the Link header
+                    const linkHeader = commitsResponse.headers.get('Link');
+                    if (linkHeader) {
+                        const match = linkHeader.match(/page=(\d+)>; rel="last"/);
+                        if (match) {
+                            return parseInt(match[1]);
+                        }
+                    }
+                    // If no Link header, there's at least 1 commit
+                    const commits = await commitsResponse.json();
+                    return commits.length;
+                }
+                return 0;
+            } catch (err) {
+                console.warn(`Failed to fetch commits for ${repo.name}:`, err.message);
+                return 0;
+            }
+        });
+        
+        const commitCounts = await Promise.all(commitPromises);
+        totalCommits = commitCounts.reduce((sum, count) => sum + count, 0);
+        
         // Calculate metrics
         const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
         const totalForks = repos.reduce((sum, repo) => sum + repo.forks_count, 0);
@@ -58,10 +89,12 @@ export async function fetchGitHubProfile(username) {
             avatarUrl: userData.avatar_url,
             profileUrl: userData.html_url,
             publicRepos: userData.public_repos,
+            totalRepos: userData.public_repos, // Explicit total repos count
+            totalCommits, // Total commits across all repos
+            totalStars, // Total stars received
             followers: userData.followers,
             following: userData.following,
             createdAt: userData.created_at,
-            totalStars,
             totalForks,
             topLanguages,
             featuredRepos,

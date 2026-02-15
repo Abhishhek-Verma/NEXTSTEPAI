@@ -1,0 +1,16 @@
+{
+  "name": "NextStep AI - Career Guidance Platform",
+  "short_name": "NextStep AI",
+  "description": "AI-powered personalized career recommendations and roadmaps",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

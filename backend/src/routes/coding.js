@@ -1,7 +1,7 @@
 import express from 'express';
 import db from '../db/index.js';
 import { codingProfiles } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { requireAuth } from '../middleware/auth.js';
 import { validate, codingProfileSchema } from '../middleware/validation.js';
 import { fetchGitHubProfile, fetchGitHubContributions } from '../services/platforms/github.js';
@@ -14,55 +14,33 @@ const router = express.Router();
 // Get coding profile for the authenticated user
 router.get('/profile', requireAuth, async (req, res) => {
     try {
-        let [profile] = await db
+        // Fetch all platform profiles for this user
+        const profiles = await db
             .select()
             .from(codingProfiles)
             .where(eq(codingProfiles.userId, req.user.id));
 
-        // If no profile exists, return empty structure
-        if (!profile) {
-            profile = {
-                userId: req.user.id,
-                githubUsername: '',
-                githubProfileUrl: '',
-                githubMetrics: {},
-                leetcodeUsername: '',
-                leetcodeProfileUrl: '',
-                leetcodeMetrics: {},
-                codeforcesHandle: '',
-                codeforcesProfileUrl: '',
-                codeforcesMetrics: {},
-                codechefHandle: '',
-                codechefProfileUrl: '',
-                codechefMetrics: {},
-            };
-        }
+        // Transform to frontend format grouped by platform
+        const platformsData = {
+            github: null,
+            leetcode: null,
+            codeforces: null,
+            codechef: null,
+        };
 
-        // Transform to frontend format
+        profiles.forEach(profile => {
+            if (profile.platform && platformsData.hasOwnProperty(profile.platform)) {
+                platformsData[profile.platform] = {
+                    username: profile.metrics?.username || '',
+                    profileUrl: profile.profileUrl || '',
+                    metrics: profile.metrics || {},
+                };
+            }
+        });
+
         const response = {
             profile: {
-                platforms: {
-                    github: {
-                        username: profile.githubUsername || '',
-                        profileUrl: profile.githubProfileUrl || '',
-                        metrics: profile.githubMetrics || {},
-                    },
-                    leetcode: {
-                        username: profile.leetcodeUsername || '',
-                        profileUrl: profile.leetcodeProfileUrl || '',
-                        metrics: profile.leetcodeMetrics || {},
-                    },
-                    codeforces: {
-                        handle: profile.codeforcesHandle || '',
-                        profileUrl: profile.codeforcesProfileUrl || '',
-                        metrics: profile.codeforcesMetrics || {},
-                    },
-                    codechef: {
-                        handle: profile.codechefHandle || '',
-                        profileUrl: profile.codechefProfileUrl || '',
-                        metrics: profile.codechefMetrics || {},
-                    },
-                },
+                platforms: platformsData,
             },
         };
 
@@ -78,46 +56,53 @@ router.post('/profile', requireAuth, validate(codingProfileSchema), async (req, 
     try {
         const { platforms } = req.body;
 
-        const profileData = {
-            userId: req.user.id,
-            githubUsername: platforms.github?.username || null,
-            githubProfileUrl: platforms.github?.profileUrl || null,
-            githubMetrics: platforms.github?.metrics || {},
-            leetcodeUsername: platforms.leetcode?.username || null,
-            leetcodeProfileUrl: platforms.leetcode?.profileUrl || null,
-            leetcodeMetrics: platforms.leetcode?.metrics || {},
-            codeforcesHandle: platforms.codeforces?.handle || null,
-            codeforcesProfileUrl: platforms.codeforces?.profileUrl || null,
-            codeforcesMetrics: platforms.codeforces?.metrics || {},
-            codechefHandle: platforms.codechef?.handle || null,
-            codechefProfileUrl: platforms.codechef?.profileUrl || null,
-            codechefMetrics: platforms.codechef?.metrics || {},
-            updatedAt: new Date(),
-        };
+        // Process each platform
+        for (const [platformName, platformData] of Object.entries(platforms)) {
+            if (!platformData || !platformData.profileUrl) continue;
 
-        // Check if profile exists
-        const [existing] = await db
+            // Check if profile exists for this platform
+            const [existing] = await db
+                .select()
+                .from(codingProfiles)
+                .where(
+                    and(
+                        eq(codingProfiles.userId, req.user.id),
+                        eq(codingProfiles.platform, platformName)
+                    )
+                );
+
+            const profileData = {
+                userId: req.user.id,
+                platform: platformName,
+                profileUrl: platformData.profileUrl || null,
+                metrics: platformData.metrics || {},
+                updatedAt: new Date(),
+            };
+
+            if (existing) {
+                // Update existing profile
+                await db
+                    .update(codingProfiles)
+                    .set(profileData)
+                    .where(
+                        and(
+                            eq(codingProfiles.userId, req.user.id),
+                            eq(codingProfiles.platform, platformName)
+                        )
+                    );
+            } else {
+                // Insert new profile
+                await db.insert(codingProfiles).values(profileData);
+            }
+        }
+
+        // Fetch updated profiles
+        const updatedProfiles = await db
             .select()
             .from(codingProfiles)
             .where(eq(codingProfiles.userId, req.user.id));
 
-        let profile;
-        if (existing) {
-            // Update existing profile
-            [profile] = await db
-                .update(codingProfiles)
-                .set(profileData)
-                .where(eq(codingProfiles.userId, req.user.id))
-                .returning();
-        } else {
-            // Insert new profile
-            [profile] = await db
-                .insert(codingProfiles)
-                .values(profileData)
-                .returning();
-        }
-
-        res.json({ message: 'Coding profile saved successfully', profile });
+        res.json({ message: 'Coding profile saved successfully', profiles: updatedProfiles });
     } catch (error) {
         console.error('Error saving coding profile:', error);
         res.status(500).json({ error: 'Failed to save coding profile' });
@@ -142,30 +127,39 @@ router.post('/fetch/github', requireAuth, async (req, res) => {
             contributions: contributionsData
         };
 
-        // Update database
+        // Update database - normalized structure
         const [existing] = await db
             .select()
             .from(codingProfiles)
-            .where(eq(codingProfiles.userId, req.user.id));
+            .where(
+                and(
+                    eq(codingProfiles.userId, req.user.id),
+                    eq(codingProfiles.platform, 'github')
+                )
+            );
 
         if (existing) {
             await db
                 .update(codingProfiles)
                 .set({
-                    githubUsername: username,
-                    githubProfileUrl: profileData.profileUrl,
-                    githubMetrics: metrics,
+                    profileUrl: profileData.profileUrl,
+                    metrics: metrics,
                     updatedAt: new Date()
                 })
-                .where(eq(codingProfiles.userId, req.user.id));
+                .where(
+                    and(
+                        eq(codingProfiles.userId, req.user.id),
+                        eq(codingProfiles.platform, 'github')
+                    )
+                );
         } else {
             await db
                 .insert(codingProfiles)
                 .values({
                     userId: req.user.id,
-                    githubUsername: username,
-                    githubProfileUrl: profileData.profileUrl,
-                    githubMetrics: metrics
+                    platform: 'github',
+                    profileUrl: profileData.profileUrl,
+                    metrics: metrics
                 });
         }
 
@@ -192,30 +186,39 @@ router.post('/fetch/leetcode', requireAuth, async (req, res) => {
         // Fetch data from LeetCode
         const metrics = await fetchLeetCodeProfile(username);
 
-        // Update database
+        // Update database - normalized structure
         const [existing] = await db
             .select()
             .from(codingProfiles)
-            .where(eq(codingProfiles.userId, req.user.id));
+            .where(
+                and(
+                    eq(codingProfiles.userId, req.user.id),
+                    eq(codingProfiles.platform, 'leetcode')
+                )
+            );
 
         if (existing) {
             await db
                 .update(codingProfiles)
                 .set({
-                    leetcodeUsername: username,
-                    leetcodeProfileUrl: metrics.profileUrl,
-                    leetcodeMetrics: metrics,
+                    profileUrl: metrics.profileUrl,
+                    metrics: metrics,
                     updatedAt: new Date()
                 })
-                .where(eq(codingProfiles.userId, req.user.id));
+                .where(
+                    and(
+                        eq(codingProfiles.userId, req.user.id),
+                        eq(codingProfiles.platform, 'leetcode')
+                    )
+                );
         } else {
             await db
                 .insert(codingProfiles)
                 .values({
                     userId: req.user.id,
-                    leetcodeUsername: username,
-                    leetcodeProfileUrl: metrics.profileUrl,
-                    leetcodeMetrics: metrics
+                    platform: 'leetcode',
+                    profileUrl: metrics.profileUrl,
+                    metrics: metrics
                 });
         }
 
@@ -242,30 +245,39 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
         // Fetch data from Codeforces
         const metrics = await fetchCodeforcesProfile(handle);
 
-        // Update database
+        // Update database - normalized structure
         const [existing] = await db
             .select()
             .from(codingProfiles)
-            .where(eq(codingProfiles.userId, req.user.id));
+            .where(
+                and(
+                    eq(codingProfiles.userId, req.user.id),
+                    eq(codingProfiles.platform, 'codeforces')
+                )
+            );
 
         if (existing) {
             await db
                 .update(codingProfiles)
                 .set({
-                    codeforcesHandle: handle,
-                    codeforcesProfileUrl: metrics.profileUrl,
-                    codeforcesMetrics: metrics,
+                    profileUrl: metrics.profileUrl,
+                    metrics: metrics,
                     updatedAt: new Date()
                 })
-                .where(eq(codingProfiles.userId, req.user.id));
+                .where(
+                    and(
+                        eq(codingProfiles.userId, req.user.id),
+                        eq(codingProfiles.platform, 'codeforces')
+                    )
+                );
         } else {
             await db
                 .insert(codingProfiles)
                 .values({
                     userId: req.user.id,
-                    codeforcesHandle: handle,
-                    codeforcesProfileUrl: metrics.profileUrl,
-                    codeforcesMetrics: metrics
+                    platform: 'codeforces',
+                    profileUrl: metrics.profileUrl,
+                    metrics: metrics
                 });
         }
 
@@ -292,30 +304,39 @@ router.post('/fetch/codechef', requireAuth, async (req, res) => {
         // Fetch data from CodeChef
         const metrics = await fetchCodeChefProfile(handle);
 
-        // Update database
+        // Update database - normalized structure
         const [existing] = await db
             .select()
             .from(codingProfiles)
-            .where(eq(codingProfiles.userId, req.user.id));
+            .where(
+                and(
+                    eq(codingProfiles.userId, req.user.id),
+                    eq(codingProfiles.platform, 'codechef')
+                )
+            );
 
         if (existing) {
             await db
                 .update(codingProfiles)
                 .set({
-                    codechefHandle: handle,
-                    codechefProfileUrl: metrics.profileUrl,
-                    codechefMetrics: metrics,
+                    profileUrl: metrics.profileUrl,
+                    metrics: metrics,
                     updatedAt: new Date()
                 })
-                .where(eq(codingProfiles.userId, req.user.id));
+                .where(
+                    and(
+                        eq(codingProfiles.userId, req.user.id),
+                        eq(codingProfiles.platform, 'codechef')
+                    )
+                );
         } else {
             await db
                 .insert(codingProfiles)
                 .values({
                     userId: req.user.id,
-                    codechefHandle: handle,
-                    codechefProfileUrl: metrics.profileUrl,
-                    codechefMetrics: metrics
+                    platform: 'codechef',
+                    profileUrl: metrics.profileUrl,
+                    metrics: metrics
                 });
         }
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import db from '../db/index.js';
-import { roadmaps, users, onboardingData, academicRecords } from '../db/schema.js';
+import { roadmaps, roadmapItems, users, onboardingData, academicRecords } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '../middleware/auth.js';
 import { validate, roadmapSchema } from '../middleware/validation.js';
@@ -26,7 +26,18 @@ router.get('/', requireAuth, async (req, res) => {
                 items: [],
                 generatedAt: null,
             };
+            return res.json({ roadmap });
         }
+
+        // Fetch roadmap items from roadmapItems table
+        const items = await db
+            .select()
+            .from(roadmapItems)
+            .where(eq(roadmapItems.roadmapId, roadmap.id))
+            .orderBy(roadmapItems.sequenceNo);
+
+        // Add items to roadmap response
+        roadmap.items = items;
 
         res.json({ roadmap });
     } catch (error) {
@@ -77,9 +88,7 @@ router.post('/generate', requireAuth, async (req, res) => {
             title: aiRoadmap.title,
             description: aiRoadmap.description || '',
             targetRole: aiRoadmap.targetRole || targetRole,
-            items: aiRoadmap.items || [],
             generatedAt: new Date(),
-            updatedAt: new Date(),
         };
 
         // Check if roadmap exists
@@ -90,6 +99,11 @@ router.post('/generate', requireAuth, async (req, res) => {
 
         let roadmap;
         if (existing) {
+            // Delete old items
+            await db
+                .delete(roadmapItems)
+                .where(eq(roadmapItems.roadmapId, existing.id));
+            
             // Update existing roadmap
             [roadmap] = await db
                 .update(roadmaps)
@@ -104,6 +118,26 @@ router.post('/generate', requireAuth, async (req, res) => {
                 .returning();
         }
 
+        // Insert roadmap items as separate rows
+        const items = aiRoadmap.items || [];
+        const itemsToInsert = items.map((item, index) => ({
+            roadmapId: roadmap.id,
+            sequenceNo: index + 1,
+            taskType: item.type || item.taskType || 'task',
+            description: item.description || item.title || '',
+            completed: false,
+            dueDate: item.dueDate || null,
+        }));
+
+        if (itemsToInsert.length > 0) {
+            roadmap.items = await db
+                .insert(roadmapItems)
+                .values(itemsToInsert)
+                .returning();
+        } else {
+            roadmap.items = [];
+        }
+
         res.json({ message: 'Roadmap generated successfully', roadmap });
     } catch (error) {
         console.error('Error generating roadmap:', error);
@@ -111,37 +145,53 @@ router.post('/generate', requireAuth, async (req, res) => {
     }
 });
 
-// Update roadmap items
-router.put('/items', requireAuth, async (req, res) => {
+// Update a specific roadmap item
+router.put('/items/:itemId', requireAuth, async (req, res) => {
     try {
-        const { items } = req.body;
+        const { itemId } = req.params;
+        const { completed, description, dueDate } = req.body;
 
-        const [roadmap] = await db
-            .update(roadmaps)
-            .set({ 
-                items,
-                updatedAt: new Date(),
-            })
-            .where(eq(roadmaps.userId, req.user.id))
+        const updateData = {};
+        if (completed !== undefined) updateData.completed = completed;
+        if (description !== undefined) updateData.description = description;
+        if (dueDate !== undefined) updateData.dueDate = dueDate;
+
+        const [item] = await db
+            .update(roadmapItems)
+            .set(updateData)
+            .where(eq(roadmapItems.id, itemId))
             .returning();
 
-        if (!roadmap) {
-            return res.status(404).json({ error: 'Roadmap not found' });
+        if (!item) {
+            return res.status(404).json({ error: 'Roadmap item not found' });
         }
 
-        res.json({ message: 'Roadmap items updated successfully', roadmap });
+        res.json({ message: 'Roadmap item updated successfully', item });
     } catch (error) {
-        console.error('Error updating roadmap items:', error);
-        res.status(500).json({ error: 'Failed to update roadmap items' });
+        console.error('Error updating roadmap item:', error);
+        res.status(500).json({ error: 'Failed to update roadmap item' });
     }
 });
 
-// Delete roadmap
+// Delete roadmap (cascade deletes items due to foreign key)
 router.delete('/', requireAuth, async (req, res) => {
     try {
-        await db
-            .delete(roadmaps)
+        const [roadmap] = await db
+            .select()
+            .from(roadmaps)
             .where(eq(roadmaps.userId, req.user.id));
+
+        if (roadmap) {
+            // Delete items first
+            await db
+                .delete(roadmapItems)
+                .where(eq(roadmapItems.roadmapId, roadmap.id));
+            
+            // Delete roadmap
+            await db
+                .delete(roadmaps)
+                .where(eq(roadmaps.userId, req.user.id));
+        }
 
         res.json({ message: 'Roadmap deleted successfully' });
     } catch (error) {

@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../../store';
 import Button from '../../components/ui/Button';
 
 const RecommendationsPage = () => {
     const navigate = useNavigate();
-    const { recommendations, saveRole, unsaveRole } = useStore();
+    const { recommendations, fetchRecommendations, generateRecommendations, saveRole, unsaveRole } = useStore();
     const [activeTab, setActiveTab] = useState('roles');
+
+    // Fetch recommendations on mount
+    useEffect(() => {
+        fetchRecommendations();
+    }, []);
 
     const tabs = [
         { id: 'roles', label: 'Career Roles', icon: '💼' },
@@ -14,7 +19,16 @@ const RecommendationsPage = () => {
         { id: 'companies', label: 'Target Companies', icon: '🏢' },
     ];
 
-    const isRoleSaved = (roleId) => recommendations.savedRoles.includes(roleId);
+    const handleGenerateRecommendations = async () => {
+        try {
+            await generateRecommendations();
+            alert('Recommendations generated successfully!');
+        } catch (error) {
+            alert('Failed to generate recommendations. Please try again.');
+        }
+    };
+
+    const isRoleSaved = (roleId) => recommendations.savedRoles?.includes(roleId);
 
     const toggleSaveRole = (roleId) => {
         if (isRoleSaved(roleId)) {
@@ -24,7 +38,12 @@ const RecommendationsPage = () => {
         }
     };
 
-    // Mock data (will be replaced with API data)
+    // Use actual data from store or fallback to empty arrays
+    const roles = recommendations.roles || [];
+    const skills = recommendations.skills || [];
+    const companies = recommendations.companies || [];
+
+    // Mock data (fallback for demo purposes)
     const mockRoles = [
         {
             id: 1,
@@ -149,12 +168,40 @@ const RecommendationsPage = () => {
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">
                             Personalized suggestions based on your profile
+                            {recommendations.generatedAt && (
+                                <span className="ml-2 text-sm">
+                                    • Generated {new Date(recommendations.generatedAt).toLocaleDateString()}
+                                </span>
+                            )}
                         </p>
                     </div>
-                    <Button onClick={() => navigate('/roadmap')}>
-                        Generate Roadmap →
-                    </Button>
+                    <div className="flex gap-3">
+                        <Button 
+                            onClick={handleGenerateRecommendations} 
+                            variant="outline"
+                            disabled={recommendations.loading}
+                        >
+                            {recommendations.loading ? 'Generating...' : '🤖 Generate AI Recommendations'}
+                        </Button>
+                        <Button onClick={() => navigate('/roadmap')}>
+                            Generate Roadmap →
+                        </Button>
+                    </div>
                 </div>
+
+                {/* Error Display */}
+                {recommendations.error && (
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                        <p className="text-red-700 dark:text-red-400">{recommendations.error}</p>
+                    </div>
+                )}
+
+                {/* Loading State */}
+                {recommendations.loading && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6 text-center">
+                        <p className="text-blue-700 dark:text-blue-300">Loading recommendations...</p>
+                    </div>
+                )}
 
                 {/* Tabs */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6">
@@ -180,7 +227,7 @@ const RecommendationsPage = () => {
                 {/* Roles Tab */}
                 {activeTab === 'roles' && (
                     <div className="space-y-6">
-                        {mockRoles.map((role) => (
+                        {(roles.length > 0 ? roles : mockRoles).map((role) => (
                             <div
                                 key={role.id}
                                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
@@ -259,7 +306,7 @@ const RecommendationsPage = () => {
                 {/* Skills Tab */}
                 {activeTab === 'skills' && (
                     <div className="space-y-6">
-                        {mockSkills.map((skill) => (
+                        {(skills.length > 0 ? skills : mockSkills).map((skill) => (
                             <div
                                 key={skill.id}
                                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
@@ -335,7 +382,7 @@ const RecommendationsPage = () => {
                 {/* Companies Tab */}
                 {activeTab === 'companies' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {mockCompanies.map((company) => (
+                        {(companies.length > 0 ? companies : mockCompanies).map((company) => (
                             <div
                                 key={company.id}
                                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
