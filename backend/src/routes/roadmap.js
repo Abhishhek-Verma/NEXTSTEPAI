@@ -1,9 +1,10 @@
 import express from 'express';
 import db from '../db/index.js';
-import { roadmaps } from '../db/schema.js';
+import { roadmaps, users, onboardingData, academicRecords } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '../middleware/auth.js';
 import { validate, roadmapSchema } from '../middleware/validation.js';
+import { generateRoadmap } from '../services/ai.js';
 
 const router = express.Router();
 
@@ -35,17 +36,48 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 // Generate/create a new roadmap
-router.post('/generate', requireAuth, validate(roadmapSchema), async (req, res) => {
+router.post('/generate', requireAuth, async (req, res) => {
     try {
-        // TODO: Integrate with AI service to generate personalized roadmap
-        // For now, using provided data
+        const { targetRole } = req.body;
+        
+        if (!targetRole) {
+            return res.status(400).json({ error: 'Target role is required' });
+        }
+
+        // Gather user data from various sources
+        const [user] = await db
+            .select()
+            .from(users)
+            .where(eq(users.clerkId, req.user.id));
+
+        const [userOnboarding] = await db
+            .select()
+            .from(onboardingData)
+            .where(eq(onboardingData.userId, req.user.id));
+
+        const [academicData] = await db
+            .select()
+            .from(academicRecords)
+            .where(eq(academicRecords.userId, req.user.id));
+
+        // Prepare user data for AI
+        const userData = {
+            targetRole,
+            currentSkills: userOnboarding?.skills || [],
+            education: userOnboarding?.currentEducation || academicData?.degree || 'Not specified',
+            experience: userOnboarding?.experience || 'Beginner',
+            interests: userOnboarding?.interests || [],
+        };
+
+        // Generate AI-powered roadmap
+        const aiRoadmap = await generateRoadmap(userData);
         
         const roadmapData = {
             userId: req.user.id,
-            title: req.body.title,
-            description: req.body.description || '',
-            targetRole: req.body.targetRole || '',
-            items: req.body.items || [],
+            title: aiRoadmap.title,
+            description: aiRoadmap.description || '',
+            targetRole: aiRoadmap.targetRole || targetRole,
+            items: aiRoadmap.items || [],
             generatedAt: new Date(),
             updatedAt: new Date(),
         };

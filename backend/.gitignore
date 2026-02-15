@@ -49,3 +49,9 @@ test-*.js
 test-*.ps1
 setup-db.js
 TEST-RESULTS.md
+verify-api-key.js
+list-models.js
+
+# Documentation (keep only README.md)
+AI-SETUP.md
+ARCHITECTURE.md

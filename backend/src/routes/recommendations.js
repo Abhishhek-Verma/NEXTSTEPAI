@@ -1,8 +1,9 @@
 import express from 'express';
 import db from '../db/index.js';
-import { recommendations } from '../db/schema.js';
+import { recommendations, users, onboardingData, academicRecords, projects } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '../middleware/auth.js';
+import { generateRecommendations } from '../services/ai.js';
 
 const router = express.Router();
 
@@ -35,15 +36,46 @@ router.get('/', requireAuth, async (req, res) => {
 // Generate/update recommendations
 router.post('/generate', requireAuth, async (req, res) => {
     try {
-        // TODO: Integrate with AI service to generate personalized recommendations
-        // For now, using sample data structure
+        // Gather user data from various sources
+        const [user] = await db
+            .select()
+            .from(users)
+            .where(eq(users.clerkId, req.user.id));
+
+        const [userOnboarding] = await db
+            .select()
+            .from(onboardingData)
+            .where(eq(onboardingData.userId, req.user.id));
+
+        const [academicData] = await db
+            .select()
+            .from(academicRecords)
+            .where(eq(academicRecords.userId, req.user.id));
+
+        const userProjects = await db
+            .select()
+            .from(projects)
+            .where(eq(projects.userId, req.user.id));
+
+        // Prepare user data for AI
+        const userData = {
+            skills: userOnboarding?.skills || [],
+            education: userOnboarding?.currentEducation || academicData?.degree,
+            experience: userOnboarding?.experience || 'Entry level',
+            interests: userOnboarding?.interests || [],
+            projects: userProjects || [],
+            academicData: academicData || null,
+        };
+
+        // Generate AI-powered recommendations
+        const aiRecommendations = await generateRecommendations(userData);
         
         const recsData = {
             userId: req.user.id,
-            roles: req.body.roles || [],
-            skills: req.body.skills || [],
-            companies: req.body.companies || [],
-            savedRoles: req.body.savedRoles || [],
+            roles: aiRecommendations.roles || [],
+            skills: aiRecommendations.skills || [],
+            companies: aiRecommendations.companies || [],
+            savedRoles: [],
             generatedAt: new Date(),
             updatedAt: new Date(),
         };
@@ -56,7 +88,8 @@ router.post('/generate', requireAuth, async (req, res) => {
 
         let userRecs;
         if (existing) {
-            // Update existing recommendations
+            // Update existing recommendations (preserve savedRoles)
+            recsData.savedRoles = existing.savedRoles || [];
             [userRecs] = await db
                 .update(recommendations)
                 .set(recsData)
