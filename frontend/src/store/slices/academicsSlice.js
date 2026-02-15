@@ -49,15 +49,21 @@ export const academicsSlice = (set, get) => ({
     // Selectors
     getGPAAverage: () => {
         const records = get().academics.records;
-        if (records.length === 0) return 0;
-        const sum = records.reduce((acc, r) => acc + (r.gpa || 0), 0);
+        if (records.length === 0) return '0.00';
+        const sum = records.reduce((acc, r) => {
+            const gpaValue = parseFloat(r.gpa);
+            return acc + (isNaN(gpaValue) ? 0 : gpaValue);
+        }, 0);
         return (sum / records.length).toFixed(2);
     },
 
     getGPATrend: () => {
         const records = get().academics.records;
         return records
-            .sort((a, b) => a.semester - b.semester)
-            .map((r) => ({ semester: r.semester, gpa: r.gpa }));
+            .sort((a, b) => (a.semester || 0) - (b.semester || 0))
+            .map((r) => ({ 
+                semester: r.semester || 0, 
+                gpa: parseFloat(r.gpa) || 0 
+            }));
     },
 });
