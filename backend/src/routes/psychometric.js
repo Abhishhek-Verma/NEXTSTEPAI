@@ -41,8 +41,8 @@ router.post('/results', requireAuth, validate(psychometricSchema), async (req, r
             userId: req.user.id,
             testName: req.body.testName || 'Career Traits Assessment',
             traits: req.body.traits || {},
-            score: req.body.score || 0,
-            progress: req.body.progress || 0,
+            score: Math.round(req.body.score || 0), // Convert to integer
+            progress: Math.round(req.body.progress || 0), // Convert to integer
             responses: req.body.responses || {},
             takenAt: req.body.progress === 100 ? new Date() : null,
             updatedAt: new Date(),
