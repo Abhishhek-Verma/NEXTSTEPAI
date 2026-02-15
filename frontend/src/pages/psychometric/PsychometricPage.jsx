@@ -60,6 +60,126 @@ const PsychometricPage = () => {
             question: 'I enjoy diving deep into technical documentation and learning new tools',
             trait: 'technical'
         },
+        {
+            id: 9,
+            category: 'Problem Solving',
+            question: 'When faced with a complex issue, I break it down into smaller, manageable parts',
+            trait: 'problemSolving'
+        },
+        {
+            id: 10,
+            category: 'Adaptability',
+            question: 'I adjust quickly to changing priorities and new work environments',
+            trait: 'adaptability'
+        },
+        {
+            id: 11,
+            category: 'Attention to Detail',
+            question: 'I consistently catch errors and inconsistencies that others miss',
+            trait: 'detailOriented'
+        },
+        {
+            id: 12,
+            category: 'Time Management',
+            question: 'I effectively prioritize tasks to meet multiple deadlines simultaneously',
+            trait: 'timeManagement'
+        },
+        {
+            id: 13,
+            category: 'Resilience',
+            question: 'I remain productive and focused even under high-pressure situations',
+            trait: 'resilience'
+        },
+        {
+            id: 14,
+            category: 'Critical Thinking',
+            question: 'I evaluate information objectively before making decisions',
+            trait: 'criticalThinking'
+        },
+        {
+            id: 15,
+            category: 'Creativity',
+            question: 'I generate innovative solutions when conventional approaches fail',
+            trait: 'creativity'
+        },
+        {
+            id: 16,
+            category: 'Self-Motivation',
+            question: 'I take initiative on tasks without needing external supervision',
+            trait: 'selfMotivation'
+        },
+        {
+            id: 17,
+            category: 'Conflict Resolution',
+            question: 'I successfully mediate disagreements and find win-win solutions',
+            trait: 'conflictResolution'
+        },
+        {
+            id: 18,
+            category: 'Strategic Planning',
+            question: 'I develop long-term plans with clear milestones and contingencies',
+            trait: 'strategicPlanning'
+        },
+        {
+            id: 19,
+            category: 'Emotional Intelligence',
+            question: 'I recognize and respond appropriately to others emotional states',
+            trait: 'emotionalIntelligence'
+        },
+        {
+            id: 20,
+            category: 'Decision Making',
+            question: 'I make informed decisions quickly, even with incomplete information',
+            trait: 'decisionMaking'
+        },
+        {
+            id: 21,
+            category: 'Learning Agility',
+            question: 'I rapidly acquire new skills and apply them to unfamiliar situations',
+            trait: 'learningAgility'
+        },
+        {
+            id: 22,
+            category: 'Risk Management',
+            question: 'I assess potential risks and develop effective mitigation strategies',
+            trait: 'riskManagement'
+        },
+        {
+            id: 23,
+            category: 'Client Focus',
+            question: 'I prioritize customer needs and consistently exceed expectations',
+            trait: 'clientFocus'
+        },
+        {
+            id: 24,
+            category: 'Data-Driven Thinking',
+            question: 'I base my conclusions on quantitative evidence rather than intuition',
+            trait: 'dataDriven'
+        },
+        {
+            id: 25,
+            category: 'Accountability',
+            question: 'I take full responsibility for my work outcomes and mistakes',
+            trait: 'accountability'
+        },
+        {
+            id: 26,
+            category: 'Influence',
+            question: 'I persuade stakeholders to support my proposals and ideas',
+            trait: 'influence'
+        },
+        {
+            id: 27,
+            category: 'Quality Orientation',
+            question: 'I maintain high standards and refuse to compromise on deliverable quality',
+            trait: 'qualityOrientation'
+        },
+        {
+            id: 28,
+            category: 'Continuous Improvement',
+            question: 'I actively seek feedback and implement changes to enhance performance',
+            trait: 'continuousImprovement'
+        },
     ];
 
     const handleAnswer = (score) => {
