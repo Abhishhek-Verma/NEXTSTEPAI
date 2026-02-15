@@ -40,19 +40,24 @@ const AcademicPage = () => {
             
             // Map frontend format to backend format
             const recordsToSave = updatedRecordsList.map(record => ({
-                semester: record.semester,
-                gpa: record.gpa,
-                additionalInfo: record.additionalInfo || record.subjects ? { subjects: record.subjects || record.additionalInfo?.subjects } : null
+                semester: parseInt(record.semester) || null,
+                gpa: parseFloat(record.gpa) || null,
+                additionalInfo: record.additionalInfo || record.subjects ? { subjects: record.subjects || record.additionalInfo?.subjects || [] } : null
             }));
 
-            await apiClient.post('/academic/records', { records: recordsToSave });
+            console.log('Saving records:', recordsToSave);
+            const response = await apiClient.post('/academic/records', { records: recordsToSave });
+            console.log('Save response:', response.data);
             
             // Refresh records from server
-            const response = await apiClient.get('/academic/records');
-            setAcademicRecords(response.data.records || []);
+            const fetchResponse = await apiClient.get('/academic/records');
+            setAcademicRecords(fetchResponse.data.records || []);
+            setAcademicsLoading(false);
         } catch (error) {
             console.error('Failed to save academic records:', error);
-            setAcademicsError(error.message || 'Failed to save academic records');
+            console.error('Error response:', error.response?.data);
+            setAcademicsLoading(false);
+            setAcademicsError(error.response?.data?.error || error.message || 'Failed to save academic records');
             throw error;
         }
     };
@@ -121,9 +126,28 @@ const AcademicPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Validate inputs
+        if (!formData.semester || !formData.gpa) {
+            alert('Please fill in both Semester and GPA fields');
+            return;
+        }
+
+        const semesterNum = parseInt(formData.semester);
+        const gpaNum = parseFloat(formData.gpa);
+
+        if (isNaN(semesterNum) || semesterNum < 1) {
+            alert('Please enter a valid semester number (1 or greater)');
+            return;
+        }
+
+        if (isNaN(gpaNum) || gpaNum < 0 || gpaNum > 10) {
+            alert('Please enter a valid GPA between 0 and 10');
+            return;
+        }
+
         const record = {
-            semester: parseInt(formData.semester),
-            gpa: parseFloat(formData.gpa),
+            semester: semesterNum,
+            gpa: gpaNum,
             subjects: formData.subjects,
         };
 
@@ -146,6 +170,7 @@ const AcademicPage = () => {
             setShowAddForm(false);
             setEditingId(null);
         } catch (error) {
+            console.error('Save error:', error);
             alert('Failed to save record. Please try again.');
         }
     };
@@ -201,6 +226,32 @@ const AcademicPage = () => {
                         Next: Coding Profile →
                     </Button>
                 </div>
+
+                {/* Error Display */}
+                {academics.error && (
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                        <div className="flex items-start">
+                            <span className="text-red-600 dark:text-red-400 text-xl mr-3">⚠️</span>
+                            <div className="flex-1">
+                                <h3 className="text-red-800 dark:text-red-300 font-semibold">Error</h3>
+                                <p className="text-red-700 dark:text-red-400 text-sm mt-1">{academics.error}</p>
+                            </div>
+                            <button 
+                                onClick={() => setAcademicsError(null)}
+                                className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Loading Indicator */}
+                {academics.loading && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6 text-center">
+                        <p className="text-blue-700 dark:text-blue-300">Saving your data...</p>
+                    </div>
+                )}
 
                 {/* Stats Card */}
                 {academics.records.length > 0 && (
@@ -277,6 +328,8 @@ const AcademicPage = () => {
                                 <Input
                                     label="Semester"
                                     type="number"
+                                    min="1"
+                                    max="20"
                                     value={formData.semester}
                                     onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
                                     placeholder="e.g., 1"
@@ -286,6 +339,8 @@ const AcademicPage = () => {
                                     label="GPA"
                                     type="number"
                                     step="0.01"
+                                    min="0"
+                                    max="10"
                                     value={formData.gpa}
                                     onChange={(e) => setFormData({ ...formData, gpa: e.target.value })}
                                     placeholder="e.g., 8.5"
