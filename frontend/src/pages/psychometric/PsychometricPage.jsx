@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import Button from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import useStore from '../../store';
@@ -11,6 +12,8 @@ const PsychometricPage = () => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState({});
     const [showTest, setShowTest] = useState(false);
+    const [showResults, setShowResults] = useState(false);
+    const [showPreviousResults, setShowPreviousResults] = useState(false);
 
     // Fetch existing psychometric results on mount
     useEffect(() => {
@@ -202,12 +205,14 @@ const PsychometricPage = () => {
 
     const handleAnswer = (score) => {
         const question = questions[currentQuestion];
-        setAnswers({ ...answers, [question.trait]: score });
+        const newAnswers = { ...answers, [question.trait]: score };
+        setAnswers(newAnswers);
 
         if (currentQuestion < questions.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
         } else {
-            completeTest();
+            // All questions answered, show results
+            setShowResults(true);
         }
     };
 
@@ -247,6 +252,233 @@ const PsychometricPage = () => {
 
     const progress = ((currentQuestion + 1) / questions.length) * 100;
 
+    // Prepare traits data for radar chart
+    const getTraitsData = () => {
+        if (Object.keys(answers).length === 0) return [];
+        
+        return Object.entries(answers).map(([key, value]) => ({
+            trait: key.replace(/([A-Z])/g, ' $1').trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(''),
+            score: (value / 5) * 100, // Convert 1-5 scale to 0-100
+        }));
+    };
+
+    // Show results preview after all questions answered
+    if (showResults) {
+        const traitsData = getTraitsData();
+        const avgScore = Object.values(answers).reduce((a, b) => a + b, 0) / questions.length;
+
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-brand-blue/10 via-brand-purple/10 to-brand-accent/10 py-12 px-4">
+                <div className="max-w-5xl mx-auto">
+                    <Card className="mb-6" gradient>
+                        <CardContent className="p-8 text-center">
+                            <div className="text-6xl mb-4 animate-float">🎉</div>
+                            <CardTitle className="mb-2 text-3xl">Assessment Complete!</CardTitle>
+                            <p className="text-gray-600 dark:text-gray-400 text-lg">
+                                Review your personality profile below
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    {/* Large Radar Chart */}
+                    <Card gradient className="mb-6">
+                        <CardHeader>
+                            <CardTitle className="text-2xl text-center">Your Personality Traits</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4">
+                            <ResponsiveContainer width="100%" height={850}>
+                                <RadarChart data={traitsData}>
+                                    <PolarGrid stroke="#8b5cf6" strokeOpacity={0.3} />
+                                    <PolarAngleAxis 
+                                        dataKey="trait" 
+                                        tick={(props) => {
+                                            const { x, y, payload } = props;
+                                            return (
+                                                <text
+                                                    x={x}
+                                                    y={y}
+                                                    textAnchor="middle"
+                                                    fill="#374151"
+                                                    fontSize={14}
+                                                    fontWeight={600}
+                                                >
+                                                    {payload.value}
+                                                </text>
+                                            );
+                                        }}
+                                    />
+                                    <PolarRadiusAxis 
+                                        domain={[0, 100]} 
+                                        tick={{ fill: '#6b7280', fontSize: 13 }}
+                                        axisLine={false}
+                                    />
+                                    <Radar 
+                                        name="Score" 
+                                        dataKey="score" 
+                                        stroke="#8b5cf6" 
+                                        fill="#8b5cf6" 
+                                        fillOpacity={0.65}
+                                        strokeWidth={3}
+                                    />
+                                    <Tooltip 
+                                        contentStyle={{
+                                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                            border: '2px solid #8b5cf6',
+                                            borderRadius: '8px',
+                                            padding: '10px 14px'
+                                        }}
+                                        formatter={(value) => [`${Math.round(value)}%`, 'Score']}
+                                    />
+                                </RadarChart>
+                            </ResponsiveContainer>
+
+                            <div className="mt-6 text-center">
+                                <div className="inline-block bg-gradient-to-r from-brand-blue to-brand-purple rounded-lg px-6 py-3 text-white">
+                                    <span className="text-sm font-medium">Overall Score: </span>
+                                    <span className="text-2xl font-bold">{Math.round((avgScore / 5) * 100)}%</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Submit Button */}
+                    <div className="flex gap-4 justify-center">
+                        <Button 
+                            onClick={completeTest}
+                            size="lg" 
+                            className="px-12 py-6 text-lg"
+                        >
+                            🚀 Submit & View Profile
+                        </Button>
+                        <Button 
+                            onClick={() => {
+                                setShowResults(false);
+                                setCurrentQuestion(0);
+                                setAnswers({});
+                            }}
+                            variant="outline"
+                            size="lg"
+                            className="px-12 py-6 text-lg"
+                        >
+                            ← Retake Test
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Show previous results
+    if (showPreviousResults && psychometric.traits) {
+        const previousTraitsData = Object.entries(psychometric.traits).map(([key, value]) => ({
+            trait: key.replace(/([A-Z])/g, ' $1').trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(''),
+            score: value * 100,
+        }));
+        const avgScore = psychometric.score || 0;
+
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-brand-blue/10 via-brand-purple/10 to-brand-accent/10 py-12 px-4">
+                <div className="max-w-5xl mx-auto">
+                    <Card className="mb-6" gradient>
+                        <CardContent className="p-8 text-center">
+                            <div className="text-6xl mb-4 animate-float">📊</div>
+                            <CardTitle className="mb-2 text-3xl">Your Previous Results</CardTitle>
+                            <p className="text-gray-600 dark:text-gray-400 text-lg">
+                                Completed on {new Date(psychometric.takenAt).toLocaleDateString()}
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    {/* Large Radar Chart */}
+                    <Card gradient className="mb-6">
+                        <CardHeader>
+                            <CardTitle className="text-2xl text-center">Your Personality Traits</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4">
+                            <ResponsiveContainer width="100%" height={850}>
+                                <RadarChart data={previousTraitsData}>
+                                    <PolarGrid stroke="#8b5cf6" strokeOpacity={0.3} />
+                                    <PolarAngleAxis 
+                                        dataKey="trait" 
+                                        tick={(props) => {
+                                            const { x, y, payload } = props;
+                                            return (
+                                                <text
+                                                    x={x}
+                                                    y={y}
+                                                    textAnchor="middle"
+                                                    fill="#374151"
+                                                    fontSize={14}
+                                                    fontWeight={600}
+                                                >
+                                                    {payload.value}
+                                                </text>
+                                            );
+                                        }}
+                                    />
+                                    <PolarRadiusAxis 
+                                        domain={[0, 100]} 
+                                        tick={{ fill: '#6b7280', fontSize: 13 }}
+                                        axisLine={false}
+                                    />
+                                    <Radar 
+                                        name="Score" 
+                                        dataKey="score" 
+                                        stroke="#8b5cf6" 
+                                        fill="#8b5cf6" 
+                                        fillOpacity={0.65}
+                                        strokeWidth={3}
+                                    />
+                                    <Tooltip 
+                                        contentStyle={{
+                                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                            border: '2px solid #8b5cf6',
+                                            borderRadius: '8px',
+                                            padding: '10px 14px'
+                                        }}
+                                        formatter={(value) => [`${Math.round(value)}%`, 'Score']}
+                                    />
+                                </RadarChart>
+                            </ResponsiveContainer>
+
+                            <div className="mt-6 text-center">
+                                <div className="inline-block bg-gradient-to-r from-brand-blue to-brand-purple rounded-lg px-6 py-3 text-white">
+                                    <span className="text-sm font-medium">Overall Score: </span>
+                                    <span className="text-2xl font-bold">{Math.round((avgScore / 5) * 100)}%</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Back Button */}
+                    <div className="flex gap-4 justify-center">
+                        <Button 
+                            onClick={() => setShowPreviousResults(false)}
+                            variant="outline"
+                            size="lg"
+                            className="px-12 py-6 text-lg"
+                        >
+                            ← Back
+                        </Button>
+                        <Button 
+                            onClick={() => {
+                                setShowPreviousResults(false);
+                                setShowTest(true);
+                                setCurrentQuestion(0);
+                                setAnswers({});
+                                setShowResults(false);
+                            }}
+                            size="lg"
+                            className="px-12 py-6 text-lg"
+                        >
+                            Retake Assessment
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     if (psychometric.takenAt && !showTest) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-brand-blue/10 via-brand-purple/10 to-brand-accent/10 flex items-center justify-center px-4">
@@ -258,7 +490,14 @@ const PsychometricPage = () => {
                             You completed the assessment on {new Date(psychometric.takenAt).toLocaleDateString()}
                         </p>
                         <div className="space-y-4">
-                            <Button onClick={() => navigate('/profile')} size="lg" className="w-full">
+                            <Button 
+                                onClick={() => setShowPreviousResults(true)}
+                                size="lg" 
+                                className="w-full"
+                            >
+                                📊 View Previous Results
+                            </Button>
+                            <Button onClick={() => navigate('/profile')} size="lg" variant="outline" className="w-full">
                                 View Profile
                             </Button>
                             <Button 
@@ -266,6 +505,7 @@ const PsychometricPage = () => {
                                     setShowTest(true);
                                     setCurrentQuestion(0);
                                     setAnswers({});
+                                    setShowResults(false);
                                 }} 
                                 variant="outline" 
                                 className="w-full"

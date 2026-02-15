@@ -14,9 +14,9 @@ const ProfilePage = () => {
     const gpaAverage = getGPAAverage();
     const gpaTrend = getGPATrend();
 
-    // Transform psychometric traits for radar chart
+    // Transform psychometric traits for charts
     const psychTraits = Object.entries(psychometric.traits || {}).map(([key, value]) => ({
-        trait: key.charAt(0).toUpperCase() + key.slice(1),
+        trait: key.replace(/([A-Z])/g, ' $1').trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
         score: Math.round(value * 100),
     }));
 
@@ -161,19 +161,49 @@ const ProfilePage = () => {
                         </Card>
                     )}
 
-                    {/* Personality Traits Radar */}
+                    {/* Personality Traits - Full Radar Chart */}
                     {psychTraits.length > 0 && (
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                                 Personality Traits
                             </h3>
-                            <ResponsiveContainer width="100%" height={300}>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                Hover over the chart to see trait names and scores
+                            </p>
+                            <ResponsiveContainer width="100%" height={500}>
                                 <RadarChart data={psychTraits}>
-                                    <PolarGrid />
-                                    <PolarAngleAxis dataKey="trait" />
-                                    <PolarRadiusAxis domain={[0, 100]} />
-                                    <Radar name="Score" dataKey="score" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
-                                    <Tooltip />
+                                    <PolarGrid stroke="#8b5cf6" strokeOpacity={0.3} />
+                                    <PolarAngleAxis 
+                                        dataKey="trait"
+                                        tick={false}
+                                    />
+                                    <PolarRadiusAxis 
+                                        domain={[0, 100]} 
+                                        tick={{ fill: '#6b7280', fontSize: 12 }}
+                                        axisLine={false}
+                                    />
+                                    <Radar 
+                                        name="Score" 
+                                        dataKey="score" 
+                                        stroke="#8b5cf6" 
+                                        fill="#8b5cf6" 
+                                        fillOpacity={0.65}
+                                        strokeWidth={3}
+                                    />
+                                    <Tooltip 
+                                        contentStyle={{
+                                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                            border: '2px solid #8b5cf6',
+                                            borderRadius: '8px',
+                                            padding: '10px 14px',
+                                            fontSize: '14px',
+                                            fontWeight: 600
+                                        }}
+                                        formatter={(value, name, props) => [
+                                            `${Math.round(value)}%`,
+                                            props.payload.trait
+                                        ]}
+                                    />
                                 </RadarChart>
                             </ResponsiveContainer>
                         </div>
