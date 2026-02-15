@@ -36,7 +36,12 @@ out/
 test-*.js
 test-*.ps1
 setup-db.js
+verify-api-key.js
+list-models.js
 TEST-RESULTS.md
+AI-SETUP.md
+SECURITY-*.md
+GITHUB-CHECKLIST.md
 *.test.js
 *.spec.js
 coverage/

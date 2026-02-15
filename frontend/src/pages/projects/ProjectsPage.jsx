@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../../store';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import apiClient from '../../api/client';
 
 const ProjectsPage = () => {
     const navigate = useNavigate();
-    const { projects, addProject, updateProject, deleteProject } = useStore();
+    const { projects, setProjects, setProjectsLoading, setProjectsError } = useStore();
     const projectsList = projects.list || [];
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingProject, setEditingProject] = useState(null);
@@ -20,49 +21,96 @@ const ProjectsPage = () => {
         status: 'in-progress',
     });
 
-    const handleSubmit = (e) => {
+    // Fetch projects from database on mount
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                setProjectsLoading(true);
+                const response = await apiClient.get('/api/projects');
+                setProjects(response.data || []);
+            } catch (error) {
+                console.error('Failed to fetch projects:', error);
+                setProjectsError(error.message || 'Failed to load projects');
+            }
+        };
+
+        fetchProjects();
+    }, []);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const projectData = {
-            ...formData,
-            techStack: formData.techStack.split(',').map((tech) => tech.trim()).filter(Boolean),
-            completedAt: formData.status === 'completed' ? new Date().toISOString() : null,
+            title: formData.title,
+            description: formData.description,
+            githubUrl: formData.repoUrl || null,
+            liveUrl: formData.liveUrl || null,
+            technologies: formData.techStack.split(',').map((tech) => tech.trim()).filter(Boolean),
+            status: formData.status,
+            endDate: formData.status === 'completed' ? new Date().toISOString() : null,
         };
 
-        if (editingProject) {
-            updateProject(editingProject.id, projectData);
-        } else {
-            addProject(projectData);
-        }
+        try {
+            setProjectsLoading(true);
+            
+            if (editingProject) {
+                // Update existing project
+                await apiClient.put(`/api/projects/${editingProject.id}`, projectData);
+            } else {
+                // Create new project
+                await apiClient.post('/api/projects', projectData);
+            }
 
-        setFormData({
-            title: '',
-            description: '',
-            repoUrl: '',
-            liveUrl: '',
-            techStack: '',
-            status: 'in-progress',
-        });
-        setShowAddForm(false);
-        setEditingProject(null);
+            // Refresh projects list
+            const response = await apiClient.get('/api/projects');
+            setProjects(response.data || []);
+
+            setFormData({
+                title: '',
+                description: '',
+                repoUrl: '',
+                liveUrl: '',
+                techStack: '',
+                status: 'in-progress',
+            });
+            setShowAddForm(false);
+            setEditingProject(null);
+        } catch (error) {
+            console.error('Failed to save project:', error);
+            setProjectsError(error.message || 'Failed to save project');
+            alert('Failed to save project. Please try again.');
+        }
     };
 
     const handleEdit = (project) => {
         setFormData({
             title: project.title,
             description: project.description,
-            repoUrl: project.repoUrl || '',
+            repoUrl: project.githubUrl || '',
             liveUrl: project.liveUrl || '',
-            techStack: project.techStack ? project.techStack.join(', ') : '',
-            status: project.completedAt ? 'completed' : 'in-progress',
+            techStack: project.technologies ? project.technologies.join(', ') : '',
+            status: project.status || (project.endDate ? 'completed' : 'in-progress'),
         });
         setEditingProject(project);
         setShowAddForm(true);
     };
 
-    const handleDelete = (id) => {
-        if (window.confirm('Are you sure you want to delete this project?')) {
-            deleteProject(id);
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this project?')) {
+            return;
+        }
+
+        try {
+            setProjectsLoading(true);
+            await apiClient.delete(`/api/projects/${id}`);
+            
+            // Refresh projects list
+            const response = await apiClient.get('/api/projects');
+            setProjects(response.data || []);
+        } catch (error) {
+            console.error('Failed to delete project:', error);
+            setProjectsError(error.message || 'Failed to delete project');
+            alert('Failed to delete project. Please try again.');
         }
     };
 
@@ -71,7 +119,7 @@ const ProjectsPage = () => {
         completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
     };
 
-    const completedProjects = projectsList.filter((p) => p.completedAt).length;
+    const completedProjects = projectsList.filter((p) => p.status === 'completed' || p.endDate).length;
     const inProgressProjects = projectsList.length - completedProjects;
 
     return (
@@ -248,10 +296,10 @@ const ProjectsPage = () => {
                                         </h3>
                                         <span
                                             className={`px-2 py-1 text-xs font-medium rounded ${
-                                                statusColors[project.completedAt ? 'completed' : 'in-progress']
+                                                statusColors[project.status === 'completed' || project.endDate ? 'completed' : 'in-progress']
                                             }`}
                                         >
-                                            {project.completedAt ? '✅ Done' : '🔄 WIP'}
+                                            {project.status === 'completed' || project.endDate ? '✅ Done' : '🔄 WIP'}
                                         </span>
                                     </div>
 
@@ -259,10 +307,10 @@ const ProjectsPage = () => {
                                         {project.description}
                                     </p>
 
-                                    {project.techStack && project.techStack.length > 0 && (
+                                    {project.technologies && project.technologies.length > 0 && (
                                         <div className="mb-4">
                                             <div className="flex flex-wrap gap-2">
-                                                {project.techStack.map((tech, index) => (
+                                                {project.technologies.map((tech, index) => (
                                                     <span
                                                         key={index}
                                                         className="px-3 py-1 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 text-xs rounded-full font-medium"
@@ -275,9 +323,9 @@ const ProjectsPage = () => {
                                     )}
 
                                     <div className="flex gap-2 mb-4">
-                                        {project.repoUrl && (
+                                        {project.githubUrl && (
                                             <a
-                                                href={project.repoUrl}
+                                                href={project.githubUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 transition-colors"
@@ -297,9 +345,9 @@ const ProjectsPage = () => {
                                         )}
                                     </div>
 
-                                    {project.completedAt && (
+                                    {project.endDate && (
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                                            Completed: {new Date(project.completedAt).toLocaleDateString()}
+                                            Completed: {new Date(project.endDate).toLocaleDateString()}
                                         </p>
                                     )}
 

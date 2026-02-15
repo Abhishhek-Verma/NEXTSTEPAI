@@ -1,15 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import useStore from '../../store';
+import apiClient from '../../api/client';
 
 const PsychometricPage = () => {
     const navigate = useNavigate();
-    const { psychometric, setPsychometric } = useStore();
+    const { psychometric, setPsychometric, setPsychLoading } = useStore();
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState({});
     const [showTest, setShowTest] = useState(false);
+
+    // Fetch existing psychometric results on mount
+    useEffect(() => {
+        const fetchResults = async () => {
+            try {
+                const response = await apiClient.get('/api/psychometric/results');
+                if (response.data && response.data.takenAt) {
+                    setPsychometric(response.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch psychometric results:', error);
+                // User hasn't taken test yet - this is expected
+            }
+        };
+
+        fetchResults();
+    }, []);
 
     const questions = [
         {
@@ -193,19 +211,38 @@ const PsychometricPage = () => {
         }
     };
 
-    const completeTest = () => {
+    const completeTest = async () => {
         const traits = {};
         Object.keys(answers).forEach(key => {
             traits[key] = answers[key] / 5;
         });
 
-        setPsychometric({
-            traits,
-            takenAt: new Date().toISOString(),
-            score: Object.values(answers).reduce((a, b) => a + b, 0) / questions.length,
-        });
+        const totalScore = Object.values(answers).reduce((a, b) => a + b, 0) / questions.length;
+        const now = new Date().toISOString();
 
-        navigate('/profile');
+        const testResults = {
+            testName: 'Career Traits Assessment',
+            traits,
+            score: totalScore,
+            progress: 100,
+            responses: answers,
+            takenAt: now,
+        };
+
+        try {
+            setPsychLoading(true);
+            
+            // Save to database
+            await apiClient.post('/api/psychometric/results', testResults);
+            
+            // Update local store
+            setPsychometric(testResults);
+            
+            navigate('/profile');
+        } catch (error) {
+            console.error('Failed to save psychometric results:', error);
+            alert('Failed to save test results. Please try again.');
+        }
     };
 
     const progress = ((currentQuestion + 1) / questions.length) * 100;
@@ -224,7 +261,15 @@ const PsychometricPage = () => {
                             <Button onClick={() => navigate('/profile')} size="lg" className="w-full">
                                 View Profile
                             </Button>
-                            <Button onClick={() => setShowTest(true)} variant="outline" className="w-full">
+                            <Button 
+                                onClick={() => {
+                                    setShowTest(true);
+                                    setCurrentQuestion(0);
+                                    setAnswers({});
+                                }} 
+                                variant="outline" 
+                                className="w-full"
+                            >
                                 Retake Assessment
                             </Button>
                         </div>

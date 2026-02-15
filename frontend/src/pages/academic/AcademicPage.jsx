@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../../store';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import apiClient from '../../api/client';
 
 const AcademicPage = () => {
     const navigate = useNavigate();
-    const { academics, addAcademicRecord, updateAcademicRecord, deleteAcademicRecord, getGPAAverage } = useStore();
+    const { academics, setAcademicRecords, setAcademicsLoading, setAcademicsError } = useStore();
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
@@ -16,22 +17,67 @@ const AcademicPage = () => {
     });
     const [subjectInput, setSubjectInput] = useState({ name: '', score: '' });
 
+    // Fetch academic records from database on mount
+    useEffect(() => {
+        const fetchRecords = async () => {
+            try {
+                setAcademicsLoading(true);
+                const response = await apiClient.get('/api/academic/records');
+                setAcademicRecords(response.data.records || []);
+            } catch (error) {
+                console.error('Failed to fetch academic records:', error);
+                setAcademicsError(error.message || 'Failed to load academic records');
+            }
+        };
+
+        fetchRecords();
+    }, []);
+
+    // Save all records to database
+    const saveRecordsToDatabase = async (updatedRecordsList) => {
+        try {
+            setAcademicsLoading(true);
+            
+            // Map frontend format to backend format
+            const recordsToSave = updatedRecordsList.map(record => ({
+                semester: record.semester,
+                gpa: record.gpa,
+                additionalInfo: record.additionalInfo || record.subjects ? { subjects: record.subjects || record.additionalInfo?.subjects } : null
+            }));
+
+            await apiClient.post('/api/academic/records', { records: recordsToSave });
+            
+            // Refresh records from server
+            const response = await apiClient.get('/api/academic/records');
+            setAcademicRecords(response.data.records || []);
+        } catch (error) {
+            console.error('Failed to save academic records:', error);
+            setAcademicsError(error.message || 'Failed to save academic records');
+            throw error;
+        }
+    };
+
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             try {
+                let newRecords = [];
                 if (file.name.endsWith('.json')) {
                     const data = JSON.parse(event.target.result);
-                    data.forEach((record) => addAcademicRecord(record));
-                    alert('Academic records imported successfully!');
+                    newRecords = data;
                 } else if (file.name.endsWith('.csv')) {
-                    parseCSV(event.target.result);
+                    newRecords = parseCSV(event.target.result);
                 }
+
+                // Save to database
+                const updatedList = [...academics.records, ...newRecords];
+                await saveRecordsToDatabase(updatedList);
+                alert('Academic records imported successfully!');
             } catch (error) {
-                alert('Failed to parse file. Please check the format.');
+                alert('Failed to import records. Please check the format and try again.');
             }
         };
         reader.readAsText(file);
@@ -39,19 +85,20 @@ const AcademicPage = () => {
 
     const parseCSV = (csvText) => {
         const lines = csvText.split('\n');
-        const headers = lines[0].split(',');
+        const records = [];
 
         for (let i = 1; i < lines.length; i++) {
             const values = lines[i].split(',');
             if (values.length >= 2) {
-                addAcademicRecord({
+                records.push({
                     semester: parseInt(values[0]) || i,
                     gpa: parseFloat(values[1]) || 0,
                     subjects: [],
                 });
             }
         }
-        alert('CSV imported successfully!');
+        
+        return records;
     };
 
     const handleAddSubject = () => {
@@ -71,44 +118,71 @@ const AcademicPage = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const record = {
-            id: editingId || Date.now(),
             semester: parseInt(formData.semester),
             gpa: parseFloat(formData.gpa),
             subjects: formData.subjects,
         };
 
-        if (editingId) {
-            updateAcademicRecord(editingId, record);
-        } else {
-            addAcademicRecord(record);
-        }
+        try {
+            let updatedRecords;
+            if (editingId) {
+                // Update existing record
+                updatedRecords = academics.records.map((r) =>
+                    r.id === editingId ? { ...r, ...record } : r
+                );
+            } else {
+                // Add new record with temporary ID
+                updatedRecords = [...academics.records, { ...record, id: Date.now() }];
+            }
 
-        setFormData({ semester: '', gpa: '', subjects: [] });
-        setShowAddForm(false);
-        setEditingId(null);
+            // Save to database
+            await saveRecordsToDatabase(updatedRecords);
+
+            setFormData({ semester: '', gpa: '', subjects: [] });
+            setShowAddForm(false);
+            setEditingId(null);
+        } catch (error) {
+            alert('Failed to save record. Please try again.');
+        }
     };
 
     const handleEdit = (record) => {
         setFormData({
             semester: record.semester.toString(),
             gpa: record.gpa.toString(),
-            subjects: record.subjects || [],
+            subjects: record.additionalInfo?.subjects || record.subjects || [],
         });
         setEditingId(record.id);
         setShowAddForm(true);
     };
 
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this record?')) {
-            deleteAcademicRecord(id);
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this record?')) {
+            return;
+        }
+
+        try {
+            setAcademicsLoading(true);
+            await apiClient.delete(`/api/academic/records/${id}`);
+            
+            // Refresh records from server
+            const response = await apiClient.get('/api/academic/records');
+            setAcademicRecords(response.data.records || []);
+        } catch (error) {
+            console.error('Failed to delete record:', error);
+            setAcademicsError(error.message || 'Failed to delete record');
+            alert('Failed to delete record. Please try again.');
         }
     };
 
-    const averageGPA = getGPAAverage();
+    // Calculate average GPA from records
+    const averageGPA = academics.records.length > 0
+        ? (academics.records.reduce((acc, r) => acc + (parseFloat(r.gpa) || 0), 0) / academics.records.length).toFixed(2)
+        : '0.00';
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-brand-blue/10 via-brand-purple/10 to-brand-accent/10 dark:bg-gray-900">
@@ -311,7 +385,7 @@ const AcademicPage = () => {
                                                 {record.gpa}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                                {record.subjects?.length || 0} subjects
+                                                {record.additionalInfo?.subjects?.length || record.subjects?.length || 0} subjects
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <button
