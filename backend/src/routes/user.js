@@ -3,6 +3,7 @@ import db from '../db/index.js';
 import { users } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '../middleware/auth.js';
+import { fetchCompleteUserProfile, fetchBasicUserProfile } from '../services/userProfile.js';
 
 const router = express.Router();
 
@@ -68,6 +69,40 @@ router.get('/stats', requireAuth, async (req, res) => {
     } catch (error) {
         console.error('Error fetching user stats:', error);
         res.status(500).json({ error: 'Failed to fetch user stats' });
+    }
+});
+
+// Get complete user profile with all related data (OPTIMIZED)
+router.get('/complete-profile', requireAuth, async (req, res) => {
+    try {
+        const completeProfile = await fetchCompleteUserProfile(req.user.id);
+        res.json({ 
+            success: true, 
+            profile: completeProfile 
+        });
+    } catch (error) {
+        console.error('Error fetching complete user profile:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch complete user profile' 
+        });
+    }
+});
+
+// Get basic user profile (lightweight)
+router.get('/basic', requireAuth, async (req, res) => {
+    try {
+        const basicProfile = await fetchBasicUserProfile(req.user.id);
+        res.json({ 
+            success: true, 
+            profile: basicProfile 
+        });
+    } catch (error) {
+        console.error('Error fetching basic user profile:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch basic user profile' 
+        });
     }
 });
 

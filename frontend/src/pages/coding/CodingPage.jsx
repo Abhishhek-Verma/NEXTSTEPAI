@@ -27,7 +27,7 @@ const CodingPage = () => {
                 { key: 'profileUrl', label: 'Profile URL', placeholder: 'https://github.com/johndoe' },
             ],
             metrics: [
-                { key: 'commitsPerWeek', label: 'Commits/Week', icon: '📊' },
+                { key: 'commitsPerWeek', label: 'Commits', icon: '📊' },
                 { key: 'stars', label: 'Total Stars', icon: '⭐' },
                 { key: 'prs', label: 'Pull Requests', icon: '🔀' },
             ],
