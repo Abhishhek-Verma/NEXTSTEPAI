@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import useStore from '../../store';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import apiClient from '../../api/client';
 
 const CodingPage = () => {
     const navigate = useNavigate();
     const { coding, updatePlatform } = useStore();
     const [activeTab, setActiveTab] = useState('github');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const platforms = [
         {
@@ -100,8 +103,88 @@ const CodingPage = () => {
     };
 
     const handleFetchProfile = async () => {
-        // Placeholder for API call to fetch profile data
-        alert(`Fetching ${activePlatform.name} profile... (API integration pending)`);
+        setError(null);
+        setLoading(true);
+
+        try {
+            // Get the username/handle based on platform
+            const usernameKey = activeTab === 'github' || activeTab === 'leetcode' ? 'username' : 'handle';
+            const username = platformData[usernameKey];
+
+            if (!username) {
+                alert(`Please enter your ${activePlatform.name} ${usernameKey} first`);
+                setLoading(false);
+                return;
+            }
+
+            // Call the appropriate backend API endpoint
+            const endpoint = `/coding/fetch/${activeTab}`;
+            const payload = { [usernameKey]: username };
+
+            const response = await apiClient.post(endpoint, payload);
+
+            if (response.data && response.data.metrics) {
+                const metrics = response.data.metrics;
+                
+                // Update the platform data with fetched metrics
+                updatePlatform(activeTab, {
+                    [usernameKey]: username,
+                    profileUrl: metrics.profileUrl || platformData.profileUrl || '',
+                    metrics: formatPlatformMetrics(activeTab, metrics)
+                });
+
+                alert(`✅ ${activePlatform.name} profile fetched successfully!\n\nData has been saved to your profile.`);
+            }
+        } catch (err) {
+            console.error('Error fetching profile:', err);
+            const errorMessage = err.response?.data?.error || err.message || 'Failed to fetch profile';
+            setError(errorMessage);
+            alert(`❌ Error: ${errorMessage}\n\nPlease check your ${activeTab === 'github' || activeTab === 'leetcode' ? 'username' : 'handle'} and try again.`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Format metrics based on platform
+    const formatPlatformMetrics = (platform, data) => {
+        switch (platform) {
+            case 'github':
+                return {
+                    commitsPerWeek: data.contributions?.contributionScore || 0,
+                    stars: data.totalStars || 0,
+                    prs: data.contributions?.eventTypes?.PullRequestEvent || 0,
+                    repos: data.publicRepos || 0,
+                    followers: data.followers || 0,
+                    languages: data.topLanguages?.map(l => l.language).join(', ') || ''
+                };
+            case 'leetcode':
+                return {
+                    problemsSolved: data.problemsSolved?.total || 0,
+                    contestRating: data.contestStats?.rating || 0,
+                    easy: data.problemsSolved?.easy || 0,
+                    medium: data.problemsSolved?.medium || 0,
+                    hard: data.problemsSolved?.hard || 0,
+                    acceptanceRate: data.acceptanceRate || 0
+                };
+            case 'codeforces':
+                return {
+                    rating: data.rating || 0,
+                    contests: data.stats?.contestsParticipated || 0,
+                    maxRating: data.maxRating || 0,
+                    problemsSolved: data.stats?.problemsSolved || 0,
+                    rank: data.rank || 'Unrated'
+                };
+            case 'codechef':
+                return {
+                    rating: data.rating || 0,
+                    contests: data.contestsParticipated || 0,
+                    stars: data.stars || 0,
+                    problemsSolved: data.problemsSolved || 0,
+                    rank: data.rank || 'Unrated'
+                };
+            default:
+                return data;
+        }
     };
 
     const completedPlatforms = platforms.filter(
@@ -202,9 +285,19 @@ const CodingPage = () => {
                                     placeholder={field.placeholder}
                                 />
                             ))}
-                            <Button onClick={handleFetchProfile} variant="outline" className="w-full">
-                                🔄 Fetch Profile Data
+                            <Button 
+                                onClick={handleFetchProfile} 
+                                variant="outline" 
+                                className="w-full"
+                                disabled={loading}
+                            >
+                                {loading ? '⏳ Fetching data...' : '🔄 Fetch Profile Data'}
                             </Button>
+                            {error && (
+                                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-800 dark:text-red-200">
+                                    ❌ {error}
+                                </div>
+                            )}
                         </div>
 
                         {/* Metrics Section */}
