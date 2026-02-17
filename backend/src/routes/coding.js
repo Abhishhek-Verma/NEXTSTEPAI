@@ -242,10 +242,8 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
             return res.status(400).json({ error: 'Codeforces handle is required' });
         }
 
-        // Fetch data from Codeforces
-        const metrics = await fetchCodeforcesProfile(handle);
-
-        // Update database - normalized structure
+        // Database caching: Check for recent data (5 minutes TTL)
+        const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
         const [existing] = await db
             .select()
             .from(codingProfiles)
@@ -256,6 +254,26 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
                 )
             );
 
+        // If we have cached data that's fresh enough, return it
+        if (existing && existing.metrics) {
+            const cacheAge = Date.now() - new Date(existing.updatedAt).getTime();
+            if (cacheAge < CACHE_TTL) {
+                console.log(`Using cached Codeforces data for user ${req.user.id} (${Math.round(cacheAge/1000)}s old)`);
+                return res.json({ 
+                    message: 'Codeforces profile retrieved from cache', 
+                    platform: 'codeforces',
+                    metrics: existing.metrics,
+                    cached: true,
+                    cacheAge: Math.round(cacheAge / 1000) // seconds
+                });
+            }
+        }
+
+        // Fetch fresh data from Codeforces API
+        console.log(`Fetching fresh Codeforces data for handle: ${handle}`);
+        const metrics = await fetchCodeforcesProfile(handle);
+
+        // Update database with fresh data
         if (existing) {
             await db
                 .update(codingProfiles)
@@ -284,7 +302,8 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
         res.json({ 
             message: 'Codeforces profile fetched successfully', 
             platform: 'codeforces',
-            metrics 
+            metrics,
+            cached: false
         });
     } catch (error) {
         console.error('Error fetching Codeforces profile:', error);
@@ -301,10 +320,9 @@ router.post('/fetch/codechef', requireAuth, async (req, res) => {
             return res.status(400).json({ error: 'CodeChef handle is required' });
         }
 
-        // Fetch data from CodeChef
-        const metrics = await fetchCodeChefProfile(handle);
-
-        // Update database - normalized structure
+        // Database caching: Check for recent data (3 hours TTL for scraping)
+        // Longer cache than Codeforces to avoid IP blocking from frequent scraping
+        const CACHE_TTL = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
         const [existing] = await db
             .select()
             .from(codingProfiles)
@@ -315,6 +333,26 @@ router.post('/fetch/codechef', requireAuth, async (req, res) => {
                 )
             );
 
+        // If we have cached data that's fresh enough, return it
+        if (existing && existing.metrics && existing.metrics.rating !== undefined) {
+            const cacheAge = Date.now() - new Date(existing.updatedAt).getTime();
+            if (cacheAge < CACHE_TTL) {
+                console.log(`Using cached CodeChef data for user ${req.user.id} (${Math.round(cacheAge/1000/60)} minutes old)`);
+                return res.json({ 
+                    message: 'CodeChef profile retrieved from cache', 
+                    platform: 'codechef',
+                    metrics: existing.metrics,
+                    cached: true,
+                    cacheAge: Math.round(cacheAge / 60000) // minutes
+                });
+            }
+        }
+
+        // Fetch fresh data from CodeChef (scraping)
+        console.log(`Fetching fresh CodeChef data via scraping for handle: ${handle}`);
+        const metrics = await fetchCodeChefProfile(handle);
+
+        // Update database with fresh data
         if (existing) {
             await db
                 .update(codingProfiles)
@@ -343,7 +381,8 @@ router.post('/fetch/codechef', requireAuth, async (req, res) => {
         res.json({ 
             message: 'CodeChef profile fetched successfully', 
             platform: 'codechef',
-            metrics 
+            metrics,
+            cached: false
         });
     } catch (error) {
         console.error('Error fetching CodeChef profile:', error);

@@ -1,62 +1,132 @@
 /**
  * Codeforces API Integration
  * Fetches user profile, ratings, and contest history
+ * 
+ * Improvements:
+ * - Parallel API calls for better performance
+ * - Optimized submission fetch (2500) to balance accuracy vs performance
+ * - Request timeout protection (8 seconds)
+ * - Automatic retry on failure
+ * - User-Agent header to prevent blocking
+ * - Efficient single-pass statistics calculation
+ * - Database caching handled by calling route
  */
+
+// Request headers to mimic browser and prevent blocking
+const REQUEST_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+};
+
+// Request timeout (6 seconds)
+const REQUEST_TIMEOUT = 6000;
+
+/**
+ * Fetch with timeout protection
+ */
+async function fetchWithTimeout(url, options = {}, timeout = REQUEST_TIMEOUT) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        return response;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+            throw new Error('Request timeout - Codeforces API is too slow');
+        }
+        throw error;
+    }
+}
+
+/**
+ * Retry wrapper for API calls
+ */
+async function fetchWithRetry(url, options = {}, retries = 1) {
+    try {
+        return await fetchWithTimeout(url, options);
+    } catch (error) {
+        if (retries > 0 && !error.message.includes('timeout')) {
+            console.log(`Retrying Codeforces API call... (${retries} retries left)`);
+            // Wait 1 second before retry
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return fetchWithRetry(url, options, retries - 1);
+        }
+        throw error;
+    }
+}
 
 export async function fetchCodeforcesProfile(handle) {
     try {
         const baseUrl = 'https://codeforces.com/api';
         
-        // Fetch user info
-        const userResponse = await fetch(`${baseUrl}/user.info?handles=${handle}`);
+        // Fetch all data in parallel for better performance
+        // Reduced submission count to 2500 for better performance
+        const [userResponse, ratingResponse, submissionsResponse] = await Promise.all([
+            fetchWithRetry(`${baseUrl}/user.info?handles=${handle}`, { headers: REQUEST_HEADERS }),
+            fetchWithRetry(`${baseUrl}/user.rating?handle=${handle}`, { headers: REQUEST_HEADERS }),
+            // Optimized: Fetch 2500 submissions (good balance of accuracy vs performance)
+            // This covers most users while avoiding slow responses
+            fetchWithRetry(`${baseUrl}/user.status?handle=${handle}&from=1&count=2500`, { headers: REQUEST_HEADERS })
+        ]);
+
+        // Parse user info
         if (!userResponse.ok) {
             throw new Error(`Codeforces API request failed: ${userResponse.statusText}`);
         }
         
         const userData = await userResponse.json();
-        if (userData.status !== 'OK' || !userData.result || userData.result.length === 0) {
+        
+        // Handle rate limiting and API errors
+        if (userData.status === 'FAILED') {
+            if (userData.comment?.includes('limit')) {
+                throw new Error('Codeforces API rate limit exceeded. Please try again in a few seconds.');
+            }
+            throw new Error(userData.comment || 'Codeforces API request failed');
+        }
+        
+        if (!userData.result || userData.result.length === 0) {
             throw new Error(`Codeforces user not found: ${handle}`);
         }
         
         const user = userData.result[0];
         
-        // Fetch user rating history
+        // Parse rating history
         let ratingHistory = [];
-        try {
-            const ratingResponse = await fetch(`${baseUrl}/user.rating?handle=${handle}`);
-            if (ratingResponse.ok) {
-                const ratingData = await ratingResponse.json();
-                if (ratingData.status === 'OK') {
-                    ratingHistory = ratingData.result;
-                }
+        if (ratingResponse.ok) {
+            const ratingData = await ratingResponse.json();
+            if (ratingData.status === 'OK') {
+                ratingHistory = ratingData.result;
             }
-        } catch (error) {
-            console.warn('Failed to fetch rating history:', error.message);
         }
         
-        // Fetch user submissions (last 100)
+        // Parse submissions
         let submissions = [];
-        try {
-            const submissionsResponse = await fetch(`${baseUrl}/user.status?handle=${handle}&from=1&count=100`);
-            if (submissionsResponse.ok) {
-                const submissionsData = await submissionsResponse.json();
-                if (submissionsData.status === 'OK') {
-                    submissions = submissionsData.result;
-                }
+        if (submissionsResponse.ok) {
+            const submissionsData = await submissionsResponse.json();
+            if (submissionsData.status === 'OK') {
+                submissions = submissionsData.result;
             }
-        } catch (error) {
-            console.warn('Failed to fetch submissions:', error.message);
         }
         
-        // Calculate problem-solving stats
+        // Calculate problem-solving stats in a single pass (efficient)
         const solvedProblems = new Set();
         const problemRatings = [];
+        let acceptedSubmissions = 0;
+        
         submissions.forEach(sub => {
-            if (sub.verdict === 'OK' && sub.problem) {
-                const problemId = `${sub.problem.contestId}-${sub.problem.index}`;
-                solvedProblems.add(problemId);
-                if (sub.problem.rating) {
-                    problemRatings.push(sub.problem.rating);
+            if (sub.verdict === 'OK') {
+                acceptedSubmissions++;
+                if (sub.problem) {
+                    const problemId = `${sub.problem.contestId}-${sub.problem.index}`;
+                    solvedProblems.add(problemId);
+                    if (sub.problem.rating) {
+                        problemRatings.push(sub.problem.rating);
+                    }
                 }
             }
         });
@@ -73,7 +143,10 @@ export async function fetchCodeforcesProfile(handle) {
         // Count contests
         const contestsParticipated = ratingHistory.length;
         
-        return {
+        // Check if we hit the fetch limit (user likely has more submissions)
+        const likelyHasMoreSubmissions = submissions.length === 2500;
+        
+        const profileData = {
             handle: user.handle,
             firstName: user.firstName || null,
             lastName: user.lastName || null,
@@ -93,7 +166,11 @@ export async function fetchCodeforcesProfile(handle) {
                 contestsParticipated,
                 avgProblemRating,
                 totalSubmissions: submissions.length,
-                acceptedSubmissions: submissions.filter(s => s.verdict === 'OK').length
+                acceptedSubmissions,
+                // Note: problemsSolved is based on fetched submissions (up to 2500)
+                // For very active users (50k+ submissions), this is an approximation
+                submissionsFetched: submissions.length,
+                isApproximation: likelyHasMoreSubmissions
             },
             ratingHistory: ratingHistory.slice(-10).map(r => ({
                 contestName: r.contestName,
@@ -106,6 +183,8 @@ export async function fetchCodeforcesProfile(handle) {
             profileUrl: `https://codeforces.com/profile/${handle}`,
             lastFetched: new Date().toISOString()
         };
+        
+        return profileData;
     } catch (error) {
         console.error('Codeforces API Error:', error.message);
         throw new Error(`Failed to fetch Codeforces profile: ${error.message}`);
