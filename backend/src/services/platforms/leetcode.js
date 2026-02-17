@@ -59,7 +59,9 @@ export async function fetchLeetCodeProfile(username) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Referer': 'https://leetcode.com'
+                'Referer': 'https://leetcode.com',
+                'Origin': 'https://leetcode.com',
+                'User-Agent': 'Mozilla/5.0'
             },
             body: JSON.stringify({
                 query,
