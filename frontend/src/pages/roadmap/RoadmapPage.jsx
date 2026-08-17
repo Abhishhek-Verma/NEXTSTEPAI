@@ -38,9 +38,9 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
     };
 
     const taskTypeColors = {
-        learn: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-        build: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-        apply: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+        learn: 'badge-info',
+        build: 'badge-success',
+        apply: 'badge-ai',
     };
 
     const taskTypeIcons = {
@@ -55,20 +55,22 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
             style={style}
             {...attributes}
             {...listeners}
-            className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-3 cursor-move hover:shadow-lg transition-shadow ${task.completed ? 'opacity-60' : ''
-                }`}
+            className={`bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-2xl p-5 mb-3 cursor-move hover:shadow-soft transition-all duration-200 ${
+                task.completed ? 'opacity-60' : ''
+            }`}
         >
             <div className="flex items-start justify-between mb-2">
-                <span className={`px-2 py-1 text-xs font-medium rounded ${taskTypeColors[task.taskType]}`}>
+                <span className={`text-xs font-semibold ${taskTypeColors[task.taskType] || 'badge-pending'}`}>
                     {taskTypeIcons[task.taskType]} {task.taskType.toUpperCase()}
                 </span>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleComplete(task.id);
                         }}
-                        className={`text-xl ${task.completed ? 'text-green-500' : 'text-gray-300'}`}
+                        className={`text-lg transition-transform hover:scale-110 ${task.completed ? 'text-[#10B981]' : 'text-[#909090]'}`}
+                        title={task.completed ? 'Mark incomplete' : 'Mark complete'}
                     >
                         {task.completed ? '✅' : '⬜'}
                     </button>
@@ -77,7 +79,8 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
                             e.stopPropagation();
                             onEdit(task);
                         }}
-                        className="text-blue-500 hover:text-blue-700"
+                        className="text-[#6B6B6B] hover:text-[#111111] dark:hover:text-white transition-colors text-sm p-1"
+                        title="Edit task"
                     >
                         ✏️
                     </button>
@@ -86,17 +89,18 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
                             e.stopPropagation();
                             onDelete(task.id);
                         }}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-[#EF4444]/70 hover:text-[#EF4444] transition-colors text-sm p-1"
+                        title="Delete task"
                     >
                         🗑️
                     </button>
                 </div>
             </div>
-            <p className={`text-gray-900 dark:text-white mb-2 ${task.completed ? 'line-through' : ''}`}>
+            <p className={`text-[#111111] dark:text-white text-sm font-medium mb-2 leading-relaxed ${task.completed ? 'line-through text-[#909090] dark:text-[#666]' : ''}`}>
                 {task.description}
             </p>
             {task.dueDate && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-[#909090]">
                     📅 Due: {new Date(task.dueDate).toLocaleDateString()}
                 </p>
             )}
@@ -212,15 +216,15 @@ const RoadmapPage = () => {
         : 0;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-brand-blue/10 via-brand-purple/10 to-brand-accent/10 dark:bg-gray-900">
-            <div className="container mx-auto px-4 py-8">
+        <div className="min-h-screen">
+            <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
                     <div>
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-blue via-brand-purple to-brand-accent bg-clip-text text-transparent">
+                        <h1 className="heading-serif text-display text-[#111111] dark:text-white">
                             Career Roadmap
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-1">
+                        <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mt-1">
                             Your personalized learning and career path
                         </p>
                     </div>
@@ -236,19 +240,19 @@ const RoadmapPage = () => {
 
                 {/* Progress Card */}
                 {roadmap.items.length > 0 && (
-                    <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-xl p-6 mb-8 text-white">
+                    <div className="card-pastel-blue rounded-2xl p-6 lg:p-8 mb-8 border border-[rgba(216,232,252,0.6)] shadow-card">
                         <div className="flex justify-between items-center mb-4">
                             <div>
-                                <h2 className="text-2xl font-bold">Progress Tracker</h2>
-                                <p className="text-blue-100 mt-1">
+                                <h2 className="text-xl font-semibold text-[#1E40AF]">Progress Tracker</h2>
+                                <p className="text-xs text-[#1E40AF]/80 mt-1">
                                     {completedCount} of {roadmap.items.length} tasks completed
                                 </p>
                             </div>
-                            <div className="text-5xl font-bold">{progressPercentage}%</div>
+                            <div className="text-4xl font-bold text-[#1E40AF]">{progressPercentage}%</div>
                         </div>
-                        <div className="w-full bg-white/20 rounded-full h-4">
+                        <div className="w-full bg-white/60 dark:bg-white/10 rounded-full h-3">
                             <div
-                                className="bg-gradient-to-r from-brand-accent to-white h-4 rounded-full transition-all duration-500"
+                                className="bg-[#1E40AF] h-3 rounded-full transition-all duration-500"
                                 style={{ width: `${progressPercentage}%` }}
                             />
                         </div>
@@ -267,12 +271,12 @@ const RoadmapPage = () => {
 
                 {/* Generate Roadmap Modal */}
                 {showGenerateModal && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                    <div className="fixed inset-0 bg-[#111111]/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-[#1F2023] rounded-3xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-lift p-8 max-w-md w-full">
+                            <h2 className="heading-serif text-display text-[#111111] dark:text-white mb-2">
                                 Generate AI Roadmap
                             </h2>
-                            <p className="text-gray-600 dark:text-gray-400 mb-4">
+                            <p className="text-[#6B6B6B] dark:text-[#A1A1A1] text-sm mb-6">
                                 Enter your target role and we'll create a personalized learning roadmap for you.
                             </p>
                             <Input
@@ -280,7 +284,7 @@ const RoadmapPage = () => {
                                 placeholder="e.g., Full Stack Developer, Data Scientist"
                                 value={targetRole}
                                 onChange={(e) => setTargetRole(e.target.value)}
-                                className="mb-4"
+                                className="mb-6"
                             />
                             <div className="flex gap-3">
                                 <Button onClick={handleGenerateRoadmap} className="flex-1" disabled={roadmap.loading}>
@@ -303,18 +307,18 @@ const RoadmapPage = () => {
 
                 {/* Add/Edit Form */}
                 {showAddForm && (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 mb-6">
+                        <h2 className="text-xl font-semibold text-[#111111] dark:text-white mb-4">
                             {editingTask ? 'Edit Task' : 'Add New Task'}
                         </h2>
                         <form onSubmit={handleSubmit}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Task Type</label>
+                                    <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Task Type</label>
                                     <select
                                         value={formData.taskType}
                                         onChange={(e) => setFormData({ ...formData, taskType: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2.5 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 text-sm"
                                         required
                                     >
                                         <option value="learn">📚 Learn</option>
@@ -330,11 +334,11 @@ const RoadmapPage = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium mb-2">Description</label>
+                                <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Description</label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-3 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 text-sm"
                                     rows={3}
                                     placeholder="Describe the task..."
                                     required
@@ -358,10 +362,10 @@ const RoadmapPage = () => {
                     </div>
                 )}
 
-                {/* Kanban Board */}
+                {/* Task List */}
                 {roadmap.items.length > 0 ? (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8">
+                        <h2 className="text-xl font-semibold text-[#111111] dark:text-white mb-4">
                             Your Roadmap (Drag to Reorder)
                         </h2>
                         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -379,16 +383,16 @@ const RoadmapPage = () => {
                         </DndContext>
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 text-center">
-                        <div className="text-6xl mb-4">🗺️</div>
-                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-12 text-center">
+                        <div className="text-5xl mb-4">🗺️</div>
+                        <h3 className="heading-serif text-display text-[#111111] dark:text-white mb-2">
                             No Roadmap Yet
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                        <p className="text-[#6B6B6B] dark:text-[#A1A1A1] text-sm mb-6">
                             Generate an AI-powered roadmap or add tasks manually
                         </p>
                         <div className="flex gap-4 justify-center">
-                            <Button onClick={handleGenerateRoadmap}>🤖 Generate AI Roadmap</Button>
+                            <Button onClick={() => setShowGenerateModal(true)}>🤖 Generate AI Roadmap</Button>
                             <Button variant="outline" onClick={() => setShowAddForm(true)}>
                                 ➕ Add Task
                             </Button>

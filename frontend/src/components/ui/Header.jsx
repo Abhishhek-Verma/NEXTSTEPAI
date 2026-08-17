@@ -8,25 +8,17 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
-  const [scrollProgress, setScrollProgress] = useState(0);
 
   const navigationItems = [
     { label: 'How It Works', anchor: '#how-it-works', offset: 80 },
     { label: 'Features', anchor: '#features', offset: 80 },
     { label: 'Success Stories', anchor: '#success-stories', offset: 80 },
-    // { label: 'Get Started', anchor: '#get-started', offset: 80, isPrimary: true }
   ];
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement?.scrollHeight;
-
       setIsScrolled(scrollPosition > 20);
-
-      const progress = (scrollPosition / (documentHeight - windowHeight)) * 100;
-      setScrollProgress(Math.min(progress, 100));
 
       const sections = navigationItems?.filter(item => !item?.isPrimary)?.map(item => ({
         id: item?.anchor?.substring(1),
@@ -89,47 +81,33 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${isScrolled
-          ? 'bg-background/80 backdrop-blur-nav shadow-sm'
-          : 'bg-transparent'
-          }`}
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-32px)] max-w-5xl transition-all duration-500 ${
+          isScrolled
+            ? 'nav-floating'
+            : 'bg-white/70 backdrop-blur-md border border-[#E8E5DF]/50 rounded-full shadow-soft'
+        }`}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-18">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
             <div className="flex items-center">
               <a
                 href="/"
-                className="flex items-center gap-3 group"
-                aria-label="CareerCraft AI Home"
+                className="flex items-center gap-2.5 group"
+                aria-label="NextStepAI Home"
               >
-                {/* Logo placeholder - replace src with your logo image path */}
-                <img
-                  src="../../public/logo.png"
-                  alt="CareerCraft AI Logo"
-                  className="h-10 w-auto transition-transform duration-200 group-hover:scale-105"
-                />
-                <span className="text-2xl font-logo logo-road-rage text-foreground">
-                  NextStep AI
+                <div className="w-9 h-9 bg-[#111111] dark:bg-white rounded-xl flex items-center justify-center text-white dark:text-[#111111] font-bold text-xs transition-transform duration-200 group-hover:scale-105">
+                  NS
+                </div>
+                <span className="text-lg font-bold text-[#111111] dark:text-white tracking-tight">
+                  NextStep<span className="text-[#6B6B6B]">AI</span>
                 </span>
               </a>
             </div>
 
-            <nav className="hidden lg:flex items-center space-x-1">
+            {/* Desktop Nav */}
+            <nav className="hidden lg:flex items-center gap-1">
               {navigationItems?.map((item) => {
-                if (item?.isPrimary) {
-                  return (
-                    <Button
-                      key={item?.label}
-                      variant="default"
-                      size="default"
-                      onClick={(e) => handleNavClick(e, item?.anchor, item?.offset)}
-                      className="ml-4"
-                    >
-                      {item?.label}
-                    </Button>
-                  );
-                }
-
                 const isActive = activeSection === item?.anchor?.substring(1);
 
                 return (
@@ -137,72 +115,74 @@ const Header = () => {
                     key={item?.label}
                     href={item?.anchor}
                     onClick={(e) => handleNavClick(e, item?.anchor, item?.offset)}
-                    className={`relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-md ${isActive
-                      ? 'text-primary bg-primary/5'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    className={`px-4 py-2 text-sm font-medium transition-all duration-200 rounded-full ${isActive
+                      ? 'text-[#111111] bg-[#F8F7F3] dark:text-white dark:bg-[#2a2b2e]'
+                      : 'text-[#6B6B6B] hover:text-[#111111] hover:bg-[#F8F7F3]/50 dark:text-[#A1A1A1] dark:hover:text-white'
                       }`}
                   >
                     {item?.label}
-                    {isActive && (
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-primary rounded-full" />
-                    )}
                   </a>
                 );
               })}
             </nav>
 
+            {/* Right Actions */}
+            <div className="hidden lg:flex items-center gap-3">
+              <SignedOut>
+                <Link
+                  to="/auth/login"
+                  className="px-4 py-2 text-sm font-medium text-[#6B6B6B] hover:text-[#111111] transition-colors rounded-full"
+                >
+                  Log in
+                </Link>
+                <Link to="/auth/register">
+                  <Button size="sm">
+                    Get Started
+                  </Button>
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link to="/profile">
+                  <Button size="sm">
+                    Dashboard
+                  </Button>
+                </Link>
+              </SignedIn>
+            </div>
+
+            {/* Mobile Menu Button */}
             <button
               onClick={toggleMobileMenu}
-              className="lg:hidden p-2 rounded-md text-foreground hover:bg-muted/50 transition-colors duration-200"
+              className="lg:hidden p-2 rounded-xl text-[#111111] hover:bg-[#F8F7F3] transition-colors duration-200"
               aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMobileMenuOpen}
             >
               <Icon
                 name={isMobileMenuOpen ? 'X' : 'Menu'}
-                size={24}
+                size={22}
               />
             </button>
           </div>
         </div>
-
-        <div
-          className="absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-300"
-          style={{ width: `${scrollProgress}%` }}
-          aria-hidden="true"
-        />
       </header>
 
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <>
           <div
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[150] lg:hidden"
+            className="fixed inset-0 bg-[#111111]/30 backdrop-blur-sm z-[150] lg:hidden"
             onClick={toggleMobileMenu}
             aria-hidden="true"
           />
 
           <nav
-            className="fixed top-16 left-0 right-0 bottom-0 bg-background z-[200] lg:hidden overflow-y-auto"
+            className="fixed top-24 left-4 right-4 bg-white dark:bg-[#161719] z-[200] lg:hidden rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-lift overflow-hidden"
             role="navigation"
             aria-label="Mobile navigation"
           >
-            <div className="container mx-auto px-4 py-6">
-              <div className="flex flex-col space-y-2">
+            <div className="p-4">
+              <div className="flex flex-col space-y-1">
                 {navigationItems?.map((item) => {
-                  if (item?.isPrimary) {
-                    return (
-                      <Button
-                        key={item?.label}
-                        variant="default"
-                        size="lg"
-                        fullWidth
-                        onClick={(e) => handleNavClick(e, item?.anchor, item?.offset)}
-                        className="mt-4"
-                      >
-                        {item?.label}
-                      </Button>
-                    );
-                  }
-
                   const isActive = activeSection === item?.anchor?.substring(1);
 
                   return (
@@ -210,15 +190,39 @@ const Header = () => {
                       key={item?.label}
                       href={item?.anchor}
                       onClick={(e) => handleNavClick(e, item?.anchor, item?.offset)}
-                      className={`px-4 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${isActive
-                        ? 'text-primary bg-primary/10'
-                        : 'text-foreground hover:bg-muted/50'
+                      className={`px-4 py-3 text-base font-medium rounded-xl transition-colors duration-200 ${isActive
+                        ? 'text-[#111111] bg-[#F8F7F3] dark:text-white dark:bg-[#2a2b2e]'
+                        : 'text-[#6B6B6B] hover:bg-[#F8F7F3] dark:text-[#A1A1A1] dark:hover:bg-[#2a2b2e]'
                         }`}
                     >
                       {item?.label}
                     </a>
                   );
                 })}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] space-y-2">
+                <SignedOut>
+                  <Link
+                    to="/auth/login"
+                    onClick={toggleMobileMenu}
+                    className="block px-4 py-3 text-base font-medium text-[#6B6B6B] hover:text-[#111111] rounded-xl transition-colors"
+                  >
+                    Log in
+                  </Link>
+                  <Link to="/auth/register" onClick={toggleMobileMenu}>
+                    <Button fullWidth size="lg">
+                      Get Started
+                    </Button>
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <Link to="/profile" onClick={toggleMobileMenu}>
+                    <Button fullWidth size="lg">
+                      Dashboard
+                    </Button>
+                  </Link>
+                </SignedIn>
               </div>
             </div>
           </nav>

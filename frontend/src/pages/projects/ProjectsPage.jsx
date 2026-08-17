@@ -123,25 +123,20 @@ const ProjectsPage = () => {
         }
     };
 
-    const statusColors = {
-        'in-progress': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-        completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-    };
-
     const completedProjects = projectsList.filter((p) => p.status === 'completed' || p.completedAt).length;
     const inProgressProjects = projectsList.length - completedProjects;
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <div className="container mx-auto px-4 py-8">
+        <div className="min-h-screen">
+            <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <div className="flex justify-between items-start mb-4">
+                <div className="mb-10">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                         <div>
-                            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                            <h1 className="heading-serif text-display text-[#111111] dark:text-white">
                                 My Projects
                             </h1>
-                            <p className="text-gray-600 dark:text-gray-400">
+                            <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mt-1">
                                 Showcase your portfolio and track your builds
                             </p>
                         </div>
@@ -160,51 +155,45 @@ const ProjectsPage = () => {
                 {/* Stats */}
                 {projectsList.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <Card hover>
-                            <CardContent className="pt-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Projects</p>
-                                        <p className="text-4xl font-bold text-blue-600 mt-2">
-                                            {projectsList.length}
-                                        </p>
-                                    </div>
-                                    <div className="text-5xl">📁</div>
+                        <div className="card-pastel-blue rounded-2xl p-6 border border-[rgba(216,232,252,0.6)] shadow-card">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-semibold text-[#1E40AF]">Total Projects</p>
+                                    <p className="text-3xl font-bold text-[#1E40AF] mt-1">
+                                        {projectsList.length}
+                                    </p>
                                 </div>
-                            </CardContent>
-                        </Card>
-                        <Card hover>
-                            <CardContent className="pt-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Completed</p>
-                                        <p className="text-4xl font-bold text-green-600 mt-2">
-                                            {completedProjects}
-                                        </p>
-                                    </div>
-                                    <div className="text-5xl">✅</div>
+                                <div className="text-4xl">📁</div>
+                            </div>
+                        </div>
+                        <div className="card-pastel-mint rounded-2xl p-6 border border-[rgba(205,238,220,0.6)] shadow-card">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-semibold text-[#166534]">Completed</p>
+                                    <p className="text-3xl font-bold text-[#166534] mt-1">
+                                        {completedProjects}
+                                    </p>
                                 </div>
-                            </CardContent>
-                        </Card>
-                        <Card hover>
-                            <CardContent className="pt-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">In Progress</p>
-                                        <p className="text-4xl font-bold text-amber-600 mt-2">
-                                            {inProgressProjects}
-                                        </p>
-                                    </div>
-                                    <div className="text-5xl">🔄</div>
+                                <div className="text-4xl">✅</div>
+                            </div>
+                        </div>
+                        <div className="card-pastel-yellow rounded-2xl p-6 border border-[rgba(254,243,199,0.6)] shadow-card">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-semibold text-[#92400E]">In Progress</p>
+                                    <p className="text-3xl font-bold text-[#92400E] mt-1">
+                                        {inProgressProjects}
+                                    </p>
                                 </div>
-                            </CardContent>
-                        </Card>
+                                <div className="text-4xl">🔄</div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
                 {/* Add/Edit Project Form */}
                 {showAddForm && (
-                    <Card className="mb-8">
+                    <Card className="mb-8 rounded-2xl">
                         <CardHeader>
                             <CardTitle>{editingProject ? '✏️ Edit Project' : '➕ Add New Project'}</CardTitle>
                         </CardHeader>
@@ -219,11 +208,11 @@ const ProjectsPage = () => {
                                         required
                                     />
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                                        <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Status</label>
                                         <select
                                             value={formData.status}
                                             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-blue dark:bg-gray-700 dark:text-white"
+                                            className="w-full px-4 py-2.5 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 text-sm"
                                         >
                                             <option value="in-progress">🔄 In Progress</option>
                                             <option value="completed">✅ Completed</option>
@@ -232,11 +221,11 @@ const ProjectsPage = () => {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                                    <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Description</label>
                                     <textarea
                                         value={formData.description}
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-blue dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-3 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 text-sm"
                                         rows={3}
                                         placeholder="Brief description of the project..."
                                         required
@@ -258,7 +247,7 @@ const ProjectsPage = () => {
                                     />
                                 </div>
 
-                                <div className="mb-4">
+                                <div className="mb-6">
                                     <Input
                                         label="Tech Stack (comma separated)"
                                         value={formData.techStack}
@@ -297,32 +286,30 @@ const ProjectsPage = () => {
                 {projectsList.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {projectsList.map((project) => (
-                            <Card key={project.id} hover className="overflow-hidden">
+                            <Card key={project.id} hover className="overflow-hidden rounded-2xl flex flex-col justify-between">
                                 <CardContent className="p-6">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                    <div className="flex justify-between items-start mb-3 gap-2">
+                                        <h3 className="text-lg font-semibold text-[#111111] dark:text-white leading-snug">
                                             {project.title}
                                         </h3>
                                         <span
-                                            className={`px-2 py-1 text-xs font-medium rounded ${
-                                                statusColors[project.status === 'completed' || project.completedAt ? 'completed' : 'in-progress']
-                                            }`}
+                                            className={project.status === 'completed' || project.completedAt ? 'badge-success' : 'badge-warning'}
                                         >
                                             {project.status === 'completed' || project.completedAt ? '✅ Done' : '🔄 WIP'}
                                         </span>
                                     </div>
 
-                                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                                    <p className="text-[#6B6B6B] dark:text-[#A1A1A1] text-xs mb-4 leading-relaxed">
                                         {project.description}
                                     </p>
 
                                     {project.technologies && project.technologies.length > 0 && (
                                         <div className="mb-4">
-                                            <div className="flex flex-wrap gap-2">
+                                            <div className="flex flex-wrap gap-1.5">
                                                 {project.technologies.map((tech, index) => (
                                                     <span
                                                         key={index}
-                                                        className="px-3 py-1 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 text-xs rounded-full font-medium"
+                                                        className="badge-info"
                                                     >
                                                         {tech}
                                                     </span>
@@ -331,13 +318,13 @@ const ProjectsPage = () => {
                                         </div>
                                     )}
 
-                                    <div className="flex gap-2 mb-4">
+                                    <div className="flex gap-3 mb-4">
                                         {project.githubUrl && (
                                             <a
                                                 href={project.githubUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                                                className="flex items-center gap-1 text-xs text-[#111111] dark:text-white font-medium hover:underline"
                                             >
                                                 <span>🔗</span> GitHub
                                             </a>
@@ -347,7 +334,7 @@ const ProjectsPage = () => {
                                                 href={project.liveUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center gap-1 text-sm text-green-600 hover:text-green-700 transition-colors"
+                                                className="flex items-center gap-1 text-xs text-[#10B981] font-medium hover:underline"
                                             >
                                                 <span>🌐</span> Live Demo
                                             </a>
@@ -355,21 +342,21 @@ const ProjectsPage = () => {
                                     </div>
 
                                     {project.completedAt && (
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                        <p className="text-xs text-[#909090] mb-4">
                                             Completed: {new Date(project.completedAt).toLocaleDateString()}
                                         </p>
                                     )}
 
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 pt-2 border-t border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)]">
                                         <button
                                             onClick={() => handleEdit(project)}
-                                            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                            className="flex-1 py-2 bg-[#F8F7F3] dark:bg-[#2a2b2e] text-[#111111] dark:text-white border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] rounded-full hover:bg-white transition-colors text-xs font-semibold"
                                         >
                                             ✏️ Edit
                                         </button>
                                         <button
                                             onClick={() => handleDelete(project.id)}
-                                            className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                                            className="flex-1 py-2 bg-[#FCE5E6] dark:bg-[#991B1B]/20 text-[#991B1B] dark:text-[#FCA5A5] border border-[rgba(252,229,230,0.8)] rounded-full hover:bg-[#F8D7DA] transition-colors text-xs font-semibold"
                                         >
                                             🗑️ Delete
                                         </button>
@@ -379,13 +366,13 @@ const ProjectsPage = () => {
                         ))}
                     </div>
                 ) : (
-                    <Card className="text-center">
+                    <Card className="text-center rounded-2xl">
                         <CardContent className="py-12">
-                            <div className="text-6xl mb-4 animate-float">📂</div>
-                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                            <div className="text-5xl mb-4">📂</div>
+                            <h3 className="heading-serif text-display text-[#111111] dark:text-white mb-2">
                                 No Projects Yet
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            <p className="text-[#6B6B6B] dark:text-[#A1A1A1] text-sm mb-6">
                                 Start building and showcasing your portfolio projects
                             </p>
                             <Button onClick={() => setShowAddForm(true)} size="lg">

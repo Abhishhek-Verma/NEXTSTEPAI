@@ -20,12 +20,12 @@ const Layout = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-bg dark:bg-bg-dark">
             <Navigation />
             <main className={`transition-all duration-300 ${
                 isSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'
             }`}>
-                <div className="p-6">
+                <div className="p-6 lg:p-8">
                     <Outlet />
                 </div>
             </main>

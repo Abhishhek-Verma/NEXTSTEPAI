@@ -5,27 +5,27 @@ import { cn } from "../../utils/cn";
 import Icon from '../AppIcon';
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center whitespace-nowrap font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-DEFAULT/20 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
     {
         variants: {
             variant: {
-                default: "bg-primary text-primary-foreground hover:bg-primary/90",
-                destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-                outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-                secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-                ghost: "hover:bg-accent hover:text-accent-foreground",
-                link: "text-primary underline-offset-4 hover:underline",
-                success: "bg-success text-success-foreground hover:bg-success/90",
-                warning: "bg-warning text-warning-foreground hover:bg-warning/90",
-                danger: "bg-error text-error-foreground hover:bg-error/90",
+                default: "bg-[#111111] text-white rounded-full hover:bg-[#2a2a2a] hover:-translate-y-0.5 hover:shadow-lg dark:bg-white dark:text-[#111111] dark:hover:bg-gray-100",
+                destructive: "bg-[#EF4444] text-white rounded-full hover:bg-[#DC2626]",
+                outline: "border border-[#E8E5DF] bg-white text-[#111111] rounded-full hover:bg-[#F8F7F3] hover:-translate-y-0.5 hover:shadow-soft dark:bg-[#1F2023] dark:text-white dark:border-[rgba(255,255,255,0.1)] dark:hover:bg-[#2a2b2e]",
+                secondary: "bg-[#F8F7F3] text-[#404040] rounded-full hover:bg-[#F0EFEB] dark:bg-[#2a2b2e] dark:text-[#A1A1A1]",
+                ghost: "rounded-xl text-[#404040] hover:bg-[#F8F7F3] dark:text-[#A1A1A1] dark:hover:bg-[#2a2b2e]",
+                link: "text-[#111111] underline-offset-4 hover:underline dark:text-white",
+                success: "bg-[#D4F2E3] text-[#166534] rounded-full hover:bg-[#CDEEDC]",
+                warning: "bg-[#FFF0C9] text-[#92400E] rounded-full hover:bg-[#FDE8B3]",
+                danger: "bg-[#FCE5E6] text-[#991B1B] rounded-full hover:bg-[#FADADB]",
             },
             size: {
-                default: "h-10 px-4 py-2",
-                sm: "h-9 rounded-md px-3",
-                lg: "h-11 rounded-md px-8",
+                default: "h-11 px-6 py-2.5 text-sm",
+                sm: "h-9 px-4 text-sm",
+                lg: "h-12 px-8 text-base",
                 icon: "h-10 w-10",
-                xs: "h-8 rounded-md px-2 text-xs",
-                xl: "h-12 rounded-md px-10 text-base",
+                xs: "h-8 px-3 text-xs",
+                xl: "h-14 px-10 text-base",
             },
         },
         defaultVariants: {

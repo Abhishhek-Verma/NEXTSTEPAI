@@ -43,7 +43,7 @@ const RecommendationsPage = () => {
     const skills = recommendations.skills || [];
     const companies = recommendations.companies || [];
 
-    // Mock data (fallback for demo purposes)
+    // Fallback data for demonstration
     const mockRoles = [
         {
             id: 1,
@@ -158,18 +158,18 @@ const RecommendationsPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-brand-blue/10 via-brand-purple/10 to-brand-accent/10 dark:bg-gray-900">
-            <div className="container mx-auto px-4 py-8">
+        <div className="min-h-screen">
+            <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
                     <div>
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-blue via-brand-purple to-brand-accent bg-clip-text text-transparent">
+                        <h1 className="heading-serif text-display text-[#111111] dark:text-white">
                             Career Recommendations
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-1">
+                        <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mt-1">
                             Personalized suggestions based on your profile
                             {recommendations.generatedAt && (
-                                <span className="ml-2 text-sm">
+                                <span className="ml-2 text-xs text-[#909090]">
                                     • Generated {new Date(recommendations.generatedAt).toLocaleDateString()}
                                 </span>
                             )}
@@ -191,36 +191,38 @@ const RecommendationsPage = () => {
 
                 {/* Error Display */}
                 {recommendations.error && (
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-                        <p className="text-red-700 dark:text-red-400">{recommendations.error}</p>
+                    <div className="card-pastel-pink rounded-2xl p-4 mb-6">
+                        <p className="text-[#991B1B] text-sm">{recommendations.error}</p>
                     </div>
                 )}
 
                 {/* Loading State */}
                 {recommendations.loading && (
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6 text-center">
-                        <p className="text-blue-700 dark:text-blue-300">Loading recommendations...</p>
+                    <div className="card-pastel-blue rounded-2xl p-4 mb-6 text-center">
+                        <p className="text-[#1E40AF] text-sm font-medium">Loading recommendations...</p>
                     </div>
                 )}
 
-                {/* Tabs */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6">
-                    <div className="border-b border-gray-200 dark:border-gray-700">
-                        <nav className="flex -mb-px">
-                            {tabs.map((tab) => (
+                {/* Floating Navigation Tabs */}
+                <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-2 mb-8">
+                    <div className="flex gap-2">
+                        {tabs.map((tab) => {
+                            const isSelected = activeTab === tab.id;
+                            return (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-2 px-6 py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
-                                            ? 'border-brand-blue text-brand-blue'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                                        }`}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex-1 justify-center ${
+                                        isSelected
+                                            ? 'bg-[#111111] text-white shadow-soft dark:bg-white dark:text-[#111111]'
+                                            : 'text-[#6B6B6B] hover:text-[#111111] hover:bg-[#F8F7F3] dark:text-[#A1A1A1] dark:hover:text-white dark:hover:bg-[#2a2b2e]'
+                                    }`}
                                 >
-                                    <span className="text-xl">{tab.icon}</span>
+                                    <span className="text-base">{tab.icon}</span>
                                     {tab.label}
                                 </button>
-                            ))}
-                        </nav>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -230,59 +232,60 @@ const RecommendationsPage = () => {
                         {(roles.length > 0 ? roles : mockRoles).map((role) => (
                             <div
                                 key={role.id}
-                                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+                                className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8 hover:-translate-y-0.5 transition-all duration-300"
                             >
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                            <h3 className="text-xl font-semibold text-[#111111] dark:text-white">
                                                 {role.title}
                                             </h3>
-                                            <span className="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-sm font-medium rounded-full">
+                                            <span className="badge-success">
                                                 {role.score}% Match
                                             </span>
                                         </div>
-                                        <p className="text-gray-600 dark:text-gray-400 mb-4">
+                                        <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mb-4 text-sm leading-relaxed">
                                             {role.description}
                                         </p>
                                     </div>
                                     <button
                                         onClick={() => toggleSaveRole(role.id)}
-                                        className={`ml-4 text-2xl transition-transform hover:scale-110 ${isRoleSaved(role.id) ? 'text-red-500' : 'text-gray-300'
-                                            }`}
+                                        className={`ml-4 text-2xl transition-transform hover:scale-110 p-2 rounded-full hover:bg-[#F8F7F3] dark:hover:bg-[#2a2b2e] ${
+                                            isRoleSaved(role.id) ? 'text-[#EF4444]' : 'text-[#909090]'
+                                        }`}
                                     >
                                         {isRoleSaved(role.id) ? '❤️' : '🤍'}
                                     </button>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">Salary Range</p>
-                                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                    <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-4">
+                                        <p className="text-xs text-[#909090]">Salary Range</p>
+                                        <p className="text-lg font-semibold text-[#111111] dark:text-white mt-0.5">
                                             {role.salary}
                                         </p>
                                     </div>
-                                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">Market Demand</p>
-                                        <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                                    <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-4">
+                                        <p className="text-xs text-[#909090]">Market Demand</p>
+                                        <p className="text-lg font-semibold text-[#166534] dark:text-[#D4F2E3] mt-0.5">
                                             {role.demand}
                                         </p>
                                     </div>
-                                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">Skills Required</p>
-                                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-4">
+                                        <p className="text-xs text-[#909090]">Skills Required</p>
+                                        <p className="text-lg font-semibold text-[#111111] dark:text-white mt-0.5">
                                             {role.skills.length}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="mb-4">
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Key Skills:</p>
+                                <div className="mb-6">
+                                    <p className="text-xs text-[#909090] mb-2 font-medium">Key Skills:</p>
                                     <div className="flex flex-wrap gap-2">
                                         {role.skills.map((skill, index) => (
                                             <span
                                                 key={index}
-                                                className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-sm rounded-full"
+                                                className="badge-info"
                                             >
                                                 {skill}
                                             </span>
@@ -309,61 +312,61 @@ const RecommendationsPage = () => {
                         {(skills.length > 0 ? skills : mockSkills).map((skill) => (
                             <div
                                 key={skill.id}
-                                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+                                className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8"
                             >
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
-                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                                        <h3 className="text-xl font-semibold text-[#111111] dark:text-white mb-1">
                                             {skill.name}
                                         </h3>
-                                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        <span className="text-xs text-[#909090]">
                                             {skill.category}
                                         </span>
                                     </div>
-                                    <span className="px-3 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 text-sm font-medium rounded-full">
+                                    <span className="badge-ai">
                                         Gap: {skill.targetLevel - skill.currentLevel}%
                                     </span>
                                 </div>
 
                                 <div className="mb-4">
-                                    <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-gray-600 dark:text-gray-400">Current Level</span>
-                                        <span className="font-medium text-gray-900 dark:text-white">
+                                    <div className="flex justify-between text-xs mb-1.5">
+                                        <span className="text-[#6B6B6B]">Current Level</span>
+                                        <span className="font-semibold text-[#111111] dark:text-white">
                                             {skill.currentLevel}%
                                         </span>
                                     </div>
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                    <div className="w-full bg-[#F8F7F3] dark:bg-[rgba(255,255,255,0.06)] rounded-full h-2.5">
                                         <div
-                                            className="bg-blue-600 h-3 rounded-full"
+                                            className="bg-[#111111] dark:bg-white h-2.5 rounded-full"
                                             style={{ width: `${skill.currentLevel}%` }}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="mb-4">
-                                    <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-gray-600 dark:text-gray-400">Target Level</span>
-                                        <span className="font-medium text-gray-900 dark:text-white">
+                                <div className="mb-6">
+                                    <div className="flex justify-between text-xs mb-1.5">
+                                        <span className="text-[#6B6B6B]">Target Level</span>
+                                        <span className="font-semibold text-[#111111] dark:text-white">
                                             {skill.targetLevel}%
                                         </span>
                                     </div>
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                    <div className="w-full bg-[#F8F7F3] dark:bg-[rgba(255,255,255,0.06)] rounded-full h-2.5">
                                         <div
-                                            className="bg-green-600 h-3 rounded-full"
+                                            className="bg-[#10B981] h-2.5 rounded-full"
                                             style={{ width: `${skill.targetLevel}%` }}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="mb-4">
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                <div className="mb-6">
+                                    <p className="text-xs text-[#909090] mb-2 font-medium">
                                         Recommended Resources:
                                     </p>
-                                    <ul className="space-y-1">
+                                    <ul className="space-y-1.5">
                                         {skill.resources.map((resource, index) => (
                                             <li
                                                 key={index}
-                                                className="text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                                                className="text-sm text-[#404040] dark:text-[#A1A1A1] hover:text-[#111111] dark:hover:text-white transition-colors cursor-pointer"
                                             >
                                                 • {resource}
                                             </li>
@@ -385,29 +388,29 @@ const RecommendationsPage = () => {
                         {(companies.length > 0 ? companies : mockCompanies).map((company) => (
                             <div
                                 key={company.id}
-                                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+                                className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8 hover:-translate-y-0.5 transition-all duration-300"
                             >
                                 <div className="flex items-start gap-4 mb-4">
-                                    <div className="text-5xl">{company.logo}</div>
+                                    <div className="text-4xl p-3 bg-[#FAF9F6] dark:bg-[#2a2b2e] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)]">{company.logo}</div>
                                     <div className="flex-1">
-                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                                        <h3 className="text-xl font-semibold text-[#111111] dark:text-white mb-1">
                                             {company.name}
                                         </h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                        <p className="text-xs text-[#909090]">
                                             {company.domain}
                                         </p>
                                     </div>
-                                    <span className="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-sm font-medium rounded-full">
+                                    <span className="badge-success">
                                         {company.matchScore}% Match
                                     </span>
                                 </div>
 
-                                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                                <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mb-4 text-sm leading-relaxed">
                                     {company.notes}
                                 </p>
 
-                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 mb-4">
-                                    <p className="text-sm text-blue-900 dark:text-blue-200">
+                                <div className="card-pastel-blue rounded-xl p-4 mb-6">
+                                    <p className="text-xs text-[#1E40AF]">
                                         🎯 <strong>{company.openRoles}</strong> open roles matching your profile
                                     </p>
                                 </div>

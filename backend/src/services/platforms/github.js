@@ -29,7 +29,7 @@ async function executeGraphQLQuery(query, variables = {}) {
     }
 
     const result = await response.json();
-    
+
     if (result.errors) {
         console.error('GitHub GraphQL Errors:', result.errors);
         throw new Error(`GitHub API Error: ${result.errors[0]?.message || 'Unknown error'}`);
@@ -93,7 +93,7 @@ export async function fetchGitHubProfile(username) {
         `;
 
         const data = await executeGraphQLQuery(query, { username });
-        
+
         if (!data.user) {
             throw new Error(`GitHub user not found: ${username}`);
         }
@@ -187,7 +187,7 @@ export async function fetchGitHubContributions(username) {
         `;
 
         const data = await executeGraphQLQuery(query, { username });
-        
+
         if (!data.user) {
             throw new Error(`GitHub user not found: ${username}`);
         }
@@ -195,7 +195,7 @@ export async function fetchGitHubContributions(username) {
         const contributions = data.user.contributionsCollection;
 
         // Calculate contribution score
-        const contributionScore = 
+        const contributionScore =
             (contributions.totalCommitContributions * 2) +
             (contributions.totalPullRequestContributions * 5) +
             (contributions.totalIssueContributions * 3) +

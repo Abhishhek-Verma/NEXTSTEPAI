@@ -16,16 +16,16 @@ const OnboardingPage = () => {
             description: 'Let\'s build your personalized tech career roadmap',
             content: (
                 <div className="text-center space-y-4">
-                    <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                    <div className="w-20 h-20 bg-[#FAF9F6] border border-[#E8E5DF] dark:bg-[#2a2b2e] rounded-full flex items-center justify-center mx-auto shadow-soft">
                         <span className="text-4xl">👋</span>
                     </div>
-                    <h2 className="text-2xl font-bold">Hi {user?.firstName || 'there'}!</h2>
-                    <p className="text-gray-600 max-w-md mx-auto">
+                    <h2 className="heading-serif text-display text-[#111111] dark:text-white">Hi {user?.firstName || 'there'}!</h2>
+                    <p className="text-[#6B6B6B] dark:text-[#A1A1A1] max-w-md mx-auto text-sm leading-relaxed">
                         We'll guide you through a quick setup to understand your academic background,
                         coding skills, and career interests.
                     </p>
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                        <p className="text-sm text-blue-800">
+                    <div className="card-pastel-blue p-4 rounded-2xl">
+                        <p className="text-xs font-semibold text-[#1E40AF]">
                             ⏱️ This will take approximately 5 minutes
                         </p>
                     </div>
@@ -39,27 +39,27 @@ const OnboardingPage = () => {
             content: (
                 <div className="space-y-4">
                     <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 bg-[#D4F2E3] rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <span className="text-3xl">📚</span>
                         </div>
-                        <h3 className="text-xl font-semibold">Academic Performance</h3>
-                        <p className="text-gray-600 mt-2">
+                        <h3 className="text-xl font-semibold text-[#111111] dark:text-white">Academic Performance</h3>
+                        <p className="text-xs text-[#6B6B6B] dark:text-[#A1A1A1] mt-1">
                             We'll analyze your GPA trends and subject strengths
                         </p>
                     </div>
-                    <div className="bg-gray-50 p-6 rounded-lg space-y-3">
+                    <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] p-6 rounded-2xl space-y-3">
                         <div className="flex items-start gap-3">
-                            <span className="text-green-600 mt-1">✓</span>
+                            <span className="text-[#10B981] font-bold mt-0.5">✓</span>
                             <div>
-                                <p className="font-medium">Upload transcripts or enter manually</p>
-                                <p className="text-sm text-gray-600">CSV, JSON, or manual entry supported</p>
+                                <p className="font-semibold text-sm text-[#111111] dark:text-white">Upload transcripts or enter manually</p>
+                                <p className="text-xs text-[#6B6B6B]">CSV, JSON, or manual entry supported</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <span className="text-green-600 mt-1">✓</span>
+                            <span className="text-[#10B981] font-bold mt-0.5">✓</span>
                             <div>
-                                <p className="font-medium">Track semester-wise progress</p>
-                                <p className="text-sm text-gray-600">Visualize your academic growth</p>
+                                <p className="font-semibold text-sm text-[#111111] dark:text-white">Track semester-wise progress</p>
+                                <p className="text-xs text-[#6B6B6B]">Visualize your academic growth</p>
                             </div>
                         </div>
                     </div>
@@ -73,19 +73,19 @@ const OnboardingPage = () => {
             content: (
                 <div className="space-y-4">
                     <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 bg-[#E9D5FF] rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <span className="text-3xl">💻</span>
                         </div>
-                        <h3 className="text-xl font-semibold">Coding Activity</h3>
-                        <p className="text-gray-600 mt-2">
+                        <h3 className="text-xl font-semibold text-[#111111] dark:text-white">Coding Activity</h3>
+                        <p className="text-xs text-[#6B6B6B] dark:text-[#A1A1A1] mt-1">
                             Link your profiles to analyze your coding patterns
                         </p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         {['GitHub', 'LeetCode', 'Codeforces', 'CodeChef'].map((platform) => (
-                            <div key={platform} className="bg-gray-50 p-4 rounded-lg text-center">
-                                <p className="font-medium">{platform}</p>
-                                <p className="text-xs text-gray-500 mt-1">Optional</p>
+                            <div key={platform} className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] p-4 rounded-2xl text-center">
+                                <p className="font-semibold text-sm text-[#111111] dark:text-white">{platform}</p>
+                                <p className="text-xs text-[#909090] mt-1">Optional</p>
                             </div>
                         ))}
                     </div>
@@ -99,34 +99,34 @@ const OnboardingPage = () => {
             content: (
                 <div className="space-y-4">
                     <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 bg-[#FEF3C7] rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <span className="text-3xl">🎯</span>
                         </div>
-                        <h3 className="text-xl font-semibold">What's Your Goal?</h3>
-                        <p className="text-gray-600 mt-2">
+                        <h3 className="text-xl font-semibold text-[#111111] dark:text-white">What's Your Goal?</h3>
+                        <p className="text-xs text-[#6B6B6B] dark:text-[#A1A1A1] mt-1">
                             We'll tailor recommendations based on your interests
                         </p>
                     </div>
                     <div className="space-y-3">
-                        <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <input type="radio" name="goal" className="w-4 h-4" />
+                        <label className="flex items-center gap-3 p-4 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] rounded-2xl cursor-pointer hover:bg-[#FAF9F6] dark:hover:bg-[#2a2b2e] transition-colors">
+                            <input type="radio" name="goal" className="w-4 h-4 text-[#111111] accent-[#111111]" />
                             <div>
-                                <p className="font-medium">Corporate Job</p>
-                                <p className="text-sm text-gray-600">Product companies, startups</p>
+                                <p className="font-semibold text-sm text-[#111111] dark:text-white">Corporate Job</p>
+                                <p className="text-xs text-[#6B6B6B]">Product companies, startups</p>
                             </div>
                         </label>
-                        <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <input type="radio" name="goal" className="w-4 h-4" />
+                        <label className="flex items-center gap-3 p-4 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] rounded-2xl cursor-pointer hover:bg-[#FAF9F6] dark:hover:bg-[#2a2b2e] transition-colors">
+                            <input type="radio" name="goal" className="w-4 h-4 text-[#111111] accent-[#111111]" />
                             <div>
-                                <p className="font-medium">Higher Studies</p>
-                                <p className="text-sm text-gray-600">MS, PhD programs</p>
+                                <p className="font-semibold text-sm text-[#111111] dark:text-white">Higher Studies</p>
+                                <p className="text-xs text-[#6B6B6B]">MS, PhD programs</p>
                             </div>
                         </label>
-                        <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <input type="radio" name="goal" className="w-4 h-4" />
+                        <label className="flex items-center gap-3 p-4 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] rounded-2xl cursor-pointer hover:bg-[#FAF9F6] dark:hover:bg-[#2a2b2e] transition-colors">
+                            <input type="radio" name="goal" className="w-4 h-4 text-[#111111] accent-[#111111]" />
                             <div>
-                                <p className="font-medium">Entrepreneurship</p>
-                                <p className="text-sm text-gray-600">Build your own startup</p>
+                                <p className="font-semibold text-sm text-[#111111] dark:text-white">Entrepreneurship</p>
+                                <p className="text-xs text-[#6B6B6B]">Build your own startup</p>
                             </div>
                         </label>
                     </div>
@@ -139,7 +139,6 @@ const OnboardingPage = () => {
         if (currentStep < totalSteps) {
             setCurrentStep(currentStep + 1);
         } else {
-            // Complete onboarding
             navigate('/academic');
         }
     };
@@ -157,36 +156,36 @@ const OnboardingPage = () => {
     const currentStepData = steps[currentStep - 1];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-brand-blue/10 via-brand-purple/10 to-brand-accent/10 dark:from-gray-900 dark:to-gray-800 py-12 px-4">
-            <div className="max-w-2xl mx-auto">
+        <div className="min-h-screen py-12 px-4">
+            <div className="max-w-xl mx-auto">
                 {/* Progress Bar */}
                 <div className="mb-8">
                     <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span className="text-xs font-semibold text-[#6B6B6B] dark:text-[#A1A1A1]">
                             Step {currentStep} of {totalSteps}
                         </span>
                         <button
                             onClick={handleSkip}
-                            className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            className="text-xs font-semibold text-[#909090] hover:text-[#111111] dark:hover:text-white transition-colors"
                         >
                             Skip for now →
                         </button>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div className="w-full bg-[#F8F7F3] dark:bg-[rgba(255,255,255,0.06)] rounded-full h-2">
                         <div
-                            className="bg-gradient-to-r from-brand-blue to-brand-purple h-2 rounded-full transition-all duration-300"
+                            className="bg-[#111111] dark:bg-white h-2 rounded-full transition-all duration-300"
                             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
                         />
                     </div>
                 </div>
 
                 {/* Content Card */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                <div className="bg-white dark:bg-[#1F2023] rounded-3xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-8 lg:p-10">
                     <div className="mb-6">
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                        <h1 className="heading-serif text-display text-[#111111] dark:text-white mb-2">
                             {currentStepData.title}
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <p className="text-[#6B6B6B] dark:text-[#A1A1A1] text-sm">
                             {currentStepData.description}
                         </p>
                     </div>
@@ -211,7 +210,7 @@ const OnboardingPage = () => {
                 </div>
 
                 {/* Help Text */}
-                <p className="text-center text-sm text-gray-500 mt-6">
+                <p className="text-center text-xs text-[#909090] mt-6">
                     Need help? Contact support@nextstepai.com
                 </p>
             </div>

@@ -113,7 +113,7 @@ router.post('/profile', requireAuth, validate(codingProfileSchema), async (req, 
 router.post('/fetch/github', requireAuth, async (req, res) => {
     try {
         const { username } = req.body;
-        
+
         if (!username) {
             return res.status(400).json({ error: 'GitHub username is required' });
         }
@@ -121,7 +121,7 @@ router.post('/fetch/github', requireAuth, async (req, res) => {
         // Fetch data from GitHub
         const profileData = await fetchGitHubProfile(username);
         const contributionsData = await fetchGitHubContributions(username);
-        
+
         const metrics = {
             ...profileData,
             contributions: contributionsData
@@ -163,10 +163,10 @@ router.post('/fetch/github', requireAuth, async (req, res) => {
                 });
         }
 
-        res.json({ 
-            message: 'GitHub profile fetched successfully', 
+        res.json({
+            message: 'GitHub profile fetched successfully',
             platform: 'github',
-            metrics 
+            metrics
         });
     } catch (error) {
         console.error('Error fetching GitHub profile:', error);
@@ -178,7 +178,7 @@ router.post('/fetch/github', requireAuth, async (req, res) => {
 router.post('/fetch/leetcode', requireAuth, async (req, res) => {
     try {
         const { username } = req.body;
-        
+
         if (!username) {
             return res.status(400).json({ error: 'LeetCode username is required' });
         }
@@ -222,10 +222,10 @@ router.post('/fetch/leetcode', requireAuth, async (req, res) => {
                 });
         }
 
-        res.json({ 
-            message: 'LeetCode profile fetched successfully', 
+        res.json({
+            message: 'LeetCode profile fetched successfully',
             platform: 'leetcode',
-            metrics 
+            metrics
         });
     } catch (error) {
         console.error('Error fetching LeetCode profile:', error);
@@ -237,7 +237,7 @@ router.post('/fetch/leetcode', requireAuth, async (req, res) => {
 router.post('/fetch/codeforces', requireAuth, async (req, res) => {
     try {
         const { handle } = req.body;
-        
+
         if (!handle) {
             return res.status(400).json({ error: 'Codeforces handle is required' });
         }
@@ -258,9 +258,9 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
         if (existing && existing.metrics) {
             const cacheAge = Date.now() - new Date(existing.updatedAt).getTime();
             if (cacheAge < CACHE_TTL) {
-                console.log(`Using cached Codeforces data for user ${req.user.id} (${Math.round(cacheAge/1000)}s old)`);
-                return res.json({ 
-                    message: 'Codeforces profile retrieved from cache', 
+                console.log(`Using cached Codeforces data for user ${req.user.id} (${Math.round(cacheAge / 1000)}s old)`);
+                return res.json({
+                    message: 'Codeforces profile retrieved from cache',
                     platform: 'codeforces',
                     metrics: existing.metrics,
                     cached: true,
@@ -299,8 +299,8 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
                 });
         }
 
-        res.json({ 
-            message: 'Codeforces profile fetched successfully', 
+        res.json({
+            message: 'Codeforces profile fetched successfully',
             platform: 'codeforces',
             metrics,
             cached: false
@@ -315,7 +315,7 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
 router.post('/fetch/codechef', requireAuth, async (req, res) => {
     try {
         const { handle } = req.body;
-        
+
         if (!handle) {
             return res.status(400).json({ error: 'CodeChef handle is required' });
         }
@@ -337,9 +337,9 @@ router.post('/fetch/codechef', requireAuth, async (req, res) => {
         if (existing && existing.metrics && existing.metrics.rating !== undefined) {
             const cacheAge = Date.now() - new Date(existing.updatedAt).getTime();
             if (cacheAge < CACHE_TTL) {
-                console.log(`Using cached CodeChef data for user ${req.user.id} (${Math.round(cacheAge/1000/60)} minutes old)`);
-                return res.json({ 
-                    message: 'CodeChef profile retrieved from cache', 
+                console.log(`Using cached CodeChef data for user ${req.user.id} (${Math.round(cacheAge / 1000 / 60)} minutes old)`);
+                return res.json({
+                    message: 'CodeChef profile retrieved from cache',
                     platform: 'codechef',
                     metrics: existing.metrics,
                     cached: true,
@@ -378,8 +378,8 @@ router.post('/fetch/codechef', requireAuth, async (req, res) => {
                 });
         }
 
-        res.json({ 
-            message: 'CodeChef profile fetched successfully', 
+        res.json({
+            message: 'CodeChef profile fetched successfully',
             platform: 'codechef',
             metrics,
             cached: false

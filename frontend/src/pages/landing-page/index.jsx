@@ -13,6 +13,7 @@ import BenefitsChecklist from './components/BenefitsChecklist';
 import Footer from './components/Footer';
 import RoadmapForm from './components/RoadmapForm';
 import SampleRoadmapModal from './components/SampleRoadmapModal';
+import Button from '../../components/ui/Button';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -54,8 +55,8 @@ const LandingPage = () => {
   // Show loading spinner while checking auth
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-bg dark:bg-bg-dark">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#E8E5DF] border-t-[#111111]"></div>
       </div>
     );
   }
@@ -85,7 +86,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-bg dark:bg-bg-dark">
       <Header />
 
       <main>
@@ -126,26 +127,26 @@ const LandingPage = () => {
       )}
 
       {showExitIntent && !showRoadmapForm && !showSampleModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-          <div className="bg-card rounded-2xl shadow-2xl border border-border max-w-md w-full p-8 text-center">
-            <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">🎯</span>
+        <div className="fixed inset-0 bg-[#111111]/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#1F2023] rounded-3xl shadow-lift border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] max-w-md w-full p-8 text-center">
+            <div className="w-14 h-14 bg-pastel-yellow rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <span className="text-2xl">🎯</span>
             </div>
-            <h3 className="text-2xl font-bold text-foreground mb-2">
+            <h3 className="heading-serif text-display text-[#111111] dark:text-white mb-3">
               Wait! Don't Miss Out
             </h3>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mb-8 text-body leading-relaxed">
               Join 1,200+ B.Tech students who transformed their careers with AI-powered guidance. Get early access with exclusive benefits!
             </p>
             <div className="space-y-3">
               <Link to="/auth/register" className="block">
-                <button className="w-full px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                <Button fullWidth size="lg">
                   Get Started
-                </button>
+                </Button>
               </Link>
               <button
                 onClick={handleCloseExitIntent}
-                className="w-full px-6 py-3 text-muted-foreground hover:text-foreground transition-colors"
+                className="w-full px-6 py-3 text-[#909090] hover:text-[#111111] dark:hover:text-white transition-colors text-sm font-medium"
               >
                 Maybe later
               </button>

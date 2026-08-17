@@ -119,24 +119,24 @@ const SkillsPage = () => {
         }
     };
 
-    const getProficiencyColor = (level) => {
-        const colors = {
-            Beginner: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-            Intermediate: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-            Advanced: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-            Expert: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+    const getProficiencyBadge = (level) => {
+        const badges = {
+            Beginner: 'bg-[#F8F7F3] text-[#6B6B6B]',
+            Intermediate: 'badge-info',
+            Advanced: 'badge-ai',
+            Expert: 'badge-success',
         };
-        return colors[level] || colors.Beginner;
+        return badges[level] || badges.Beginner;
     };
 
     const getCategoryColor = (category) => {
         const colors = {
-            Programming: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-            Framework: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-            Database: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-            Tool: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-            'Soft Skill': 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300',
-            Other: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+            Programming: 'card-pastel-blue',
+            Framework: 'card-pastel-purple',
+            Database: 'card-pastel-mint',
+            Tool: 'card-pastel-yellow',
+            'Soft Skill': 'card-pastel-pink',
+            Other: 'bg-[#F8F7F3] border border-[#E8E5DF]',
         };
         return colors[category] || colors.Other;
     };
@@ -150,15 +150,15 @@ const SkillsPage = () => {
     }, {});
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-brand-blue/10 via-brand-purple/10 to-brand-accent/10 dark:bg-gray-900">
-            <div className="container mx-auto px-4 py-8">
+        <div className="min-h-screen">
+            <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
                     <div>
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-blue via-brand-purple to-brand-accent bg-clip-text text-transparent">
+                        <h1 className="heading-serif text-display text-[#111111] dark:text-white">
                             Skills Management
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-1">
+                        <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mt-1">
                             Manage your technical and soft skills
                         </p>
                     </div>
@@ -169,36 +169,36 @@ const SkillsPage = () => {
 
                 {/* Error Display */}
                 {error && (
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-                        <p className="text-red-700 dark:text-red-400">{error}</p>
+                    <div className="card-pastel-pink rounded-2xl p-4 mb-6">
+                        <p className="text-[#6B6B6B]">{error}</p>
                     </div>
                 )}
 
                 {/* Stats Card */}
                 {mySkills.length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 mb-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Total Skills</p>
-                                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                                <p className="text-sm text-[#909090]">Total Skills</p>
+                                <p className="text-3xl font-semibold text-[#111111] dark:text-white mt-1">
                                     {mySkills.length}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Expert Level</p>
-                                <p className="text-3xl font-bold text-green-600 mt-1">
+                                <p className="text-sm text-[#909090]">Expert Level</p>
+                                <p className="text-3xl font-semibold text-[#111111] dark:text-white mt-1">
                                     {mySkills.filter(s => s.proficiencyLevel === 'Expert').length}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Advanced</p>
-                                <p className="text-3xl font-bold text-purple-600 mt-1">
+                                <p className="text-sm text-[#909090]">Advanced</p>
+                                <p className="text-3xl font-semibold text-[#111111] dark:text-white mt-1">
                                     {mySkills.filter(s => s.proficiencyLevel === 'Advanced').length}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Categories</p>
-                                <p className="text-3xl font-bold text-brand-blue mt-1">
+                                <p className="text-sm text-[#909090]">Categories</p>
+                                <p className="text-3xl font-semibold text-[#111111] dark:text-white mt-1">
                                     {Object.keys(groupedSkills).length}
                                 </p>
                             </div>
@@ -218,16 +218,16 @@ const SkillsPage = () => {
 
                 {/* Add to Profile Form */}
                 {showAddToProfile && (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-                        <h2 className="text-xl font-semibold mb-4">Add Skill to Your Profile</h2>
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 mb-6">
+                        <h2 className="text-xl font-semibold text-[#111111] dark:text-white mb-4">Add Skill to Your Profile</h2>
                         <form onSubmit={handleAddToProfile}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Select Skill</label>
+                                    <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Select Skill</label>
                                     <select
                                         value={selectedSkill}
                                         onChange={(e) => setSelectedSkill(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2.5 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111]/30 transition-all"
                                         required
                                     >
                                         <option value="">Choose a skill...</option>
@@ -239,11 +239,11 @@ const SkillsPage = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Proficiency Level</label>
+                                    <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Proficiency Level</label>
                                     <select
                                         value={proficiencyLevel}
                                         onChange={(e) => setProficiencyLevel(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2.5 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111]/30 transition-all"
                                     >
                                         {proficiencyLevels.map((level) => (
                                             <option key={level} value={level}>
@@ -253,7 +253,7 @@ const SkillsPage = () => {
                                     </select>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-3">
                                 <Button type="submit" disabled={loading}>
                                     {loading ? 'Adding...' : 'Add to Profile'}
                                 </Button>
@@ -271,8 +271,8 @@ const SkillsPage = () => {
 
                 {/* Create New Skill Form */}
                 {showAddSkill && (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-                        <h2 className="text-xl font-semibold mb-4">Create New Skill</h2>
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 mb-6">
+                        <h2 className="text-xl font-semibold text-[#111111] dark:text-white mb-4">Create New Skill</h2>
                         <form onSubmit={handleAddNewSkill}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <Input
@@ -283,11 +283,11 @@ const SkillsPage = () => {
                                     required
                                 />
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Category</label>
+                                    <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Category</label>
                                     <select
                                         value={newSkill.category}
                                         onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2.5 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111]/30 transition-all"
                                     >
                                         {categories.map((cat) => (
                                             <option key={cat} value={cat}>
@@ -297,7 +297,7 @@ const SkillsPage = () => {
                                     </select>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-3">
                                 <Button type="submit" disabled={loading}>
                                     {loading ? 'Creating...' : 'Create Skill'}
                                 </Button>
@@ -315,47 +315,54 @@ const SkillsPage = () => {
 
                 {/* My Skills - Grouped by Category */}
                 <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h2 className="text-2xl font-semibold text-[#111111] dark:text-white">
                         Your Skills ({mySkills.length})
                     </h2>
 
                     {mySkills.length === 0 ? (
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
-                            <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">
+                        <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-8 text-center">
+                            <p className="text-[#6B6B6B] text-lg mb-4">
                                 No skills added yet
                             </p>
-                            <p className="text-gray-400 dark:text-gray-500 text-sm">
+                            <p className="text-[#909090] text-sm">
                                 Click "Add Skill to Profile" to get started
                             </p>
                         </div>
                     ) : (
                         Object.entries(groupedSkills).map(([category, skills]) => (
-                            <div key={category} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                            <div key={category} className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6">
                                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                    <span className={`px-3 py-1 rounded-full text-sm ${getCategoryColor(category)}`}>
+                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                        category === 'Programming' ? 'badge-info' :
+                                        category === 'Framework' ? 'badge-ai' :
+                                        category === 'Database' ? 'badge-success' :
+                                        category === 'Tool' ? 'badge-pending' :
+                                        category === 'Soft Skill' ? 'badge-warning' :
+                                        'bg-[#F8F7F3] text-[#6B6B6B]'
+                                    }`}>
                                         {category}
                                     </span>
-                                    <span className="text-gray-500 text-sm">({skills.length})</span>
+                                    <span className="text-[#909090] text-sm">({skills.length})</span>
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {skills.map((skill) => (
                                         <div
                                             key={skill.id}
-                                            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+                                            className="border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] rounded-xl p-4 hover:shadow-soft transition-all duration-200"
                                         >
                                             <div className="flex justify-between items-start mb-2">
-                                                <h4 className="font-semibold text-gray-900 dark:text-white">
+                                                <h4 className="font-semibold text-[#111111] dark:text-white">
                                                     {skill.skillName}
                                                 </h4>
                                                 <button
                                                     onClick={() => handleRemoveSkill(skill.skillId)}
-                                                    className="text-red-500 hover:text-red-700 text-sm"
+                                                    className="text-[#EF4444]/60 hover:text-[#EF4444] text-sm transition-colors"
                                                 >
                                                     ✕
                                                 </button>
                                             </div>
                                             <div>
-                                                <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
+                                                <label className="text-xs text-[#909090] block mb-1">
                                                     Proficiency
                                                 </label>
                                                 <select
@@ -363,9 +370,7 @@ const SkillsPage = () => {
                                                     onChange={(e) =>
                                                         handleUpdateProficiency(skill.skillId, e.target.value)
                                                     }
-                                                    className={`w-full px-2 py-1 text-sm rounded ${getProficiencyColor(
-                                                        skill.proficiencyLevel
-                                                    )} border-0 font-medium`}
+                                                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white font-medium focus:ring-2 focus:ring-[#111111]/10 transition-all"
                                                 >
                                                     {proficiencyLevels.map((level) => (
                                                         <option key={level} value={level}>

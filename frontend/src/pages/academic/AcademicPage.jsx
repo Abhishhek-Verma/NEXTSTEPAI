@@ -210,15 +210,15 @@ const AcademicPage = () => {
         : '0.00';
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-brand-blue/10 via-brand-purple/10 to-brand-accent/10 dark:bg-gray-900">
-            <div className="container mx-auto px-4 py-8">
+        <div className="min-h-screen">
+            <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
                     <div>
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-blue via-brand-purple to-brand-accent bg-clip-text text-transparent">
+                        <h1 className="heading-serif text-display text-[#111111] dark:text-white">
                             Academic Records
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-1">
+                        <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mt-1">
                             Add your semester-wise academic performance
                         </p>
                     </div>
@@ -229,16 +229,16 @@ const AcademicPage = () => {
 
                 {/* Error Display */}
                 {academics.error && (
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                    <div className="card-pastel-pink rounded-2xl p-4 mb-6">
                         <div className="flex items-start">
-                            <span className="text-red-600 dark:text-red-400 text-xl mr-3">⚠️</span>
+                            <span className="text-xl mr-3">⚠️</span>
                             <div className="flex-1">
-                                <h3 className="text-red-800 dark:text-red-300 font-semibold">Error</h3>
-                                <p className="text-red-700 dark:text-red-400 text-sm mt-1">{academics.error}</p>
+                                <h3 className="text-[#111111] font-semibold">Error</h3>
+                                <p className="text-[#6B6B6B] text-sm mt-1">{academics.error}</p>
                             </div>
                             <button 
                                 onClick={() => setAcademicsError(null)}
-                                className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                                className="text-[#6B6B6B] hover:text-[#111111] transition-colors"
                             >
                                 ✕
                             </button>
@@ -248,30 +248,30 @@ const AcademicPage = () => {
 
                 {/* Loading Indicator */}
                 {academics.loading && (
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6 text-center">
-                        <p className="text-blue-700 dark:text-blue-300">Saving your data...</p>
+                    <div className="card-pastel-blue rounded-2xl p-4 mb-6 text-center">
+                        <p className="text-[#6B6B6B]">Saving your data...</p>
                     </div>
                 )}
 
                 {/* Stats Card */}
                 {academics.records.length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 mb-6">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Total Semesters</p>
-                                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                                <p className="text-sm text-[#909090]">Total Semesters</p>
+                                <p className="text-3xl font-semibold text-[#111111] dark:text-white mt-1">
                                     {academics.records.length}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Average GPA</p>
-                                <p className="text-3xl font-bold text-brand-blue mt-1">
+                                <p className="text-sm text-[#909090]">Average GPA</p>
+                                <p className="text-3xl font-semibold text-[#111111] dark:text-white mt-1">
                                     {averageGPA}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Trend</p>
-                                <p className="text-3xl font-bold text-brand-accent mt-1">
+                                <p className="text-sm text-[#909090]">Trend</p>
+                                <p className="text-3xl font-semibold text-[#111111] dark:text-white mt-1">
                                     {academics.records.length >= 2 &&
                                         academics.records[academics.records.length - 1].gpa >
                                         academics.records[academics.records.length - 2].gpa
@@ -284,8 +284,8 @@ const AcademicPage = () => {
                 )}
 
                 {/* Upload Section */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-                    <h2 className="text-xl font-semibold mb-4">Import Records</h2>
+                <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 mb-6">
+                    <h2 className="text-xl font-semibold text-[#111111] dark:text-white mb-4">Import Records</h2>
                     <div className="flex flex-col md:flex-row gap-4">
                         <label className="flex-1 cursor-pointer">
                             <input
@@ -294,18 +294,18 @@ const AcademicPage = () => {
                                 onChange={handleFileUpload}
                                 className="hidden"
                             />
-                            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
+                            <div className="border-2 border-dashed border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-2xl p-6 text-center hover:border-[#111111]/30 dark:hover:border-white/30 transition-colors">
                                 <div className="text-4xl mb-2">📁</div>
-                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <p className="text-sm font-medium text-[#404040] dark:text-[#A1A1A1]">
                                     Upload CSV or JSON
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-[#909090] mt-1">
                                     Click to browse files
                                 </p>
                             </div>
                         </label>
                         <div className="flex items-center">
-                            <span className="text-gray-500">or</span>
+                            <span className="text-[#909090]">or</span>
                         </div>
                         <Button
                             onClick={() => setShowAddForm(!showAddForm)}
@@ -319,8 +319,8 @@ const AcademicPage = () => {
 
                 {/* Add/Edit Form */}
                 {showAddForm && (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-                        <h2 className="text-xl font-semibold mb-4">
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 mb-6">
+                        <h2 className="text-xl font-semibold text-[#111111] dark:text-white mb-4">
                             {editingId ? 'Edit Record' : 'Add New Record'}
                         </h2>
                         <form onSubmit={handleSubmit}>
@@ -350,7 +350,7 @@ const AcademicPage = () => {
 
                             {/* Subjects Section */}
                             <div className="mb-4">
-                                <label className="block text-sm font-medium mb-2">Subjects (Optional)</label>
+                                <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Subjects (Optional)</label>
                                 <div className="flex gap-2 mb-2">
                                     <Input
                                         placeholder="Subject name"
@@ -372,15 +372,15 @@ const AcademicPage = () => {
                                         {formData.subjects.map((subject, index) => (
                                             <div
                                                 key={index}
-                                                className="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-2 rounded"
+                                                className="flex justify-between items-center bg-[#F8F7F3] dark:bg-[#2a2b2e] p-3 rounded-xl"
                                             >
-                                                <span>
+                                                <span className="text-sm text-[#404040] dark:text-[#A1A1A1]">
                                                     {subject.name}: {subject.score}
                                                 </span>
                                                 <button
                                                     type="button"
                                                     onClick={() => handleRemoveSubject(index)}
-                                                    className="text-red-500 hover:text-red-700"
+                                                    className="text-[#EF4444] hover:text-[#DC2626] text-sm"
                                                 >
                                                     ✕
                                                 </button>
@@ -390,7 +390,7 @@ const AcademicPage = () => {
                                 )}
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className="flex gap-3">
                                 <Button type="submit">{editingId ? 'Update' : 'Add'} Record</Button>
                                 <Button
                                     type="button"
@@ -410,48 +410,48 @@ const AcademicPage = () => {
 
                 {/* Records List */}
                 {academics.records.length > 0 ? (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card overflow-hidden">
                         <table className="w-full">
-                            <thead className="bg-gray-50 dark:bg-gray-700">
+                            <thead className="bg-[#F8F7F3] dark:bg-[#2a2b2e]">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#6B6B6B] uppercase tracking-wider">
                                         Semester
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#6B6B6B] uppercase tracking-wider">
                                         GPA
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#6B6B6B] uppercase tracking-wider">
                                         Subjects
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                                    <th className="px-6 py-4 text-right text-xs font-semibold text-[#6B6B6B] uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                            <tbody className="divide-y divide-[#E8E5DF] dark:divide-[rgba(255,255,255,0.06)]">
                                 {academics.records
                                     .sort((a, b) => a.semester - b.semester)
                                     .map((record) => (
-                                        <tr key={record.id}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                        <tr key={record.id} className="hover:bg-[#F8F7F3]/50 dark:hover:bg-[#2a2b2e]/50 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111111] dark:text-white">
                                                 Semester {record.semester}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B6B6B] dark:text-[#A1A1A1]">
                                                 {record.gpa}
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                            <td className="px-6 py-4 text-sm text-[#6B6B6B] dark:text-[#A1A1A1]">
                                                 {record.additionalInfo?.subjects?.length || record.subjects?.length || 0} subjects
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
                                                 <button
                                                     onClick={() => handleEdit(record)}
-                                                    className="text-blue-600 hover:text-blue-900 mr-4"
+                                                    className="text-[#111111] hover:text-[#6B6B6B] dark:text-white dark:hover:text-[#A1A1A1] transition-colors"
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(record.id)}
-                                                    className="text-red-600 hover:text-red-900"
+                                                    className="text-[#EF4444] hover:text-[#DC2626] transition-colors"
                                                 >
                                                     Delete
                                                 </button>
@@ -462,12 +462,12 @@ const AcademicPage = () => {
                         </table>
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
+                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-12 text-center">
                         <div className="text-6xl mb-4">📚</div>
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                        <h3 className="text-xl font-semibold text-[#111111] dark:text-white mb-2">
                             No Records Yet
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-4">
+                        <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mb-4">
                             Upload a file or add records manually to get started
                         </p>
                     </div>

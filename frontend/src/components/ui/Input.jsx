@@ -14,8 +14,8 @@ const Input = React.forwardRef(({
     // Generate unique ID if not provided
     const inputId = id || `input-${Math.random()?.toString(36)?.substr(2, 9)}`;
 
-    // Base input classes
-    const baseInputClasses = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+    // Base input classes - premium design
+    const baseInputClasses = "flex h-11 w-full rounded-xl border border-[#E8E5DF] bg-white px-4 py-2.5 text-[15px] text-[#111111] ring-offset-white placeholder:text-[#909090] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111111]/10 focus-visible:border-[#111111]/30 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 dark:bg-[#1F2023] dark:border-[rgba(255,255,255,0.1)] dark:text-white dark:placeholder:text-[#666] dark:ring-offset-[#0C0D0E] dark:focus-visible:ring-white/10 dark:focus-visible:border-white/30";
 
     // Checkbox-specific styles
     if (type === "checkbox") {
@@ -23,7 +23,7 @@ const Input = React.forwardRef(({
             <input
                 type="checkbox"
                 className={cn(
-                    "h-4 w-4 rounded border border-input bg-background text-primary focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                    "h-4 w-4 rounded border border-[#E8E5DF] bg-white text-[#111111] focus:ring-2 focus:ring-[#111111]/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1F2023] dark:border-[rgba(255,255,255,0.1)]",
                     className
                 )}
                 ref={ref}
@@ -39,7 +39,7 @@ const Input = React.forwardRef(({
             <input
                 type="radio"
                 className={cn(
-                    "h-4 w-4 rounded-full border border-input bg-background text-primary focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                    "h-4 w-4 rounded-full border border-[#E8E5DF] bg-white text-[#111111] focus:ring-2 focus:ring-[#111111]/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1F2023] dark:border-[rgba(255,255,255,0.1)]",
                     className
                 )}
                 ref={ref}
@@ -56,12 +56,12 @@ const Input = React.forwardRef(({
                 <label
                     htmlFor={inputId}
                     className={cn(
-                        "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-                        error ? "text-destructive" : "text-foreground"
+                        "text-sm font-medium leading-none",
+                        error ? "text-[#EF4444]" : "text-[#404040] dark:text-[#A1A1A1]"
                     )}
                 >
                     {label}
-                    {required && <span className="text-destructive ml-1">*</span>}
+                    {required && <span className="text-[#EF4444] ml-1">*</span>}
                 </label>
             )}
 
@@ -69,7 +69,7 @@ const Input = React.forwardRef(({
                 type={type}
                 className={cn(
                     baseInputClasses,
-                    error && "border-destructive focus-visible:ring-destructive",
+                    error && "border-[#EF4444] focus-visible:ring-[#EF4444]/20 focus-visible:border-[#EF4444]",
                     className
                 )}
                 ref={ref}
@@ -78,13 +78,13 @@ const Input = React.forwardRef(({
             />
 
             {description && !error && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-[#909090] dark:text-[#666]">
                     {description}
                 </p>
             )}
 
             {error && (
-                <p className="text-sm text-destructive">
+                <p className="text-sm text-[#EF4444]">
                     {error}
                 </p>
             )}

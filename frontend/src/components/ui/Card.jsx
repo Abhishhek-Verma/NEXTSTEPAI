@@ -7,17 +7,30 @@ const Card = React.forwardRef(({
   hover = false,
   gradient = false,
   glass = false,
+  pastel = null,
   ...props 
 }, ref) => {
+  const pastelClasses = {
+    blue: 'card-pastel-blue',
+    mint: 'card-pastel-mint',
+    yellow: 'card-pastel-yellow',
+    pink: 'card-pastel-pink',
+    purple: 'card-pastel-purple',
+  };
+
   return (
     <div
       ref={ref}
       className={cn(
-        "rounded-xl shadow-lg overflow-hidden transition-all duration-300",
+        "rounded-2xl overflow-hidden transition-all duration-300",
         hover && "card-hover cursor-pointer",
-        gradient && "bg-ai-gradient-subtle",
-        glass && "glass-dark",
-        !gradient && !glass && "bg-white dark:bg-gray-800",
+        pastel && pastelClasses[pastel]
+          ? pastelClasses[pastel]
+          : gradient
+            ? "bg-ai-gradient-subtle border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)]"
+            : glass
+              ? "glass"
+              : "bg-white border border-[#E8E5DF] shadow-card dark:bg-[#1F2023] dark:border-[rgba(255,255,255,0.08)]",
         className
       )}
       {...props}
@@ -45,7 +58,7 @@ const CardTitle = React.forwardRef(({ className, children, ...props }, ref) => (
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight text-gray-900 dark:text-white",
+      "text-xl font-semibold leading-tight tracking-tight text-[#111111] dark:text-white",
       className
     )}
     {...props}
@@ -59,7 +72,7 @@ CardTitle.displayName = "CardTitle";
 const CardDescription = React.forwardRef(({ className, children, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-gray-600 dark:text-gray-400", className)}
+    className={cn("text-sm text-[#6B6B6B] dark:text-[#A1A1A1]", className)}
     {...props}
   >
     {children}

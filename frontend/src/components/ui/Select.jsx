@@ -104,12 +104,12 @@ const Select = React.forwardRef(({
                 <label
                     htmlFor={selectId}
                     className={cn(
-                        "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2 block",
-                        error ? "text-destructive" : "text-foreground"
+                        "text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2 block",
+                        error && "text-[#EF4444]"
                     )}
                 >
                     {label}
-                    {required && <span className="text-destructive ml-1">*</span>}
+                    {required && <span className="text-[#EF4444] ml-1">*</span>}
                 </label>
             )}
             <div className="relative">
@@ -118,9 +118,9 @@ const Select = React.forwardRef(({
                     id={selectId}
                     type="button"
                     className={cn(
-                        "flex h-10 w-full items-center justify-between rounded-md border border-input bg-white text-black px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-                        error && "border-destructive focus:ring-destructive",
-                        !hasValue && "text-muted-foreground"
+                        "flex h-11 w-full items-center justify-between rounded-xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white px-4 py-2 text-sm placeholder:text-[#909090] focus:outline-none focus:ring-2 focus:ring-[#111111]/10 disabled:cursor-not-allowed disabled:opacity-50 transition-all",
+                        error && "border-[#EF4444] focus:ring-[#EF4444]/20",
+                        !hasValue && "text-[#909090]"
                     )}
                     onClick={handleToggle}
                     disabled={disabled}
@@ -132,7 +132,7 @@ const Select = React.forwardRef(({
 
                     <div className="flex items-center gap-1">
                         {loading && (
-                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                            <svg className="animate-spin h-4 w-4 text-[#909090]" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                             </svg>
@@ -149,7 +149,7 @@ const Select = React.forwardRef(({
                             </Button>
                         )}
 
-                        <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
+                        <ChevronDown className={cn("h-4 w-4 text-[#909090] transition-transform", isOpen && "rotate-180")} />
                     </div>
                 </button>
 
@@ -157,7 +157,7 @@ const Select = React.forwardRef(({
                 <select
                     name={name}
                     value={value || ''}
-                    onChange={() => { }} // Controlled by our custom logic
+                    onChange={() => { }}
                     className="sr-only"
                     tabIndex={-1}
                     multiple={multiple}
@@ -173,24 +173,24 @@ const Select = React.forwardRef(({
 
                 {/* Dropdown */}
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white text-black border border-border rounded-md shadow-md">
+                    <div className="absolute z-50 w-full mt-2 bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] rounded-2xl shadow-lift overflow-hidden">
                         {searchable && (
-                            <div className="p-2 border-b">
+                            <div className="p-2 border-b border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)]">
                                 <div className="relative">
-                                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Search className="absolute left-3 top-3 h-4 w-4 text-[#909090]" />
                                     <Input
                                         placeholder="Search options..."
                                         value={searchTerm}
                                         onChange={handleSearchChange}
-                                        className="pl-8"
+                                        className="pl-9"
                                     />
                                 </div>
                             </div>
                         )}
 
-                        <div className="py-1 max-h-60 overflow-auto">
+                        <div className="py-2 max-h-60 overflow-auto">
                             {filteredOptions?.length === 0 ? (
-                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                <div className="px-4 py-3 text-sm text-[#909090]">
                                     {searchTerm ? 'No options found' : 'No options available'}
                                 </div>
                             ) : (
@@ -198,18 +198,18 @@ const Select = React.forwardRef(({
                                     <div
                                         key={option?.value}
                                         className={cn(
-                                            "relative flex cursor-pointer select-none items-center rounded-sm px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground",
-                                            isSelected(option?.value) && "bg-primary text-primary-foreground",
+                                            "relative flex cursor-pointer select-none items-center rounded-xl px-4 py-2.5 mx-1.5 text-sm transition-colors hover:bg-[#FAF9F6] dark:hover:bg-[#2a2b2e]",
+                                            isSelected(option?.value) && "bg-[#111111] text-white dark:bg-white dark:text-[#111111]",
                                             option?.disabled && "pointer-events-none opacity-50"
                                         )}
                                         onClick={() => !option?.disabled && handleOptionSelect(option)}
                                     >
-                                        <span className="flex-1">{option?.label}</span>
+                                        <span className="flex-1 font-medium">{option?.label}</span>
                                         {multiple && isSelected(option?.value) && (
                                             <Check className="h-4 w-4" />
                                         )}
                                         {option?.description && (
-                                            <span className="text-xs text-muted-foreground ml-2">
+                                            <span className="text-xs text-[#909090] ml-2">
                                                 {option?.description}
                                             </span>
                                         )}
@@ -221,12 +221,12 @@ const Select = React.forwardRef(({
                 )}
             </div>
             {description && !error && (
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-xs text-[#909090] mt-1.5">
                     {description}
                 </p>
             )}
             {error && (
-                <p className="text-sm text-destructive mt-1">
+                <p className="text-xs text-[#EF4444] mt-1.5">
                     {error}
                 </p>
             )}
