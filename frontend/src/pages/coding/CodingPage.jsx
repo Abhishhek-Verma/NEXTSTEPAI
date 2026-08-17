@@ -267,7 +267,7 @@ const CodingPage = () => {
                                         <span className="flex-shrink-0">{platform.icon}</span>
                                         <span>{platform.name}</span>
                                         {isConnected && (
-                                            <span className="w-5 h-5 rounded-full bg-[#C9B59C] text-[#000000] flex items-center justify-center text-xs font-bold">
+                                            <span className="w-5 h-5 rounded-full bg-[#FF5722] text-white flex items-center justify-center text-xs font-bold">
                                                 ✓
                                             </span>
                                         )}
@@ -309,7 +309,7 @@ const CodingPage = () => {
                             <button 
                                 onClick={handleFetchProfile} 
                                 disabled={loading}
-                                className="w-full py-3 px-6 bg-[#C9B59C] hover:bg-[#B8A388] text-[#000000] rounded-full font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm disabled:opacity-60"
+                                className="w-full py-3 px-6 bg-[#FF5722] hover:bg-[#e04d1d] text-white rounded-full font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-md disabled:opacity-60"
                             >
                                 <Icon name="RefreshCw" size={17} strokeWidth={2.2} className={loading ? "animate-spin" : ""} />
                                 {loading ? 'Fetching Profile Data...' : 'Fetch Profile Data'}
