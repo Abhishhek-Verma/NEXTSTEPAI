@@ -4,6 +4,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import apiClient from '../../api/client';
+import Icon from '../../components/AppIcon';
 
 const SkillsPage = () => {
     const navigate = useNavigate();
@@ -208,11 +209,11 @@ const SkillsPage = () => {
 
                 {/* Action Buttons */}
                 <div className="flex gap-4 mb-6">
-                    <Button onClick={() => setShowAddToProfile(!showAddToProfile)} className="flex-1">
-                        ➕ Add Skill to Profile
+                    <Button onClick={() => setShowAddToProfile(!showAddToProfile)} className="flex-1 flex items-center justify-center gap-2">
+                        <Icon name="Plus" size={17} strokeWidth={2} /> Add Skill to Profile
                     </Button>
-                    <Button onClick={() => setShowAddSkill(!showAddSkill)} variant="outline" className="flex-1">
-                        🆕 Create New Skill
+                    <Button onClick={() => setShowAddSkill(!showAddSkill)} variant="outline" className="flex-1 flex items-center justify-center gap-2">
+                        <Icon name="Sparkles" size={17} strokeWidth={2} /> Create New Skill
                     </Button>
                 </div>
 

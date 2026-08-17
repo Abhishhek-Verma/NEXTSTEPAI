@@ -4,6 +4,7 @@ import useStore from '../../store';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import apiClient from '../../api/client';
+import Icon from '../../components/AppIcon';
 
 const AcademicPage = () => {
     const navigate = useNavigate();
@@ -295,7 +296,7 @@ const AcademicPage = () => {
                                 className="hidden"
                             />
                             <div className="border-2 border-dashed border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-2xl p-6 text-center hover:border-[#111111]/30 dark:hover:border-white/30 transition-colors">
-                                <div className="text-4xl mb-2">📁</div>
+                                <Icon name="FolderUp" size={36} className="text-[#000000] dark:text-white mx-auto mb-2" />
                                 <p className="text-sm font-medium text-[#404040] dark:text-[#A1A1A1]">
                                     Upload CSV or JSON
                                 </p>
@@ -463,7 +464,7 @@ const AcademicPage = () => {
                     </div>
                 ) : (
                     <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-12 text-center">
-                        <div className="text-6xl mb-4">📚</div>
+                        <Icon name="GraduationCap" size={44} className="text-[#000000] dark:text-white mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-[#111111] dark:text-white mb-2">
                             No Records Yet
                         </h3>

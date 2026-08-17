@@ -53,9 +53,11 @@ const Navigation = () => {
                 }`}>
                     {isSidebarCollapsed ? (
                         <>
-                            <div className="w-10 h-10 bg-[#C9B59C] rounded-xl flex items-center justify-center text-[#000000] font-bold text-sm shadow-sm">
-                                NS
-                            </div>
+                            <img
+                                src="/logo.jpeg"
+                                alt="NextStepAI Logo"
+                                className="w-10 h-10 rounded-xl object-cover shadow-sm"
+                            />
                             <button
                                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                                 className="p-2 text-[#000000]/70 hover:bg-[#D9CFC7] dark:text-[#A1A1A1] dark:hover:bg-[#33302D] rounded-xl transition-colors w-10 flex items-center justify-center"
@@ -67,9 +69,11 @@ const Navigation = () => {
                     ) : (
                         <>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-[#C9B59C] rounded-xl flex items-center justify-center text-[#000000] font-bold text-sm shadow-sm">
-                                    NS
-                                </div>
+                                <img
+                                    src="/logo.jpeg"
+                                    alt="NextStepAI Logo"
+                                    className="w-10 h-10 rounded-xl object-cover shadow-sm"
+                                />
                                 <span className="text-lg font-bold text-[#000000] dark:text-white tracking-tight">
                                     NextStep<span className="text-[#C9B59C]">AI</span>
                                 </span>
@@ -152,9 +156,11 @@ const Navigation = () => {
             <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#EFE9E3]/94 dark:bg-[#262422]/94 backdrop-blur-xl border-b border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)]">
                 <div className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-[#C9B59C] rounded-lg flex items-center justify-center text-[#000000] font-bold text-xs">
-                            NS
-                        </div>
+                        <img
+                            src="/logo.jpeg"
+                            alt="NextStepAI Logo"
+                            className="w-8 h-8 rounded-lg object-cover"
+                        />
                         <span className="text-base font-bold text-[#000000] dark:text-white tracking-tight">
                             NextStep<span className="text-[#C9B59C]">AI</span>
                         </span>

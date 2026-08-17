@@ -5,6 +5,7 @@ import Button from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import useStore from '../../store';
 import apiClient from '../../api/client';
+import Icon from '../../components/AppIcon';
 
 const PsychometricPage = () => {
     const navigate = useNavigate();
@@ -182,11 +183,11 @@ const PsychometricPage = () => {
         return (
             <div className="min-h-screen py-12 px-4">
                 <div className="max-w-5xl mx-auto">
-                    <Card className="mb-6" pastel="blue">
-                        <CardContent className="p-8 text-center">
-                            <div className="text-6xl mb-4 animate-float">🎉</div>
-                            <h2 className="heading-serif text-display text-[#111111] dark:text-white mb-2">Assessment Complete!</h2>
-                            <p className="text-[#6B6B6B] text-lg">
+                    <Card className="mb-6">
+                        <CardContent className="p-8 text-center bg-[#EFE9E3] dark:bg-[#262422] rounded-2xl border border-[#D9CFC7]">
+                            <Icon name="Award" size={44} className="text-[#000000] dark:text-white mx-auto mb-4" />
+                            <h2 className="heading-serif text-display text-[#000000] dark:text-white mb-2">Assessment Complete!</h2>
+                            <p className="text-[#555555] dark:text-[#A1A1A1] text-lg">
                                 Review your personality profile below
                             </p>
                         </CardContent>
@@ -216,7 +217,7 @@ const PsychometricPage = () => {
                             size="lg"
                             className="px-12 py-6 text-lg"
                         >
-                            🚀 Submit & View Profile
+                            Submit & View Profile
                         </Button>
                         <Button
                             onClick={() => {
@@ -228,7 +229,7 @@ const PsychometricPage = () => {
                             size="lg"
                             className="px-12 py-6 text-lg"
                         >
-                            ← Retake Test
+                            Retake Test
                         </Button>
                     </div>
                 </div>
@@ -247,11 +248,11 @@ const PsychometricPage = () => {
         return (
             <div className="min-h-screen py-12 px-4">
                 <div className="max-w-5xl mx-auto">
-                    <Card className="mb-6" pastel="purple">
-                        <CardContent className="p-8 text-center">
-                            <div className="text-6xl mb-4 animate-float">📊</div>
-                            <h2 className="heading-serif text-display text-[#111111] dark:text-white mb-2">Your Previous Results</h2>
-                            <p className="text-[#6B6B6B] text-lg">
+                    <Card className="mb-6">
+                        <CardContent className="p-8 text-center bg-[#EFE9E3] dark:bg-[#262422] rounded-2xl border border-[#D9CFC7]">
+                            <Icon name="BarChart3" size={44} className="text-[#000000] dark:text-white mx-auto mb-4" />
+                            <h2 className="heading-serif text-display text-[#000000] dark:text-white mb-2">Your Previous Results</h2>
+                            <p className="text-[#555555] dark:text-[#A1A1A1] text-lg">
                                 Completed on {new Date(psychometric.takenAt).toLocaleDateString()}
                             </p>
                         </CardContent>
@@ -308,7 +309,7 @@ const PsychometricPage = () => {
             <div className="min-h-screen flex items-center justify-center px-4">
                 <Card className="max-w-2xl w-full">
                     <CardContent className="pt-8 text-center">
-                        <div className="text-6xl mb-6 animate-float">✅</div>
+                        <Icon name="CheckCircle2" size={48} className="text-[#000000] dark:text-white mx-auto mb-6" />
                         <h2 className="heading-serif text-display text-[#111111] dark:text-white mb-4">Personality Assessment Completed!</h2>
                         <p className="text-[#6B6B6B] mb-8">
                             You completed the assessment on {new Date(psychometric.takenAt).toLocaleDateString()}
@@ -317,9 +318,9 @@ const PsychometricPage = () => {
                             <Button
                                 onClick={() => setShowPreviousResults(true)}
                                 size="lg"
-                                className="w-full"
+                                className="w-full flex items-center justify-center gap-2"
                             >
-                                📊 View Previous Results
+                                <Icon name="BarChart3" size={17} /> View Previous Results
                             </Button>
                             <Button onClick={() => navigate('/profile')} size="lg" variant="outline" className="w-full">
                                 View Profile
@@ -346,57 +347,59 @@ const PsychometricPage = () => {
     if (!showTest) {
         return (
             <div className="min-h-screen flex items-center justify-center px-4">
-                <Card className="max-w-2xl w-full" pastel="blue">
+                <Card className="max-w-2xl w-full">
                     <CardContent className="p-8 text-center">
-                        <div className="text-6xl mb-6 animate-float">🧠</div>
-                        <h2 className="heading-serif text-display text-[#111111] dark:text-white mb-4">AI-Powered Personality Assessment</h2>
-                        <p className="text-[#6B6B6B] mb-8">
+                        <div className="w-16 h-16 bg-[#C9B59C] rounded-2xl flex items-center justify-center text-[#000000] mx-auto mb-6">
+                            <Icon name="Brain" size={32} strokeWidth={2} />
+                        </div>
+                        <h2 className="heading-serif text-display text-[#000000] dark:text-white mb-4">AI-Powered Personality Assessment</h2>
+                        <p className="text-[#555555] mb-8">
                             Complete a quick 5-minute personality test to help our AI understand your
                             strengths, work style, and career preferences for better recommendations.
                         </p>
 
-                        <div className="bg-[#111111] dark:bg-white rounded-2xl p-6 mb-8 text-white dark:text-[#111111]">
+                        <div className="bg-[#EFE9E3] dark:bg-[#1C1B1A] border border-[#D9CFC7] rounded-2xl p-6 mb-8 text-[#000000] dark:text-white">
                             <h3 className="font-semibold text-lg mb-3">
                                 What we'll assess:
                             </h3>
                             <div className="grid grid-cols-2 gap-4 text-sm text-left">
                                 <div className="flex items-start gap-2">
-                                    <span>🎯</span>
+                                    <Icon name="Target" size={17} className="text-[#C9B59C] mt-0.5" />
                                     <span>Analytical vs Creative thinking</span>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span>👥</span>
+                                    <Icon name="Users" size={17} className="text-[#C9B59C] mt-0.5" />
                                     <span>Leadership potential</span>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span>🤝</span>
+                                    <Icon name="Handshake" size={17} className="text-[#C9B59C] mt-0.5" />
                                     <span>Teamwork preferences</span>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span>💻</span>
+                                    <Icon name="Code2" size={17} className="text-[#C9B59C] mt-0.5" />
                                     <span>Technical aptitude</span>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span>💬</span>
+                                    <Icon name="MessageSquare" size={17} className="text-[#C9B59C] mt-0.5" />
                                     <span>Communication style</span>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span>💡</span>
+                                    <Icon name="Lightbulb" size={17} className="text-[#C9B59C] mt-0.5" />
                                     <span>Innovation mindset</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="space-y-3">
-                            <Button onClick={() => setShowTest(true)} size="lg" className="w-full">
-                                🚀 Start Test (2 min)
+                            <Button onClick={() => setShowTest(true)} size="lg" className="w-full flex items-center justify-center gap-2">
+                                <Icon name="Sparkles" size={17} /> Start Test (2 min)
                             </Button>
                             <Button variant="outline" onClick={() => navigate('/profile')} className="w-full">
                                 Skip for Now →
                             </Button>
                         </div>
 
-                        <p className="text-xs text-[#909090] mt-6">
+                        <p className="text-xs text-[#555555] mt-6">
                             Your responses are used solely for career recommendations
                         </p>
                     </CardContent>
@@ -439,20 +442,20 @@ const PsychometricPage = () => {
                     <CardContent>
                         <div className="space-y-3">
                             {[
-                                { label: 'Strongly Disagree', score: 1, emoji: '❌' },
-                                { label: 'Disagree', score: 2, emoji: '👎' },
-                                { label: 'Neutral', score: 3, emoji: '😐' },
-                                { label: 'Agree', score: 4, emoji: '👍' },
-                                { label: 'Strongly Agree', score: 5, emoji: '✅' },
+                                { label: 'Strongly Disagree', score: 1, icon: 'X' },
+                                { label: 'Disagree', score: 2, icon: 'ThumbsDown' },
+                                { label: 'Neutral', score: 3, icon: 'Minus' },
+                                { label: 'Agree', score: 4, icon: 'ThumbsUp' },
+                                { label: 'Strongly Agree', score: 5, icon: 'Check' },
                             ].map((option) => (
                                 <button
                                     key={option.score}
                                     onClick={() => handleAnswer(option.score)}
                                     className="w-full p-4 rounded-xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] hover:border-[#111111]/30 dark:hover:border-white/30 hover:bg-[#F8F7F3] dark:hover:bg-[#2a2b2e] transition-all duration-200 flex items-center gap-3 text-left group"
                                 >
-                                    <span className="text-2xl group-hover:scale-110 transition-transform">
-                                        {option.emoji}
-                                    </span>
+                                    <div className="w-8 h-8 rounded-lg bg-[#EFE9E3] flex items-center justify-center text-[#000000] font-bold text-xs group-hover:bg-[#C9B59C] transition-colors">
+                                        <Icon name={option.icon} size={15} />
+                                    </div>
                                     <span className="text-[#111111] dark:text-white font-medium flex-1">
                                         {option.label}
                                     </span>

@@ -5,6 +5,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import apiClient from '../../api/client';
+import Icon from '../../components/AppIcon';
 
 const ProjectsPage = () => {
     const navigate = useNavigate();
@@ -40,47 +41,55 @@ const ProjectsPage = () => {
         };
 
         fetchProjects();
-    }, [setProjects, setProjectsError, setProjectsLoading]);
+    }, []);
+
+    const resetForm = () => {
+        setFormData({
+            title: '',
+            description: '',
+            repoUrl: '',
+            liveUrl: '',
+            techStack: '',
+            status: 'in-progress',
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const projectData = {
-            title: formData.title,
-            description: formData.description,
-            githubUrl: formData.repoUrl || null,
-            liveUrl: formData.liveUrl || null,
-            technologies: formData.techStack.split(',').map((tech) => tech.trim()).filter(Boolean),
-            status: formData.status,
-            completedAt: formData.status === 'completed' ? new Date().toISOString() : null,
-        };
-
+        
         try {
             setProjectsLoading(true);
-            
+            const technologies = formData.techStack
+                ? formData.techStack.split(',').map((t) => t.trim()).filter(Boolean)
+                : [];
+
+            const projectData = {
+                title: formData.title,
+                description: formData.description,
+                githubUrl: formData.repoUrl,
+                liveUrl: formData.liveUrl,
+                technologies,
+                status: formData.status,
+                completedAt: formData.status === 'completed' ? new Date().toISOString() : null,
+            };
+
             if (editingProject) {
                 // Update existing project
-                await apiClient.put(`/projects/${editingProject.id}`, projectData);
+                const response = await apiClient.put(`/projects/${editingProject.id}`, projectData);
+                const updatedList = projectsList.map((p) =>
+                    p.id === editingProject.id ? response.data : p
+                );
+                setProjects(updatedList);
             } else {
                 // Create new project
-                await apiClient.post('/projects', projectData);
+                const response = await apiClient.post('/projects', projectData);
+                setProjects([...projectsList, response.data]);
             }
 
-            // Refresh projects list
-            const response = await apiClient.get('/projects');
-            setProjects(response.data || []);
-            setProjectsLoading(false);
-
-            setFormData({
-                title: '',
-                description: '',
-                repoUrl: '',
-                liveUrl: '',
-                techStack: '',
-                status: 'in-progress',
-            });
             setShowAddForm(false);
             setEditingProject(null);
+            resetForm();
+            setProjectsLoading(false);
         } catch (error) {
             console.error('Failed to save project:', error);
             setProjectsError(error.message || 'Failed to save project');
@@ -90,30 +99,26 @@ const ProjectsPage = () => {
     };
 
     const handleEdit = (project) => {
+        setEditingProject(project);
         setFormData({
             title: project.title,
-            description: project.description,
+            description: project.description || '',
             repoUrl: project.githubUrl || '',
             liveUrl: project.liveUrl || '',
             techStack: project.technologies ? project.technologies.join(', ') : '',
-            status: project.status || (project.completedAt ? 'completed' : 'in-progress'),
+            status: project.status || 'in-progress',
         });
-        setEditingProject(project);
         setShowAddForm(true);
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this project?')) {
-            return;
-        }
+        if (!window.confirm('Are you sure you want to delete this project?')) return;
 
         try {
             setProjectsLoading(true);
             await apiClient.delete(`/projects/${id}`);
-            
-            // Refresh projects list
-            const response = await apiClient.get('/projects');
-            setProjects(response.data || []);
+            const updatedList = projectsList.filter((p) => p.id !== id);
+            setProjects(updatedList);
             setProjectsLoading(false);
         } catch (error) {
             console.error('Failed to delete project:', error);
@@ -127,27 +132,27 @@ const ProjectsPage = () => {
     const inProgressProjects = projectsList.length - completedProjects;
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen py-6 px-4 sm:px-6">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="mb-10">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                         <div>
-                            <h1 className="heading-serif text-display text-[#111111] dark:text-white">
+                            <h1 className="heading-serif text-display text-[#000000] dark:text-white">
                                 My Projects
                             </h1>
-                            <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mt-1">
+                            <p className="text-[#555555] dark:text-[#A1A1A1] mt-1">
                                 Showcase your portfolio and track your builds
                             </p>
                         </div>
-                        <Button onClick={() => navigate('/profile')} variant="outline">
-                            ← Back to Profile
+                        <Button onClick={() => navigate('/profile')} variant="outline" className="flex items-center gap-2">
+                            <Icon name="ArrowLeft" size={16} /> Back to Profile
                         </Button>
                     </div>
 
                     {!showAddForm && (
-                        <Button onClick={() => setShowAddForm(true)} size="lg">
-                            ➕ Add New Project
+                        <Button onClick={() => setShowAddForm(true)} size="lg" className="flex items-center gap-2">
+                            <Icon name="Plus" size={17} strokeWidth={2} /> Add New Project
                         </Button>
                     )}
                 </div>
@@ -155,37 +160,37 @@ const ProjectsPage = () => {
                 {/* Stats */}
                 {projectsList.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="card-pastel-blue rounded-2xl p-6 border border-[rgba(216,232,252,0.6)] shadow-card">
+                        <div className="bg-[#EFE9E3] dark:bg-[#262422] rounded-2xl p-6 border border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] shadow-card">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-semibold text-[#1E40AF]">Total Projects</p>
-                                    <p className="text-3xl font-bold text-[#1E40AF] mt-1">
+                                    <p className="text-xs font-semibold text-[#000000] dark:text-white">Total Projects</p>
+                                    <p className="text-3xl font-bold text-[#000000] dark:text-white mt-1">
                                         {projectsList.length}
                                     </p>
                                 </div>
-                                <div className="text-4xl">📁</div>
+                                <Icon name="Folder" size={28} className="text-[#C9B59C]" />
                             </div>
                         </div>
-                        <div className="card-pastel-mint rounded-2xl p-6 border border-[rgba(205,238,220,0.6)] shadow-card">
+                        <div className="bg-[#EFE9E3] dark:bg-[#262422] rounded-2xl p-6 border border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] shadow-card">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-semibold text-[#166534]">Completed</p>
-                                    <p className="text-3xl font-bold text-[#166534] mt-1">
+                                    <p className="text-xs font-semibold text-[#000000] dark:text-white">Completed</p>
+                                    <p className="text-3xl font-bold text-[#000000] dark:text-white mt-1">
                                         {completedProjects}
                                     </p>
                                 </div>
-                                <div className="text-4xl">✅</div>
+                                <Icon name="CheckCircle2" size={28} className="text-[#C9B59C]" />
                             </div>
                         </div>
-                        <div className="card-pastel-yellow rounded-2xl p-6 border border-[rgba(254,243,199,0.6)] shadow-card">
+                        <div className="bg-[#EFE9E3] dark:bg-[#262422] rounded-2xl p-6 border border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] shadow-card">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-semibold text-[#92400E]">In Progress</p>
-                                    <p className="text-3xl font-bold text-[#92400E] mt-1">
+                                    <p className="text-xs font-semibold text-[#000000] dark:text-white">In Progress</p>
+                                    <p className="text-3xl font-bold text-[#000000] dark:text-white mt-1">
                                         {inProgressProjects}
                                     </p>
                                 </div>
-                                <div className="text-4xl">🔄</div>
+                                <Icon name="Clock" size={28} className="text-[#C9B59C]" />
                             </div>
                         </div>
                     </div>
@@ -195,7 +200,10 @@ const ProjectsPage = () => {
                 {showAddForm && (
                     <Card className="mb-8 rounded-2xl">
                         <CardHeader>
-                            <CardTitle>{editingProject ? '✏️ Edit Project' : '➕ Add New Project'}</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                <Icon name={editingProject ? "Edit3" : "Plus"} size={18} />
+                                {editingProject ? 'Edit Project' : 'Add New Project'}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit}>
@@ -212,10 +220,10 @@ const ProjectsPage = () => {
                                         <select
                                             value={formData.status}
                                             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                            className="w-full px-4 py-2.5 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 text-sm"
+                                            className="w-full px-4 py-2.5 border border-[#D9CFC7] rounded-xl bg-white text-[#000000] text-sm focus:ring-2 focus:ring-[#C9B59C]"
                                         >
-                                            <option value="in-progress">🔄 In Progress</option>
-                                            <option value="completed">✅ Completed</option>
+                                            <option value="in-progress">In Progress</option>
+                                            <option value="completed">Completed</option>
                                         </select>
                                     </div>
                                 </div>
@@ -225,7 +233,7 @@ const ProjectsPage = () => {
                                     <textarea
                                         value={formData.description}
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="w-full px-4 py-3 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 text-sm"
+                                        className="w-full px-4 py-3 border border-[#D9CFC7] rounded-xl bg-white text-[#000000] text-sm focus:ring-2 focus:ring-[#C9B59C]"
                                         rows={3}
                                         placeholder="Brief description of the project..."
                                         required
@@ -256,25 +264,20 @@ const ProjectsPage = () => {
                                     />
                                 </div>
 
-                                <div className="flex gap-3">
-                                    <Button type="submit">{editingProject ? 'Update' : 'Add'} Project</Button>
+                                <div className="flex gap-3 justify-end">
                                     <Button
                                         type="button"
                                         variant="outline"
                                         onClick={() => {
                                             setShowAddForm(false);
                                             setEditingProject(null);
-                                            setFormData({
-                                                title: '',
-                                                description: '',
-                                                repoUrl: '',
-                                                liveUrl: '',
-                                                techStack: '',
-                                                status: 'in-progress',
-                                            });
+                                            resetForm();
                                         }}
                                     >
                                         Cancel
+                                    </Button>
+                                    <Button type="submit">
+                                        {editingProject ? 'Update Project' : 'Save Project'}
                                     </Button>
                                 </div>
                             </form>
@@ -289,17 +292,17 @@ const ProjectsPage = () => {
                             <Card key={project.id} hover className="overflow-hidden rounded-2xl flex flex-col justify-between">
                                 <CardContent className="p-6">
                                     <div className="flex justify-between items-start mb-3 gap-2">
-                                        <h3 className="text-lg font-semibold text-[#111111] dark:text-white leading-snug">
+                                        <h3 className="text-lg font-semibold text-[#000000] dark:text-white leading-snug">
                                             {project.title}
                                         </h3>
                                         <span
-                                            className={project.status === 'completed' || project.completedAt ? 'badge-success' : 'badge-warning'}
+                                            className="px-3 py-1 bg-[#C9B59C] text-[#000000] text-xs font-semibold rounded-full"
                                         >
-                                            {project.status === 'completed' || project.completedAt ? '✅ Done' : '🔄 WIP'}
+                                            {project.status === 'completed' || project.completedAt ? 'Done' : 'WIP'}
                                         </span>
                                     </div>
 
-                                    <p className="text-[#6B6B6B] dark:text-[#A1A1A1] text-xs mb-4 leading-relaxed">
+                                    <p className="text-[#555555] dark:text-[#A1A1A1] text-xs mb-4 leading-relaxed">
                                         {project.description}
                                     </p>
 
@@ -309,7 +312,7 @@ const ProjectsPage = () => {
                                                 {project.technologies.map((tech, index) => (
                                                     <span
                                                         key={index}
-                                                        className="badge-info"
+                                                        className="px-2.5 py-1 bg-[#EFE9E3] border border-[#D9CFC7] rounded-md text-xs font-medium text-[#000000]"
                                                     >
                                                         {tech}
                                                     </span>
@@ -318,15 +321,15 @@ const ProjectsPage = () => {
                                         </div>
                                     )}
 
-                                    <div className="flex gap-3 mb-4">
+                                    <div className="flex items-center gap-4 mb-4">
                                         {project.githubUrl && (
                                             <a
                                                 href={project.githubUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center gap-1 text-xs text-[#111111] dark:text-white font-medium hover:underline"
+                                                className="flex items-center gap-1.5 text-xs text-[#000000] dark:text-white font-semibold hover:opacity-75 transition-opacity"
                                             >
-                                                <span>🔗</span> GitHub
+                                                <Icon name="Github" size={14} /> GitHub
                                             </a>
                                         )}
                                         {project.liveUrl && (
@@ -334,31 +337,31 @@ const ProjectsPage = () => {
                                                 href={project.liveUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center gap-1 text-xs text-[#10B981] font-medium hover:underline"
+                                                className="flex items-center gap-1.5 text-xs text-[#000000] dark:text-white font-semibold hover:opacity-75 transition-opacity"
                                             >
-                                                <span>🌐</span> Live Demo
+                                                <Icon name="ExternalLink" size={14} /> Live Demo
                                             </a>
                                         )}
                                     </div>
 
                                     {project.completedAt && (
-                                        <p className="text-xs text-[#909090] mb-4">
+                                        <p className="text-xs text-[#555555] mb-4">
                                             Completed: {new Date(project.completedAt).toLocaleDateString()}
                                         </p>
                                     )}
 
-                                    <div className="flex gap-2 pt-2 border-t border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)]">
+                                    <div className="flex gap-2 pt-3 border-t border-[#D9CFC7] dark:border-[rgba(255,255,255,0.06)]">
                                         <button
                                             onClick={() => handleEdit(project)}
-                                            className="flex-1 py-2 bg-[#F8F7F3] dark:bg-[#2a2b2e] text-[#111111] dark:text-white border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] rounded-full hover:bg-white transition-colors text-xs font-semibold"
+                                            className="flex-1 py-2 px-3 bg-white dark:bg-[#2A2826] text-[#000000] dark:text-white border border-[#D9CFC7] rounded-xl hover:bg-[#EFE9E3] transition-colors text-xs font-semibold flex items-center justify-center gap-1.5"
                                         >
-                                            ✏️ Edit
+                                            <Icon name="Edit3" size={14} /> Edit
                                         </button>
                                         <button
                                             onClick={() => handleDelete(project.id)}
-                                            className="flex-1 py-2 bg-[#FCE5E6] dark:bg-[#991B1B]/20 text-[#991B1B] dark:text-[#FCA5A5] border border-[rgba(252,229,230,0.8)] rounded-full hover:bg-[#F8D7DA] transition-colors text-xs font-semibold"
+                                            className="flex-1 py-2 px-3 bg-white dark:bg-[#2A2826] text-[#000000] dark:text-white border border-[#D9CFC7] rounded-xl hover:bg-[#EFE9E3] transition-colors text-xs font-semibold flex items-center justify-center gap-1.5"
                                         >
-                                            🗑️ Delete
+                                            <Icon name="Trash2" size={14} /> Delete
                                         </button>
                                     </div>
                                 </CardContent>
@@ -368,15 +371,15 @@ const ProjectsPage = () => {
                 ) : (
                     <Card className="text-center rounded-2xl">
                         <CardContent className="py-12">
-                            <div className="text-5xl mb-4">📂</div>
-                            <h3 className="heading-serif text-display text-[#111111] dark:text-white mb-2">
+                            <Icon name="Folder" size={44} strokeWidth={1.8} className="text-[#000000] mx-auto mb-4" />
+                            <h3 className="heading-serif text-display text-[#000000] dark:text-white mb-2">
                                 No Projects Yet
                             </h3>
-                            <p className="text-[#6B6B6B] dark:text-[#A1A1A1] text-sm mb-6">
+                            <p className="text-[#555555] dark:text-[#A1A1A1] text-sm mb-6">
                                 Start building and showcasing your portfolio projects
                             </p>
-                            <Button onClick={() => setShowAddForm(true)} size="lg">
-                                ➕ Add Your First Project
+                            <Button onClick={() => setShowAddForm(true)} className="flex items-center gap-2 mx-auto">
+                                <Icon name="Plus" size={17} strokeWidth={2} /> Add Your First Project
                             </Button>
                         </CardContent>
                     </Card>

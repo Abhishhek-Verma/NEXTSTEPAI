@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../../store';
 import Button from '../../components/ui/Button';
+import Icon from '../../components/AppIcon';
 
 const RecommendationsPage = () => {
     const navigate = useNavigate();
@@ -14,9 +15,9 @@ const RecommendationsPage = () => {
     }, []);
 
     const tabs = [
-        { id: 'roles', label: 'Career Roles', icon: '💼' },
-        { id: 'skills', label: 'Skills to Learn', icon: '🎯' },
-        { id: 'companies', label: 'Target Companies', icon: '🏢' },
+        { id: 'roles', label: 'Career Roles', iconName: 'Briefcase' },
+        { id: 'skills', label: 'Skills to Learn', iconName: 'Target' },
+        { id: 'companies', label: 'Target Companies', iconName: 'Building2' },
     ];
 
     const handleGenerateRecommendations = async () => {
@@ -180,8 +181,10 @@ const RecommendationsPage = () => {
                             onClick={handleGenerateRecommendations} 
                             variant="outline"
                             disabled={recommendations.loading}
+                            className="flex items-center gap-2"
                         >
-                            {recommendations.loading ? 'Generating...' : '🤖 Generate AI Recommendations'}
+                            <Icon name="Sparkles" size={17} strokeWidth={2} />
+                            {recommendations.loading ? 'Generating...' : 'Generate AI Recommendations'}
                         </Button>
                         <Button onClick={() => navigate('/roadmap')}>
                             Generate Roadmap →
@@ -218,7 +221,7 @@ const RecommendationsPage = () => {
                                             : 'text-[#6B6B6B] hover:text-[#111111] hover:bg-[#F8F7F3] dark:text-[#A1A1A1] dark:hover:text-white dark:hover:bg-[#2a2b2e]'
                                     }`}
                                 >
-                                    <span className="text-base">{tab.icon}</span>
+                                    <Icon name={tab.iconName} size={18} strokeWidth={2} />
                                     {tab.label}
                                 </button>
                             );

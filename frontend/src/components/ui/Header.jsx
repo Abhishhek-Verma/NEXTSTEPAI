@@ -96,9 +96,11 @@ const Header = () => {
                 className="flex items-center gap-2.5 group"
                 aria-label="NextStepAI Home"
               >
-                <div className="w-9 h-9 bg-[#C9B59C] rounded-xl flex items-center justify-center text-[#000000] font-bold text-xs transition-transform duration-200 group-hover:scale-105">
-                  NS
-                </div>
+                <img
+                  src="/logo.jpeg"
+                  alt="NextStepAI Logo"
+                  className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 group-hover:scale-105"
+                />
                 <span className="text-lg font-bold text-[#000000] dark:text-white tracking-tight">
                   NextStep<span className="text-[#C9B59C]">AI</span>
                 </span>
