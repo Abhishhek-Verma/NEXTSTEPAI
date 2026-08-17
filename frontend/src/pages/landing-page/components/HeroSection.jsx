@@ -1,12 +1,62 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../../components/ui/Button';
 
 const HeroSection = () => {
+  const vantaRef = useRef(null);
+  const vantaEffectRef = useRef(null);
+
+  // Initialize Vanta CLOUDS strictly scoped ONLY to the Hero section container
+  useEffect(() => {
+    let timer = null;
+
+    const initVantaEffect = () => {
+      if (window.VANTA && window.VANTA.CLOUDS && vantaRef.current && !vantaEffectRef.current) {
+        try {
+          vantaEffectRef.current = window.VANTA.CLOUDS({
+            el: vantaRef.current,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00
+          });
+        } catch (err) {
+          console.error('Vanta CLOUDS initialization error:', err);
+        }
+      }
+    };
+
+    if (window.VANTA && window.VANTA.CLOUDS) {
+      initVantaEffect();
+    } else {
+      timer = setInterval(() => {
+        if (window.VANTA && window.VANTA.CLOUDS) {
+          initVantaEffect();
+          if (timer) clearInterval(timer);
+        }
+      }, 50);
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+      if (vantaEffectRef.current) {
+        vantaEffectRef.current.destroy();
+        vantaEffectRef.current = null;
+      }
+    };
+  }, []);
+
   return (
-    <section className="relative overflow-hidden bg-bg dark:bg-bg-dark pt-36 pb-20 sm:pt-44 sm:pb-28">
+    <section className="relative overflow-hidden min-h-[85vh] flex items-center bg-bg dark:bg-bg-dark pt-36 pb-20 sm:pt-44 sm:pb-28">
+      {/* Vanta CLOUDS Animation Canvas - Strictly Scoped ONLY to the Hero section */}
+      <div
+        ref={vantaRef}
+        className="absolute inset-0 z-0 pointer-events-none w-full h-full"
+      />
+
       {/* Subtle background decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
         {/* Dotted pattern */}
         <div className="absolute inset-0 bg-dots opacity-30" />
         
@@ -21,7 +71,7 @@ const HeroSection = () => {
         </svg>
       </div>
 
-      <div className="page-container relative z-10">
+      <div className="page-container relative z-10 w-full">
         <div className="text-center max-w-4xl mx-auto">
           {/* Feature Pills */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">

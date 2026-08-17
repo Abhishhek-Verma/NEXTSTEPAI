@@ -60,6 +60,8 @@
     "tailwindcss-animate": "^1.0.7",
     "tailwindcss-elevation": "^2.0.0",
     "tailwindcss-fluid-type": "^2.0.7",
+    "three": "^0.134.0",
+    "vanta": "^0.5.24",
     "zustand": "^5.0.9"
   },
   "scripts": {
