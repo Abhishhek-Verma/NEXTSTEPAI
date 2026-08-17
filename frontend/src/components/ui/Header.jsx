@@ -101,8 +101,8 @@ const Header = () => {
                   alt="NextStepAI Logo"
                   className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 group-hover:scale-105"
                 />
-                <span className="text-lg font-bold text-[#000000] dark:text-white tracking-tight">
-                  NextStep<span className="text-[#C9B59C]">AI</span>
+                <span className="text-lg font-bold text-[#141414] dark:text-white tracking-tight">
+                  NextStep<span className="text-[#FF5722]">AI</span>
                 </span>
               </a>
             </div>
@@ -118,8 +118,8 @@ const Header = () => {
                     href={item?.anchor}
                     onClick={(e) => handleNavClick(e, item?.anchor, item?.offset)}
                     className={`px-4 py-2 text-sm font-medium transition-all duration-200 rounded-full ${isActive
-                      ? 'text-[#000000] bg-[#C9B59C] dark:text-white dark:bg-[#33302D]'
-                      : 'text-[#000000]/70 hover:text-[#000000] hover:bg-[#D9CFC7]/50 dark:text-[#A1A1A1] dark:hover:text-white'
+                      ? 'text-white bg-[#FF5722] font-bold shadow-sm'
+                      : 'text-[#141414]/80 hover:text-[#FF5722] hover:bg-[#D9CFC7]/40 dark:text-[#A1A1A1] dark:hover:text-white'
                       }`}
                   >
                     {item?.label}

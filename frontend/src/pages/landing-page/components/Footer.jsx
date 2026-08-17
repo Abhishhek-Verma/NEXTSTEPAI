@@ -107,7 +107,7 @@ const Footer = () => {
                 className="w-10 h-10 rounded-xl object-cover transition-transform duration-200 group-hover:scale-105"
               />
               <span className="text-2xl font-bold text-white tracking-tight">
-                NextStep<span className="text-[#C9B59C]">AI</span>
+                NextStep<span className="text-[#FF5722]">AI</span>
               </span>
             </a>
             <p className="text-sm text-[#A1A1A1] leading-relaxed">
@@ -120,7 +120,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="w-9 h-9 bg-[#262422] border border-[#D9CFC7]/20 text-white rounded-xl flex items-center justify-center hover:bg-[#C9B59C] hover:text-[#000000] transition-colors duration-300"
+                className="w-9 h-9 bg-[#262422] border border-[#D9CFC7]/20 text-white rounded-xl flex items-center justify-center hover:bg-[#FF5722] hover:text-white transition-colors duration-300"
                 title="LinkedIn Profile"
               >
                 <Icon name="Linkedin" size={18} />
@@ -129,7 +129,7 @@ const Footer = () => {
               <a
                 href="mailto:abhishekatkiet@gmail.com"
                 aria-label="Email"
-                className="w-9 h-9 bg-[#262422] border border-[#D9CFC7]/20 text-white rounded-xl flex items-center justify-center hover:bg-[#C9B59C] hover:text-[#000000] transition-colors duration-300"
+                className="w-9 h-9 bg-[#262422] border border-[#D9CFC7]/20 text-white rounded-xl flex items-center justify-center hover:bg-[#FF5722] hover:text-white transition-colors duration-300"
                 title="Contact Email"
               >
                 <Icon name="Mail" size={18} />
@@ -142,17 +142,17 @@ const Footer = () => {
             <h3 className="font-semibold text-[#F9F8F6] mb-4">Product</h3>
             <ul className="space-y-2.5">
               <li>
-                <a href="#features" className="text-sm text-[#A1A1A1] hover:text-[#C9B59C] transition-colors duration-200">
+                <a href="#features" className="text-sm text-[#A1A1A1] hover:text-[#FF5722] transition-colors duration-200">
                   Features
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" className="text-sm text-[#A1A1A1] hover:text-[#C9B59C] transition-colors duration-200">
+                <a href="#how-it-works" className="text-sm text-[#A1A1A1] hover:text-[#FF5722] transition-colors duration-200">
                   How It Works
                 </a>
               </li>
               <li>
-                <a href="#success-stories" className="text-sm text-[#A1A1A1] hover:text-[#C9B59C] transition-colors duration-200">
+                <a href="#success-stories" className="text-sm text-[#A1A1A1] hover:text-[#FF5722] transition-colors duration-200">
                   Success Stories
                 </a>
               </li>
@@ -166,7 +166,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => setActiveModal('about')}
-                  className="text-sm text-[#A1A1A1] hover:text-[#C9B59C] transition-colors duration-200 text-left"
+                  className="text-sm text-[#A1A1A1] hover:text-[#FF5722] transition-colors duration-200 text-left"
                 >
                   About NextStepAI
                 </button>
@@ -174,7 +174,7 @@ const Footer = () => {
               <li>
                 <a
                   href="mailto:abhishekatkiet@gmail.com"
-                  className="text-sm text-[#A1A1A1] hover:text-[#C9B59C] transition-colors duration-200 flex items-center gap-1.5"
+                  className="text-sm text-[#A1A1A1] hover:text-[#FF5722] transition-colors duration-200 flex items-center gap-1.5"
                 >
                   <span>Contact Us</span>
                   <Icon name="ExternalLink" size={12} />
@@ -190,7 +190,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => setActiveModal('privacy')}
-                  className="text-sm text-[#A1A1A1] hover:text-[#C9B59C] transition-colors duration-200 text-left"
+                  className="text-sm text-[#A1A1A1] hover:text-[#FF5722] transition-colors duration-200 text-left"
                 >
                   Privacy Policy
                 </button>
@@ -198,7 +198,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => setActiveModal('terms')}
-                  className="text-sm text-[#A1A1A1] hover:text-[#C9B59C] transition-colors duration-200 text-left"
+                  className="text-sm text-[#A1A1A1] hover:text-[#FF5722] transition-colors duration-200 text-left"
                 >
                   Terms of Service
                 </button>
@@ -206,7 +206,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => setActiveModal('cookies')}
-                  className="text-sm text-[#A1A1A1] hover:text-[#C9B59C] transition-colors duration-200 text-left"
+                  className="text-sm text-[#A1A1A1] hover:text-[#FF5722] transition-colors duration-200 text-left"
                 >
                   Cookie Policy
                 </button>
@@ -221,15 +221,15 @@ const Footer = () => {
             &copy; {currentYear} NextStep AI. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-sm text-[#A1A1A1]">
-            <button onClick={() => setActiveModal('privacy')} className="hover:text-[#C9B59C] transition-colors">
+            <button onClick={() => setActiveModal('privacy')} className="hover:text-[#FF5722] transition-colors">
               Privacy Policy
             </button>
             <span>•</span>
-            <button onClick={() => setActiveModal('terms')} className="hover:text-[#C9B59C] transition-colors">
+            <button onClick={() => setActiveModal('terms')} className="hover:text-[#FF5722] transition-colors">
               Terms of Service
             </button>
             <span>•</span>
-            <button onClick={() => setActiveModal('cookies')} className="hover:text-[#C9B59C] transition-colors">
+            <button onClick={() => setActiveModal('cookies')} className="hover:text-[#FF5722] transition-colors">
               Cookie Policy
             </button>
           </div>
@@ -239,19 +239,19 @@ const Footer = () => {
       {/* Info Content Modal */}
       {activeModal && modalContents[activeModal] && (
         <div className="fixed inset-0 bg-[#000000]/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-          <div className="bg-[#EFE9E3] dark:bg-[#262422] rounded-3xl shadow-lift border border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] max-w-lg w-full p-6 sm:p-8 animate-slide-up text-[#000000] dark:text-white">
+          <div className="bg-[#EFE9E3] dark:bg-[#262422] rounded-3xl shadow-lift border border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] max-w-lg w-full p-6 sm:p-8 animate-slide-up text-[#141414] dark:text-white">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#C9B59C]/20 rounded-xl flex items-center justify-center text-[#000000] dark:text-[#C9B59C]">
+                <div className="w-10 h-10 bg-[#FF5722]/15 rounded-xl flex items-center justify-center text-[#FF5722]">
                   <Icon name={modalContents[activeModal].icon} size={20} />
                 </div>
-                <h3 className="text-xl font-bold text-[#000000] dark:text-white">
+                <h3 className="text-xl font-bold text-[#141414] dark:text-white">
                   {modalContents[activeModal].title}
                 </h3>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
-                className="p-2 text-[#555555] hover:text-[#000000] dark:text-[#A1A1A1] dark:hover:text-white rounded-xl hover:bg-[#D9CFC7]/50 transition-colors"
+                className="p-2 text-[#555555] hover:text-[#141414] dark:text-[#A1A1A1] dark:hover:text-white rounded-xl hover:bg-[#D9CFC7]/50 transition-colors"
               >
                 <Icon name="X" size={20} />
               </button>
@@ -264,7 +264,7 @@ const Footer = () => {
             <div className="mt-6 pt-4 border-t border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] flex justify-end">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-6 py-2.5 bg-[#C9B59C] text-[#000000] font-bold text-sm rounded-xl hover:bg-[#b8a388] transition-colors"
+                className="px-6 py-2.5 bg-[#FF5722] text-white font-bold text-sm rounded-xl hover:bg-[#e04d1d] transition-colors"
               >
                 Close
               </button>

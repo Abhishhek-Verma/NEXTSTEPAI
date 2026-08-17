@@ -25,22 +25,22 @@ const HeroSection = () => {
         <div className="text-center max-w-4xl mx-auto">
           {/* Feature Pills */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <span className="pill-badge">
-              <span className="text-xs">✦</span> AI Powered
+            <span className="pill-badge border-[#FF5722]/30">
+              <span className="text-xs text-[#FF5722]">✦</span> AI Powered
             </span>
-            <span className="pill-badge">
-              <span className="text-xs">✓</span> Personalized
+            <span className="pill-badge border-[#FF5722]/30">
+              <span className="text-xs text-[#FF5722]">✓</span> Personalized
             </span>
-            <span className="pill-badge">
-              <span className="text-xs">✓</span> Data Driven
+            <span className="pill-badge border-[#FF5722]/30">
+              <span className="text-xs text-[#FF5722]">✓</span> Data Driven
             </span>
           </div>
 
           {/* Main Heading - Editorial Serif */}
-          <h1 className="heading-serif text-hero text-[#111111] dark:text-white mb-4 text-balance">
+          <h1 className="heading-serif text-hero text-[#141414] dark:text-white mb-2 text-balance">
             Your Personalized B.Tech
           </h1>
-          <h1 className="heading-serif-italic text-hero text-[#111111] dark:text-white mb-8 text-balance">
+          <h1 className="heading-serif-italic text-hero text-[#FF5722] mb-8 text-balance">
             Career Roadmap.
           </h1>
 

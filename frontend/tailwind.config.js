@@ -50,28 +50,28 @@ module.exports = {
           DEFAULT: '#D9CFC7',
           dark: 'rgba(217, 207, 199, 0.2)',
         },
-        /* === Button / Main Accent Color: #C9B59C === */
+        /* === Button / Main Accent Color: #FF5722 === */
         primary: {
-          DEFAULT: '#C9B59C',
-          foreground: '#000000',
+          DEFAULT: '#FF5722',
+          foreground: '#FFFFFF',
           50: '#F9F8F6',
           100: '#EFE9E3',
-          500: '#C9B59C',
-          600: '#B8A388',
-          700: '#A49076',
-          900: '#756550',
+          500: '#FF5722',
+          600: '#E64A19',
+          700: '#D84315',
+          900: '#BF360C',
         },
         secondary: {
           DEFAULT: '#EFE9E3',
-          foreground: '#000000',
+          foreground: '#141414',
         },
         tertiary: {
           DEFAULT: '#D9CFC7',
-          foreground: '#000000',
+          foreground: '#141414',
         },
         accent: {
-          DEFAULT: '#C9B59C',
-          foreground: '#000000',
+          DEFAULT: '#FF5722',
+          foreground: '#FFFFFF',
         },
         destructive: {
           DEFAULT: '#C9B59C',

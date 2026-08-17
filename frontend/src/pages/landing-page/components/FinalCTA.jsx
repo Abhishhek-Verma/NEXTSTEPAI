@@ -27,7 +27,7 @@ const FinalCTA = ({ onGenerateRoadmap }) => {
   }, []);
 
   return (
-    <section id="get-started" className="py-16 px-4 bg-gradient-to-br from-primary via-primary/90 to-accent relative overflow-hidden">
+    <section id="get-started" className="py-16 px-4 bg-gradient-to-br from-[#FF5722] via-[#E64A19] to-[#141414] relative overflow-hidden">
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl" />
@@ -57,7 +57,7 @@ const FinalCTA = ({ onGenerateRoadmap }) => {
               onClick={onGenerateRoadmap}
               iconName="Sparkles"
               iconPosition="left"
-              className="bg-white text-primary hover:bg-white/90 shadow-cta hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="bg-[#141414] text-white hover:bg-[#262422] shadow-cta hover:shadow-xl transition-all duration-300 hover:scale-105 font-bold"
             >
               Generate My Roadmap Now
             </Button>
@@ -81,7 +81,7 @@ const FinalCTA = ({ onGenerateRoadmap }) => {
           {recentSignups?.length > 0 && (
             <div className="mt-8 animate-fade-in">
               <div className="inline-flex items-center gap-3 px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-                <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                 <span className="text-sm text-white">
                   <strong>{recentSignups?.[0]?.name}</strong> from {recentSignups?.[0]?.university} just generated their roadmap {recentSignups?.[0]?.time}
                 </span>
@@ -116,12 +116,12 @@ const FinalCTA = ({ onGenerateRoadmap }) => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/auth/register">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto bg-[#141414] text-white hover:bg-[#262422]">
                 Start Your Journey
               </Button>
             </Link>
             <Link to="/auth/login">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white text-[#141414] hover:bg-[#EFE9E3]">
                 Sign In
               </Button>
             </Link>

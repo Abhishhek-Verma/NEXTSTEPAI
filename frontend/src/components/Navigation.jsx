@@ -74,13 +74,13 @@ const Navigation = () => {
                                     alt="NextStepAI Logo"
                                     className="w-10 h-10 rounded-xl object-cover shadow-sm"
                                 />
-                                <span className="text-lg font-bold text-[#000000] dark:text-white tracking-tight">
-                                    NextStep<span className="text-[#C9B59C]">AI</span>
+                                <span className="text-lg font-bold text-[#141414] dark:text-white tracking-tight">
+                                    NextStep<span className="text-[#FF5722]">AI</span>
                                 </span>
                             </div>
                             <button
                                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                                className="p-2 text-[#000000]/70 hover:bg-[#D9CFC7] dark:text-[#A1A1A1] dark:hover:bg-[#33302D] rounded-xl transition-colors"
+                                className="p-2 text-[#141414]/70 hover:bg-[#D9CFC7] dark:text-[#A1A1A1] dark:hover:bg-[#33302D] rounded-xl transition-colors"
                                 title="Collapse sidebar"
                             >
                                 <Icon name="ChevronLeft" size={18} strokeWidth={2} />
@@ -94,12 +94,12 @@ const Navigation = () => {
                     <div className="px-5 py-4 border-b border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)]">
                         <div className="flex items-center gap-3">
                             <img
-                                src={user?.imageUrl || `https://ui-avatars.com/api/?name=${user?.firstName}+${user?.lastName}&background=C9B59C&color=000000`}
+                                src={user?.imageUrl || `https://ui-avatars.com/api/?name=${user?.firstName}+${user?.lastName}&background=FF5722&color=FFFFFF`}
                                 alt="Profile"
-                                className="w-9 h-9 rounded-full ring-2 ring-[#D9CFC7] dark:ring-[rgba(217,207,199,0.15)]"
+                                className="w-9 h-9 rounded-full ring-2 ring-[#FF5722]"
                             />
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-[#000000] dark:text-white truncate">
+                                <p className="text-sm font-medium text-[#141414] dark:text-white truncate">
                                     {user?.fullName || 'User'}
                                 </p>
                                 <p className="text-xs text-[#555555] dark:text-[#A1A1A1] truncate">
@@ -120,8 +120,8 @@ const Navigation = () => {
                                 to={link.path}
                                 className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                                     active
-                                        ? 'bg-[#C9B59C] text-[#000000] font-semibold shadow-sm'
-                                        : 'text-[#000000]/80 hover:bg-[#D9CFC7] hover:text-[#000000] dark:text-[#A1A1A1] dark:hover:bg-[#33302D] dark:hover:text-white'
+                                        ? 'bg-[#FF5722] text-white font-bold shadow-sm'
+                                        : 'text-[#141414]/80 hover:bg-[#D9CFC7]/50 hover:text-[#FF5722] dark:text-[#A1A1A1] dark:hover:bg-[#33302D] dark:hover:text-white'
                                 } ${isSidebarCollapsed ? 'justify-center px-0' : ''}`}
                                 title={isSidebarCollapsed ? link.label : ''}
                             >
@@ -129,7 +129,7 @@ const Navigation = () => {
                                     name={link.iconName}
                                     size={19}
                                     strokeWidth={active ? 2.2 : 1.8}
-                                    className={`flex-shrink-0 ${active ? 'text-[#000000]' : 'text-[#000000]/70 dark:text-[#A1A1A1]'}`}
+                                    className={`flex-shrink-0 ${active ? 'text-white' : 'text-[#141414]/70 dark:text-[#A1A1A1]'}`}
                                 />
                                 {!isSidebarCollapsed && link.label}
                             </Link>

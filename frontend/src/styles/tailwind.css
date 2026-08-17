@@ -92,12 +92,12 @@
 
   /* Selection */
   ::selection {
-    background-color: #C9B59C;
-    color: #000000;
+    background-color: #FF5722;
+    color: #FFFFFF;
   }
 
   .dark ::selection {
-    background-color: rgba(201, 181, 156, 0.4);
+    background-color: #FF5722;
     color: #FFFFFF;
   }
 }
@@ -150,28 +150,28 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   }
 
-  /* Main Button / Accent Color: #C9B59C */
+  /* Main Button / Accent Color: #FF5722 */
   .btn-primary-pill {
-    background: #C9B59C;
-    color: #000000;
+    background: #FF5722;
+    color: #FFFFFF;
     border-radius: 9999px;
-    font-weight: 600;
+    font-weight: 700;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-primary-pill:hover {
-    background: #B8A388;
+    background: #e04d1d;
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(201, 181, 156, 0.3);
+    box-shadow: 0 8px 20px rgba(255, 87, 34, 0.3);
   }
 
   .dark .btn-primary-pill {
-    background: #C9B59C;
-    color: #000000;
+    background: #FF5722;
+    color: #FFFFFF;
   }
 
   .dark .btn-primary-pill:hover {
-    background: #B8A388;
+    background: #e04d1d;
   }
 
   /* Secondary Button Surface: #EFE9E3 */

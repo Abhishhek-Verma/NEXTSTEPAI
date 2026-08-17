@@ -9,15 +9,15 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-[#C9B59C] text-[#000000] rounded-full hover:bg-[#B8A388] hover:-translate-y-0.5 hover:shadow-md dark:bg-[#C9B59C] dark:text-[#000000] dark:hover:bg-[#B8A388]",
-                destructive: "bg-[#C9B59C] text-[#000000] rounded-full hover:bg-[#B8A388]",
-                outline: "border border-[#D9CFC7] bg-[#F9F8F6] text-[#000000] rounded-full hover:bg-[#EFE9E3] hover:-translate-y-0.5 hover:shadow-soft dark:bg-[#262422] dark:text-[#F9F8F6] dark:border-[rgba(217,207,199,0.15)] dark:hover:bg-[#33302D]",
-                secondary: "bg-[#EFE9E3] text-[#000000] border border-[#D9CFC7] rounded-full hover:bg-[#D9CFC7] dark:bg-[#262422] dark:text-[#F9F8F6]",
-                ghost: "rounded-xl text-[#000000] hover:bg-[#EFE9E3] dark:text-[#F9F8F6] dark:hover:bg-[#262422]",
-                link: "text-[#000000] underline-offset-4 hover:underline dark:text-[#F9F8F6]",
-                success: "bg-[#C9B59C] text-[#000000] rounded-full hover:bg-[#B8A388]",
-                warning: "bg-[#C9B59C] text-[#000000] rounded-full hover:bg-[#B8A388]",
-                danger: "bg-[#C9B59C] text-[#000000] rounded-full hover:bg-[#B8A388]",
+                default: "bg-[#FF5722] text-white font-bold rounded-full hover:bg-[#e04d1d] hover:-translate-y-0.5 hover:shadow-md dark:bg-[#FF5722] dark:text-white dark:hover:bg-[#e04d1d]",
+                destructive: "bg-[#FF5722] text-white rounded-full hover:bg-[#e04d1d]",
+                outline: "border border-[#D9CFC7] bg-[#F9F8F6] text-[#141414] rounded-full hover:bg-[#EFE9E3] hover:border-[#FF5722] hover:-translate-y-0.5 hover:shadow-soft dark:bg-[#262422] dark:text-[#F9F8F6] dark:border-[rgba(217,207,199,0.15)] dark:hover:bg-[#33302D]",
+                secondary: "bg-[#EFE9E3] text-[#141414] border border-[#D9CFC7] rounded-full hover:bg-[#D9CFC7] dark:bg-[#262422] dark:text-[#F9F8F6]",
+                ghost: "rounded-xl text-[#141414] hover:bg-[#EFE9E3] hover:text-[#FF5722] dark:text-[#F9F8F6] dark:hover:bg-[#262422]",
+                link: "text-[#141414] underline-offset-4 hover:underline hover:text-[#FF5722] dark:text-[#F9F8F6]",
+                success: "bg-[#FF5722] text-white rounded-full hover:bg-[#e04d1d]",
+                warning: "bg-[#FF5722] text-white rounded-full hover:bg-[#e04d1d]",
+                danger: "bg-[#FF5722] text-white rounded-full hover:bg-[#e04d1d]",
             },
             size: {
                 default: "h-11 px-6 py-2.5 text-sm",

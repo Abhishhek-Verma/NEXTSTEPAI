@@ -102,7 +102,7 @@ const FeaturesGrid = () => {
           {features?.map((feature, index) => (
             <div
               key={feature?.id}
-              className={`bg-card rounded-xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg cursor-pointer ${
+              className={`bg-[#EFE9E3] dark:bg-[#262422] rounded-3xl border border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] hover:border-[#FF5722] transition-all duration-300 hover:shadow-xl cursor-pointer ${
                 isVisible ? 'animate-slide-up' : 'opacity-0'
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
@@ -111,35 +111,35 @@ const FeaturesGrid = () => {
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`p-3 rounded-lg ${feature?.iconBg}`}>
-                    <Icon name={feature?.icon} size={24} className={feature?.iconColor} />
+                  <div className="p-3 rounded-2xl bg-[#FF5722]/10 border border-[#FF5722]/20">
+                    <Icon name={feature?.icon} size={24} className="text-[#FF5722]" />
                   </div>
-                  <span className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
+                  <span className="px-3 py-1 bg-[#FF5722]/10 text-[#FF5722] text-xs font-bold rounded-full border border-[#FF5722]/20">
                     {feature?.badge}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-semibold text-foreground mb-2">
+                <h3 className="text-xl font-bold text-[#141414] dark:text-white mb-2 group-hover:text-[#FF5722] transition-colors">
                   {feature?.title}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-[#555555] dark:text-[#A1A1A1] leading-relaxed mb-4">
                   {feature?.description}
                 </p>
 
                 {hoveredCard === feature?.id && (
-                  <div className="mt-4 pt-4 border-t border-border space-y-2 animate-fade-in">
+                  <div className="mt-4 pt-4 border-t border-[#D9CFC7]/40 space-y-2 animate-fade-in">
                     {feature?.preview?.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-2">
-                        <Icon name="Check" size={16} className="text-success mt-0.5 flex-shrink-0" />
-                        <span className="text-xs text-foreground">{item}</span>
+                        <Icon name="Check" size={16} className="text-[#FF5722] mt-0.5 flex-shrink-0" />
+                        <span className="text-xs text-[#141414] dark:text-white font-medium">{item}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
-                <div className="mt-4 flex items-center gap-2 text-primary hover:gap-3 transition-all duration-300">
-                  <span className="text-sm font-medium">Learn more</span>
-                  <Icon name="ArrowRight" size={16} />
+                <div className="mt-4 flex items-center gap-2 text-[#FF5722] font-bold text-xs hover:gap-3 transition-all duration-300">
+                  <span>Learn more</span>
+                  <Icon name="ArrowRight" size={14} />
                 </div>
               </div>
             </div>
