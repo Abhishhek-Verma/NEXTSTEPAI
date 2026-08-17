@@ -46,9 +46,7 @@ const AcademicPage = () => {
                 details: record.details || (record.subjects && record.subjects.length > 0 ? { subjects: record.subjects } : null)
             }));
 
-            console.log('Saving records:', recordsToSave);
             const response = await apiClient.post('/academic/records', { records: recordsToSave });
-            console.log('Save response:', response.data);
             
             // Refresh records from server
             const fetchResponse = await apiClient.get('/academic/records');

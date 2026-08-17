@@ -258,7 +258,6 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
         if (existing && existing.metrics) {
             const cacheAge = Date.now() - new Date(existing.updatedAt).getTime();
             if (cacheAge < CACHE_TTL) {
-                console.log(`Using cached Codeforces data for user ${req.user.id} (${Math.round(cacheAge / 1000)}s old)`);
                 return res.json({
                     message: 'Codeforces profile retrieved from cache',
                     platform: 'codeforces',
@@ -270,7 +269,6 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
         }
 
         // Fetch fresh data from Codeforces API
-        console.log(`Fetching fresh Codeforces data for handle: ${handle}`);
         const metrics = await fetchCodeforcesProfile(handle);
 
         // Update database with fresh data
@@ -337,7 +335,6 @@ router.post('/fetch/codechef', requireAuth, async (req, res) => {
         if (existing && existing.metrics && existing.metrics.rating !== undefined) {
             const cacheAge = Date.now() - new Date(existing.updatedAt).getTime();
             if (cacheAge < CACHE_TTL) {
-                console.log(`Using cached CodeChef data for user ${req.user.id} (${Math.round(cacheAge / 1000 / 60)} minutes old)`);
                 return res.json({
                     message: 'CodeChef profile retrieved from cache',
                     platform: 'codechef',
@@ -349,7 +346,6 @@ router.post('/fetch/codechef', requireAuth, async (req, res) => {
         }
 
         // Fetch fresh data from CodeChef (scraping)
-        console.log(`Fetching fresh CodeChef data via scraping for handle: ${handle}`);
         const metrics = await fetchCodeChefProfile(handle);
 
         // Update database with fresh data

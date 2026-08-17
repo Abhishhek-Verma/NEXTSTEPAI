@@ -54,7 +54,6 @@ async function fetchWithRetry(url, options = {}, retries = 1) {
         return await fetchWithTimeout(url, options);
     } catch (error) {
         if (retries > 0) {
-            console.log(`Retrying CodeChef scrape... (${retries} retries left). Error: ${error.message}`);
             // Wait 2-3 seconds before retry (with small randomization)
             await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1000));
             return fetchWithRetry(url, options, retries - 1);
@@ -111,8 +110,6 @@ export async function fetchCodeChefProfile(handle) {
     try {
         const profileUrl = `https://www.codechef.com/users/${handle}`;
         
-        console.log(`Fetching CodeChef profile for: ${handle}`);
-        
         // Random delay to avoid bot detection (currently commented out)
         // WHEN TO ENABLE:
         // - Scraping multiple profiles (10+) in quick succession
@@ -153,7 +150,6 @@ export async function fetchCodeChefProfile(handle) {
         const usernameMatch = html.match(/<h1[^>]*class="[^"]*h2-style[^"]*"[^>]*>\s*([^<]+)\s*<\/h1>/);
         if (usernameMatch && usernameMatch[1]) {
             username = usernameMatch[1].trim();
-            console.log(`CodeChef: Extracted username: ${username}`);
         } else {
             console.warn('CodeChef: Could not extract username, using handle');
         }
@@ -183,14 +179,6 @@ export async function fetchCodeChefProfile(handle) {
             const fallbackMatch = html.match(/contest-participated-count[^>]*>\s*(\d+)\s*</i);
             contestsParticipated = extractInteger(fallbackMatch, 'contests (fallback)');
         }
-        
-        // Log parsing results
-        console.log(`CodeChef parsed data for ${handle}:`, {
-            rating,
-            stars,
-            problemsSolved,
-            contestsParticipated
-        });
         
         // Check if critical data is missing (possible JS-rendered content)
         if (problemsSolved === null && contestsParticipated === null && rating === 0) {

@@ -51,7 +51,6 @@ async function fetchWithRetry(url, options = {}, retries = 1) {
         return await fetchWithTimeout(url, options);
     } catch (error) {
         if (retries > 0 && !error.message.includes('timeout')) {
-            console.log(`Retrying Codeforces API call... (${retries} retries left)`);
             // Wait 1 second before retry
             await new Promise(resolve => setTimeout(resolve, 1000));
             return fetchWithRetry(url, options, retries - 1);
