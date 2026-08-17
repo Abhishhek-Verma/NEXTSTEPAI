@@ -6,33 +6,32 @@
 
 @layer base {
   :root {
-    /* Legacy CSS variable compat */
-    --border: 40 6% 90%;
-    --input: 40 6% 90%;
-    --ring: 0 0% 7%;
-    --background: 40 20% 98%;
-    --foreground: 0 0% 7%;
-    --muted: 40 14% 97%;
-    --muted-foreground: 0 0% 42%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 7%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 7%;
+    --border: 30 18% 81%;         /* #D9CFC7 */
+    --input: 30 18% 81%;          /* #D9CFC7 */
+    --ring: 33 29% 70%;           /* #C9B59C */
+    --background: 40 14% 97%;     /* #F9F8F6 */
+    --foreground: 0 0% 0%;        /* Black */
+    --muted: 30 23% 91%;          /* #EFE9E3 */
+    --muted-foreground: 0 0% 33%;
+    --card: 30 23% 91%;           /* #EFE9E3 */
+    --card-foreground: 0 0% 0%;
+    --popover: 30 23% 91%;        /* #EFE9E3 */
+    --popover-foreground: 0 0% 0%;
     --radius: 0.75rem;
   }
 
   .dark {
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 0 0% 93%;
-    --background: 220 7% 5%;
-    --foreground: 0 0% 96%;
-    --muted: 220 5% 10%;
-    --muted-foreground: 0 0% 63%;
-    --card: 220 5% 9%;
-    --card-foreground: 0 0% 96%;
-    --popover: 220 5% 9%;
-    --popover-foreground: 0 0% 96%;
+    --border: 30 10% 25%;
+    --input: 30 10% 25%;
+    --ring: 33 29% 70%;
+    --background: 30 5% 10%;
+    --foreground: 40 14% 97%;
+    --muted: 30 8% 15%;
+    --muted-foreground: 30 10% 65%;
+    --card: 30 8% 13%;
+    --card-foreground: 40 14% 97%;
+    --popover: 30 8% 13%;
+    --popover-foreground: 40 14% 97%;
   }
 
   * {
@@ -44,8 +43,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    background-color: #FAF9F6;
-    color: #111111;
+    background-color: #F9F8F6;
+    color: #000000;
     overflow-x: hidden;
     font-size: 15px;
     line-height: 1.65;
@@ -53,14 +52,14 @@
 
   .dark body,
   body.dark {
-    background-color: #0C0D0E;
-    color: #FFFFFF;
+    background-color: #1C1B1A;
+    color: #F9F8F6;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: "Plus Jakarta Sans", system-ui, sans-serif;
     font-weight: 600;
-    color: #111111;
+    color: #000000;
   }
 
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
@@ -72,6 +71,11 @@
     font-family: "Newsreader", "Playfair Display", Georgia, serif;
     font-weight: 400;
     letter-spacing: -0.03em;
+    color: #000000;
+  }
+
+  .dark .heading-serif {
+    color: #FFFFFF;
   }
 
   .heading-serif-italic {
@@ -79,16 +83,21 @@
     font-weight: 400;
     font-style: italic;
     letter-spacing: -0.02em;
+    color: #000000;
+  }
+
+  .dark .heading-serif-italic {
+    color: #FFFFFF;
   }
 
   /* Selection */
   ::selection {
-    background-color: #DCEAFF;
-    color: #111111;
+    background-color: #C9B59C;
+    color: #000000;
   }
 
   .dark ::selection {
-    background-color: rgba(220, 234, 255, 0.3);
+    background-color: rgba(201, 181, 156, 0.4);
     color: #FFFFFF;
   }
 }
@@ -96,36 +105,36 @@
 @layer components {
   /* === Floating Navbar === */
   .nav-floating {
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(239, 233, 227, 0.94);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(232, 229, 223, 0.6);
+    border: 1px solid #D9CFC7;
     border-radius: 9999px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   }
 
   .dark .nav-floating {
-    background: rgba(22, 23, 25, 0.92);
-    border-color: rgba(255,255,255,0.08);
+    background: rgba(38, 36, 34, 0.94);
+    border-color: rgba(217, 207, 199, 0.15);
   }
 
   /* === Premium Card === */
   .card-premium {
-    background: #FFFFFF;
-    border: 1px solid #E8E5DF;
+    background: #EFE9E3;
+    border: 1px solid #D9CFC7;
     border-radius: 20px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.02);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .card-premium:hover {
     transform: translateY(-2px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.04);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 6px 12px rgba(0, 0, 0, 0.04);
   }
 
   .dark .card-premium {
-    background: #1F2023;
-    border-color: rgba(255,255,255,0.08);
+    background: #262422;
+    border-color: rgba(217, 207, 199, 0.15);
   }
 
   /* === Pill Button === */
@@ -138,45 +147,47 @@
 
   .btn-pill:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   }
 
+  /* Main Button / Accent Color: #C9B59C */
   .btn-primary-pill {
-    background: #111111;
-    color: #FFFFFF;
+    background: #C9B59C;
+    color: #000000;
     border-radius: 9999px;
     font-weight: 600;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-primary-pill:hover {
-    background: #2a2a2a;
+    background: #B8A388;
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(201, 181, 156, 0.3);
   }
 
   .dark .btn-primary-pill {
-    background: #FFFFFF;
-    color: #111111;
+    background: #C9B59C;
+    color: #000000;
   }
 
   .dark .btn-primary-pill:hover {
-    background: #F0F0F0;
+    background: #B8A388;
   }
 
+  /* Secondary Button Surface: #EFE9E3 */
   .btn-secondary-pill {
-    background: #FFFFFF;
-    color: #111111;
-    border: 1px solid #E8E5DF;
+    background: #EFE9E3;
+    color: #000000;
+    border: 1px solid #D9CFC7;
     border-radius: 9999px;
     font-weight: 600;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-secondary-pill:hover {
-    background: #F8F7F3;
+    background: #D9CFC7;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 
   /* === Feature Pill Badge === */
@@ -185,51 +196,56 @@
     align-items: center;
     gap: 6px;
     padding: 6px 16px;
-    background: #FFFFFF;
-    border: 1px solid #E8E5DF;
+    background: #EFE9E3;
+    border: 1px solid #D9CFC7;
     border-radius: 9999px;
     font-size: 13px;
     font-weight: 500;
-    color: #404040;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    color: #000000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   }
 
   .dark .pill-badge {
-    background: #1F2023;
-    border-color: rgba(255,255,255,0.1);
-    color: #A1A1A1;
+    background: #262422;
+    border-color: rgba(217, 207, 199, 0.15);
+    color: #F9F8F6;
   }
 
-  /* === Pastel Card Variants === */
+  /* === Color Palette Variant Cards === */
   .card-pastel-blue {
-    background: #DCEAFF;
-    border: 1px solid rgba(216,232,252,0.6);
+    background: #F9F8F6;
+    border: 1px solid #D9CFC7;
+    color: #000000;
   }
 
   .card-pastel-mint {
-    background: #D4F2E3;
-    border: 1px solid rgba(205,238,220,0.6);
+    background: #EFE9E3;
+    border: 1px solid #D9CFC7;
+    color: #000000;
   }
 
   .card-pastel-yellow {
-    background: #FFF0C9;
-    border: 1px solid rgba(253,232,179,0.6);
+    background: #C9B59C;
+    border: 1px solid #B8A388;
+    color: #000000;
   }
 
   .card-pastel-pink {
-    background: #FCE5E6;
-    border: 1px solid rgba(252,229,230,0.6);
+    background: #D9CFC7;
+    border: 1px solid #C9B59C;
+    color: #000000;
   }
 
   .card-pastel-purple {
-    background: #E9DDF8;
-    border: 1px solid rgba(233,221,248,0.6);
+    background: #EFE9E3;
+    border: 1px solid #D9CFC7;
+    color: #000000;
   }
 
   /* === Status Badges === */
   .badge-success {
-    background: #D4F2E3;
-    color: #166534;
+    background: #C9B59C;
+    color: #000000;
     padding: 4px 12px;
     border-radius: 9999px;
     font-size: 12px;
@@ -237,8 +253,8 @@
   }
 
   .badge-pending {
-    background: #FFF0C9;
-    color: #92400E;
+    background: #D9CFC7;
+    color: #000000;
     padding: 4px 12px;
     border-radius: 9999px;
     font-size: 12px;
@@ -246,17 +262,18 @@
   }
 
   .badge-info {
-    background: #DCEAFF;
-    color: #1E40AF;
+    background: #EFE9E3;
+    color: #000000;
     padding: 4px 12px;
     border-radius: 9999px;
     font-size: 12px;
     font-weight: 600;
+    border: 1px solid #D9CFC7;
   }
 
   .badge-ai {
-    background: #E9DDF8;
-    color: #6B21A8;
+    background: #C9B59C;
+    color: #000000;
     padding: 4px 12px;
     border-radius: 9999px;
     font-size: 12px;
@@ -264,8 +281,8 @@
   }
 
   .badge-warning {
-    background: #FCE5E6;
-    color: #991B1B;
+    background: #C9B59C;
+    color: #000000;
     padding: 4px 12px;
     border-radius: 9999px;
     font-size: 12px;
@@ -274,7 +291,7 @@
 
   /* === Dotted Background === */
   .bg-dots {
-    background-image: radial-gradient(circle, rgba(200, 196, 188, 0.35) 1px, transparent 1px);
+    background-image: radial-gradient(circle, #D9CFC7 1px, transparent 1px);
     background-size: 24px 24px;
   }
 

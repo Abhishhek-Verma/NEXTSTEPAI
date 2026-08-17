@@ -84,7 +84,7 @@ const Header = () => {
         className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-32px)] max-w-5xl transition-all duration-500 ${
           isScrolled
             ? 'nav-floating'
-            : 'bg-white/70 backdrop-blur-md border border-[#E8E5DF]/50 rounded-full shadow-soft'
+            : 'bg-[#EFE9E3]/90 backdrop-blur-md border border-[#D9CFC7] rounded-full shadow-soft'
         }`}
       >
         <div className="px-4 sm:px-6 lg:px-8">
@@ -96,11 +96,11 @@ const Header = () => {
                 className="flex items-center gap-2.5 group"
                 aria-label="NextStepAI Home"
               >
-                <div className="w-9 h-9 bg-[#111111] dark:bg-white rounded-xl flex items-center justify-center text-white dark:text-[#111111] font-bold text-xs transition-transform duration-200 group-hover:scale-105">
+                <div className="w-9 h-9 bg-[#C9B59C] rounded-xl flex items-center justify-center text-[#000000] font-bold text-xs transition-transform duration-200 group-hover:scale-105">
                   NS
                 </div>
-                <span className="text-lg font-bold text-[#111111] dark:text-white tracking-tight">
-                  NextStep<span className="text-[#6B6B6B]">AI</span>
+                <span className="text-lg font-bold text-[#000000] dark:text-white tracking-tight">
+                  NextStep<span className="text-[#C9B59C]">AI</span>
                 </span>
               </a>
             </div>
@@ -116,8 +116,8 @@ const Header = () => {
                     href={item?.anchor}
                     onClick={(e) => handleNavClick(e, item?.anchor, item?.offset)}
                     className={`px-4 py-2 text-sm font-medium transition-all duration-200 rounded-full ${isActive
-                      ? 'text-[#111111] bg-[#F8F7F3] dark:text-white dark:bg-[#2a2b2e]'
-                      : 'text-[#6B6B6B] hover:text-[#111111] hover:bg-[#F8F7F3]/50 dark:text-[#A1A1A1] dark:hover:text-white'
+                      ? 'text-[#000000] bg-[#C9B59C] dark:text-white dark:bg-[#33302D]'
+                      : 'text-[#000000]/70 hover:text-[#000000] hover:bg-[#D9CFC7]/50 dark:text-[#A1A1A1] dark:hover:text-white'
                       }`}
                   >
                     {item?.label}
@@ -131,7 +131,7 @@ const Header = () => {
               <SignedOut>
                 <Link
                   to="/auth/login"
-                  className="px-4 py-2 text-sm font-medium text-[#6B6B6B] hover:text-[#111111] transition-colors rounded-full"
+                  className="px-4 py-2 text-sm font-medium text-[#000000] hover:text-[#333333] transition-colors rounded-full"
                 >
                   Log in
                 </Link>
@@ -153,7 +153,7 @@ const Header = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMobileMenu}
-              className="lg:hidden p-2 rounded-xl text-[#111111] hover:bg-[#F8F7F3] transition-colors duration-200"
+              className="lg:hidden p-2 rounded-xl text-[#000000] hover:bg-[#D9CFC7] transition-colors duration-200"
               aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMobileMenuOpen}
             >
@@ -170,13 +170,13 @@ const Header = () => {
       {isMobileMenuOpen && (
         <>
           <div
-            className="fixed inset-0 bg-[#111111]/30 backdrop-blur-sm z-[150] lg:hidden"
+            className="fixed inset-0 bg-[#000000]/30 backdrop-blur-sm z-[150] lg:hidden"
             onClick={toggleMobileMenu}
             aria-hidden="true"
           />
 
           <nav
-            className="fixed top-24 left-4 right-4 bg-white dark:bg-[#161719] z-[200] lg:hidden rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-lift overflow-hidden"
+            className="fixed top-24 left-4 right-4 bg-[#EFE9E3] dark:bg-[#262422] z-[200] lg:hidden rounded-2xl border border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] shadow-lift overflow-hidden"
             role="navigation"
             aria-label="Mobile navigation"
           >
@@ -191,8 +191,8 @@ const Header = () => {
                       href={item?.anchor}
                       onClick={(e) => handleNavClick(e, item?.anchor, item?.offset)}
                       className={`px-4 py-3 text-base font-medium rounded-xl transition-colors duration-200 ${isActive
-                        ? 'text-[#111111] bg-[#F8F7F3] dark:text-white dark:bg-[#2a2b2e]'
-                        : 'text-[#6B6B6B] hover:bg-[#F8F7F3] dark:text-[#A1A1A1] dark:hover:bg-[#2a2b2e]'
+                        ? 'text-[#000000] bg-[#C9B59C] dark:text-white dark:bg-[#33302D]'
+                        : 'text-[#000000]/70 hover:bg-[#D9CFC7] dark:text-[#A1A1A1] dark:hover:bg-[#33302D]'
                         }`}
                     >
                       {item?.label}
@@ -201,12 +201,12 @@ const Header = () => {
                 })}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] space-y-2">
+              <div className="mt-4 pt-4 border-t border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] space-y-2">
                 <SignedOut>
                   <Link
                     to="/auth/login"
                     onClick={toggleMobileMenu}
-                    className="block px-4 py-3 text-base font-medium text-[#6B6B6B] hover:text-[#111111] rounded-xl transition-colors"
+                    className="block px-4 py-3 text-base font-medium text-[#000000] hover:text-[#333333] rounded-xl transition-colors"
                   >
                     Log in
                   </Link>

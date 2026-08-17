@@ -8,96 +8,100 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        /* === Page Backgrounds === */
+        /* === Website Background: #F9F8F6 === */
         bg: {
-          DEFAULT: '#FAF9F6',
-          alt: '#F8F7F3',
-          dark: '#0C0D0E',
+          DEFAULT: '#F9F8F6',
+          alt: '#EFE9E3',
+          dark: '#1C1B1A',
         },
-        /* === Surfaces === */
+        /* === Secondary Theme Surface: #EFE9E3 === */
         surface: {
-          DEFAULT: '#FFFFFF',
-          secondary: '#FCFBF9',
-          dark: '#161719',
+          DEFAULT: '#EFE9E3',
+          secondary: '#F9F8F6',
+          dark: '#262422',
         },
         /* === Cards === */
         card: {
-          DEFAULT: '#FFFFFF',
-          dark: '#1F2023',
+          DEFAULT: '#EFE9E3',
+          dark: '#262422',
         },
-        /* === Ink / Text === */
+        /* === Text: Black (#000000) === */
         ink: {
-          DEFAULT: '#111111',
-          secondary: '#404040',
-          muted: '#6B6B6B',
-          light: '#909090',
-          dark: '#FFFFFF',
-          'dark-secondary': '#A1A1A1',
+          DEFAULT: '#000000',
+          secondary: '#333333',
+          muted: '#555555',
+          light: '#777777',
+          dark: '#F9F8F6',
+          'dark-secondary': '#D9CFC7',
         },
-        /* === Pastel Accents === */
+        /* === Supporting / Pastel Palette === */
         pastel: {
-          blue: '#DCEAFF',
-          'blue-dark': '#D8E8FC',
-          mint: '#D4F2E3',
-          'mint-dark': '#CDEEDC',
-          yellow: '#FFF0C9',
-          'yellow-dark': '#FDE8B3',
-          pink: '#FCE5E6',
-          purple: '#E9DDF8',
+          blue: '#F9F8F6',
+          'blue-dark': '#EFE9E3',
+          mint: '#EFE9E3',
+          'mint-dark': '#D9CFC7',
+          yellow: '#C9B59C',
+          'yellow-dark': '#B8A388',
+          pink: '#D9CFC7',
+          purple: '#EFE9E3',
         },
-        /* === Borders === */
+        /* === Tertiary Theme Border/Dividers: #D9CFC7 === */
         border: {
-          DEFAULT: '#E8E5DF',
-          dark: 'rgba(255,255,255,0.1)',
+          DEFAULT: '#D9CFC7',
+          dark: 'rgba(217, 207, 199, 0.2)',
         },
-        /* === Legacy compatibility (used in existing Button/Card/etc CVA classes) === */
+        /* === Button / Main Accent Color: #C9B59C === */
         primary: {
-          DEFAULT: '#111111',
-          foreground: '#ffffff',
-          50: '#F5F5F5',
-          100: '#E8E8E8',
-          500: '#111111',
-          600: '#0A0A0A',
-          700: '#050505',
-          900: '#000000',
+          DEFAULT: '#C9B59C',
+          foreground: '#000000',
+          50: '#F9F8F6',
+          100: '#EFE9E3',
+          500: '#C9B59C',
+          600: '#B8A388',
+          700: '#A49076',
+          900: '#756550',
         },
         secondary: {
-          DEFAULT: '#404040',
-          foreground: '#ffffff',
+          DEFAULT: '#EFE9E3',
+          foreground: '#000000',
+        },
+        tertiary: {
+          DEFAULT: '#D9CFC7',
+          foreground: '#000000',
         },
         accent: {
-          DEFAULT: '#10B981',
-          foreground: '#ffffff',
+          DEFAULT: '#C9B59C',
+          foreground: '#000000',
         },
         destructive: {
-          DEFAULT: '#EF4444',
-          foreground: '#ffffff',
+          DEFAULT: '#C9B59C',
+          foreground: '#000000',
         },
         success: {
-          DEFAULT: '#10B981',
-          foreground: '#ffffff',
+          DEFAULT: '#C9B59C',
+          foreground: '#000000',
         },
         warning: {
-          DEFAULT: '#F59E0B',
-          foreground: '#ffffff',
+          DEFAULT: '#C9B59C',
+          foreground: '#000000',
         },
         error: {
-          DEFAULT: '#EF4444',
-          foreground: '#ffffff',
+          DEFAULT: '#C9B59C',
+          foreground: '#000000',
         },
         muted: {
-          DEFAULT: '#F8F7F3',
-          foreground: '#6B6B6B',
+          DEFAULT: '#EFE9E3',
+          foreground: '#000000',
         },
         popover: {
-          DEFAULT: '#FFFFFF',
-          foreground: '#111111',
+          DEFAULT: '#EFE9E3',
+          foreground: '#000000',
         },
-        /* === Legacy brand colors (soft-mapped) === */
-        'brand-blue': '#111111',
-        'brand-dark': '#111111',
-        'brand-accent': '#10B981',
-        'brand-purple': '#404040',
+        /* === Legacy brand tokens mapped to new palette === */
+        'brand-blue': '#C9B59C',
+        'brand-dark': '#000000',
+        'brand-accent': '#C9B59C',
+        'brand-purple': '#D9CFC7',
       },
       borderRadius: {
         sm: '10px',
@@ -174,7 +178,7 @@ module.exports = {
         'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
       backgroundImage: {
-        'dot-pattern': 'radial-gradient(circle, #D5D3CE 1px, transparent 1px)',
+        'dot-pattern': 'radial-gradient(circle, #D9CFC7 1px, transparent 1px)',
       },
       backgroundSize: {
         'dot-sm': '24px 24px',

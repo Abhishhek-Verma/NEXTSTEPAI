@@ -3,7 +3,7 @@
 /* === Custom Scrollbar === */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #D5D3CE #F8F7F3;
+  scrollbar-color: #D9CFC7 #F9F8F6;
 }
 
 *::-webkit-scrollbar {
@@ -12,24 +12,24 @@
 }
 
 *::-webkit-scrollbar-track {
-  background: #F8F7F3;
+  background: #F9F8F6;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #D5D3CE;
+  background: #D9CFC7;
   border-radius: 3px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: #B5B2AC;
+  background: #C9B59C;
 }
 
 .dark *::-webkit-scrollbar-track {
-  background: #161719;
+  background: #1C1B1A;
 }
 
 .dark *::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #D9CFC7;
 }
 
 /* === Card Hover Effects === */
@@ -39,44 +39,44 @@
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.04);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 6px 12px rgba(0, 0, 0, 0.04);
 }
 
-/* === Glass effects (legacy compat) === */
+/* === Glass effects === */
 .glass {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(239, 233, 227, 0.9);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(232, 229, 223, 0.5);
+  border: 1px solid #D9CFC7;
 }
 
 .glass-dark {
-  background: rgba(22, 23, 25, 0.85);
+  background: rgba(38, 36, 34, 0.9);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(217, 207, 199, 0.15);
 }
 
-/* === Gradient Backgrounds (softened) === */
+/* === Gradient Backgrounds === */
 .bg-ai-gradient {
-  background: linear-gradient(135deg, #DCEAFF 0%, #E9DDF8 50%, #D4F2E3 100%);
+  background: linear-gradient(135deg, #F9F8F6 0%, #EFE9E3 50%, #C9B59C 100%);
 }
 
 .bg-ai-gradient-subtle {
   background: linear-gradient(135deg, 
-    rgba(220, 234, 255, 0.3) 0%, 
-    rgba(233, 221, 248, 0.2) 50%, 
-    rgba(212, 242, 227, 0.2) 100%
+    rgba(249, 248, 246, 0.6) 0%, 
+    rgba(239, 233, 227, 0.5) 50%, 
+    rgba(201, 181, 156, 0.35) 100%
   );
 }
 
-/* === Mesh Gradient Background (premium, subtle) === */
+/* === Mesh Gradient Background === */
 .mesh-gradient {
   background: 
-    radial-gradient(at 20% 20%, rgba(220, 234, 255, 0.4) 0px, transparent 50%),
-    radial-gradient(at 80% 10%, rgba(233, 221, 248, 0.3) 0px, transparent 50%),
-    radial-gradient(at 60% 80%, rgba(212, 242, 227, 0.3) 0px, transparent 50%),
-    radial-gradient(at 10% 60%, rgba(255, 240, 201, 0.2) 0px, transparent 50%);
+    radial-gradient(at 20% 20%, rgba(249, 248, 246, 0.8) 0px, transparent 50%),
+    radial-gradient(at 80% 10%, rgba(239, 233, 227, 0.6) 0px, transparent 50%),
+    radial-gradient(at 60% 80%, rgba(201, 181, 156, 0.3) 0px, transparent 50%),
+    radial-gradient(at 10% 60%, rgba(217, 207, 199, 0.4) 0px, transparent 50%);
 }
 
 /* === Hero Background Shapes === */
@@ -91,7 +91,7 @@
   right: -5%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(220, 234, 255, 0.4), transparent 70%);
+  background: radial-gradient(circle, rgba(201, 181, 156, 0.25), transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -103,7 +103,7 @@
   left: -5%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(233, 221, 248, 0.3), transparent 70%);
+  background: radial-gradient(circle, rgba(239, 233, 227, 0.4), transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }

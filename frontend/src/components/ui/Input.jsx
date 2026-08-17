@@ -14,8 +14,8 @@ const Input = React.forwardRef(({
     // Generate unique ID if not provided
     const inputId = id || `input-${Math.random()?.toString(36)?.substr(2, 9)}`;
 
-    // Base input classes - premium design
-    const baseInputClasses = "flex h-11 w-full rounded-xl border border-[#E8E5DF] bg-white px-4 py-2.5 text-[15px] text-[#111111] ring-offset-white placeholder:text-[#909090] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111111]/10 focus-visible:border-[#111111]/30 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 dark:bg-[#1F2023] dark:border-[rgba(255,255,255,0.1)] dark:text-white dark:placeholder:text-[#666] dark:ring-offset-[#0C0D0E] dark:focus-visible:ring-white/10 dark:focus-visible:border-white/30";
+    // Base input classes - premium design with new palette
+    const baseInputClasses = "flex h-11 w-full rounded-xl border border-[#D9CFC7] bg-[#EFE9E3] px-4 py-2.5 text-[15px] text-[#000000] ring-offset-[#F9F8F6] placeholder:text-[#777777] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9B59C] focus-visible:border-[#C9B59C] disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 dark:bg-[#262422] dark:border-[rgba(217,207,199,0.15)] dark:text-white dark:placeholder:text-[#888] dark:ring-offset-[#1C1B1A] dark:focus-visible:ring-[#C9B59C]";
 
     // Checkbox-specific styles
     if (type === "checkbox") {
@@ -23,7 +23,7 @@ const Input = React.forwardRef(({
             <input
                 type="checkbox"
                 className={cn(
-                    "h-4 w-4 rounded border border-[#E8E5DF] bg-white text-[#111111] focus:ring-2 focus:ring-[#111111]/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1F2023] dark:border-[rgba(255,255,255,0.1)]",
+                    "h-4 w-4 rounded border border-[#D9CFC7] bg-[#EFE9E3] text-[#C9B59C] focus:ring-2 focus:ring-[#C9B59C] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#262422] dark:border-[rgba(217,207,199,0.15)]",
                     className
                 )}
                 ref={ref}
@@ -39,7 +39,7 @@ const Input = React.forwardRef(({
             <input
                 type="radio"
                 className={cn(
-                    "h-4 w-4 rounded-full border border-[#E8E5DF] bg-white text-[#111111] focus:ring-2 focus:ring-[#111111]/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#1F2023] dark:border-[rgba(255,255,255,0.1)]",
+                    "h-4 w-4 rounded-full border border-[#D9CFC7] bg-[#EFE9E3] text-[#C9B59C] focus:ring-2 focus:ring-[#C9B59C] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#262422] dark:border-[rgba(217,207,199,0.15)]",
                     className
                 )}
                 ref={ref}
@@ -57,11 +57,11 @@ const Input = React.forwardRef(({
                     htmlFor={inputId}
                     className={cn(
                         "text-sm font-medium leading-none",
-                        error ? "text-[#EF4444]" : "text-[#404040] dark:text-[#A1A1A1]"
+                        error ? "text-[#C9B59C]" : "text-[#000000] dark:text-white"
                     )}
                 >
                     {label}
-                    {required && <span className="text-[#EF4444] ml-1">*</span>}
+                    {required && <span className="text-[#C9B59C] ml-1">*</span>}
                 </label>
             )}
 
@@ -69,7 +69,7 @@ const Input = React.forwardRef(({
                 type={type}
                 className={cn(
                     baseInputClasses,
-                    error && "border-[#EF4444] focus-visible:ring-[#EF4444]/20 focus-visible:border-[#EF4444]",
+                    error && "border-[#C9B59C] focus-visible:ring-[#C9B59C] focus-visible:border-[#C9B59C]",
                     className
                 )}
                 ref={ref}
@@ -78,13 +78,13 @@ const Input = React.forwardRef(({
             />
 
             {description && !error && (
-                <p className="text-sm text-[#909090] dark:text-[#666]">
+                <p className="text-sm text-[#555555] dark:text-[#A1A1A1]">
                     {description}
                 </p>
             )}
 
             {error && (
-                <p className="text-sm text-[#EF4444]">
+                <p className="text-sm text-[#C9B59C]">
                     {error}
                 </p>
             )}

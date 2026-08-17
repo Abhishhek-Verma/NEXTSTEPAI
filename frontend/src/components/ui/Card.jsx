@@ -27,10 +27,10 @@ const Card = React.forwardRef(({
         pastel && pastelClasses[pastel]
           ? pastelClasses[pastel]
           : gradient
-            ? "bg-ai-gradient-subtle border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)]"
+            ? "bg-ai-gradient-subtle border border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)]"
             : glass
               ? "glass"
-              : "bg-white border border-[#E8E5DF] shadow-card dark:bg-[#1F2023] dark:border-[rgba(255,255,255,0.08)]",
+              : "bg-[#EFE9E3] border border-[#D9CFC7] shadow-card dark:bg-[#262422] dark:border-[rgba(217,207,199,0.15)]",
         className
       )}
       {...props}
@@ -58,7 +58,7 @@ const CardTitle = React.forwardRef(({ className, children, ...props }, ref) => (
   <h3
     ref={ref}
     className={cn(
-      "text-xl font-semibold leading-tight tracking-tight text-[#111111] dark:text-white",
+      "text-xl font-semibold leading-tight tracking-tight text-[#000000] dark:text-white",
       className
     )}
     {...props}
@@ -72,7 +72,7 @@ CardTitle.displayName = "CardTitle";
 const CardDescription = React.forwardRef(({ className, children, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-[#6B6B6B] dark:text-[#A1A1A1]", className)}
+    className={cn("text-sm text-[#555555] dark:text-[#A1A1A1]", className)}
     {...props}
   >
     {children}
@@ -102,4 +102,3 @@ const CardFooter = React.forwardRef(({ className, children, ...props }, ref) => 
 CardFooter.displayName = "CardFooter";
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
-export default Card;
