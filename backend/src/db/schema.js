@@ -45,6 +45,7 @@ export const projects = pgTable('projects', {
     repoUrl: text('repo_url'), // Match schema diagram
     liveUrl: text('live_url'),
     imageUrl: text('image_url'),
+    technologies: jsonb('technologies').default([]), // Store tech stack as JSON array
     status: varchar('status', { length: 50 }).default('in-progress'), // in-progress, completed
     completedAt: timestamp('completed_at'),
     createdAt: timestamp('created_at').defaultNow(),

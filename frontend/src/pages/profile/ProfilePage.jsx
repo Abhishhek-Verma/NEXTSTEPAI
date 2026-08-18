@@ -20,8 +20,14 @@ const ProfilePage = () => {
     }));
 
     // Platform completion stats
+    const platformNameMap = {
+        github: 'GitHub',
+        leetcode: 'LeetCode',
+        codeforces: 'Codeforces',
+        codechef: 'CodeChef',
+    };
     const platformStats = Object.entries(coding.platforms).map(([platform, data]) => ({
-        platform: platform.charAt(0).toUpperCase() + platform.slice(1),
+        platform: platformNameMap[platform] || platform.charAt(0).toUpperCase() + platform.slice(1),
         connected: data.profileUrl ? 1 : 0,
     }));
 
@@ -370,11 +376,11 @@ const ProfilePage = () => {
                                 </span>
                             </div>
 
-                            <div className="h-44 w-full">
+                            <div className="h-52 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={platformStats}>
+                                    <BarChart data={platformStats} margin={{ bottom: 10 }}>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#D9CFC7" opacity={0.4} />
-                                        <XAxis dataKey="platform" stroke="#555555" fontSize={11} />
+                                        <XAxis dataKey="platform" stroke="#555555" fontSize={10} angle={-15} textAnchor="end" interval={0} height={40} />
                                         <YAxis domain={[0, 1]} ticks={[0, 1]} stroke="#555555" fontSize={11} />
                                         <Tooltip contentStyle={{ borderRadius: '14px', border: '1px solid #D9CFC7', backgroundColor: '#F9F8F6', fontSize: '12px' }} />
                                         <Bar dataKey="connected" fill="#FF5722" radius={[8, 8, 0, 0]} />

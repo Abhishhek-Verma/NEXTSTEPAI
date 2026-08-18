@@ -2,25 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
-import Select from '../../components/ui/Select';
 import apiClient from '../../api/client';
 import Icon from '../../components/AppIcon';
 
 const SkillsPage = () => {
     const navigate = useNavigate();
-    const [allSkills, setAllSkills] = useState([]);
     const [mySkills, setMySkills] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [showAddSkill, setShowAddSkill] = useState(false);
     const [showAddToProfile, setShowAddToProfile] = useState(false);
     
-    const [newSkill, setNewSkill] = useState({
-        skillName: '',
-        category: 'Programming',
-    });
-    
-    const [selectedSkill, setSelectedSkill] = useState('');
+    // Manual skill input fields
+    const [skillName, setSkillName] = useState('');
+    const [category, setCategory] = useState('Programming');
     const [proficiencyLevel, setProficiencyLevel] = useState('Beginner');
 
     const categories = ['Programming', 'Framework', 'Database', 'Tool', 'Soft Skill', 'Other'];
@@ -28,22 +22,8 @@ const SkillsPage = () => {
 
     // Fetch skills on mount
     useEffect(() => {
-        fetchAllSkills();
         fetchMySkills();
     }, []);
-
-    const fetchAllSkills = async () => {
-        try {
-            setLoading(true);
-            const response = await apiClient.get('/skills');
-            setAllSkills(response.data.skills || []);
-        } catch (err) {
-            console.error('Failed to fetch skills:', err);
-            setError('Failed to load skills');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const fetchMySkills = async () => {
         try {
@@ -54,43 +34,70 @@ const SkillsPage = () => {
         }
     };
 
-    const handleAddNewSkill = async (e) => {
+    const handleAddSkillToProfile = async (e) => {
         e.preventDefault();
-        try {
-            setLoading(true);
-            await apiClient.post('/skills', newSkill);
-            setNewSkill({ skillName: '', category: 'Programming' });
-            setShowAddSkill(false);
-            fetchAllSkills(); // Refresh list
-            alert('Skill added successfully!');
-        } catch (err) {
-            console.error('Failed to add skill:', err);
-            alert('Failed to add skill. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleAddToProfile = async (e) => {
-        e.preventDefault();
-        if (!selectedSkill) {
-            alert('Please select a skill');
+        if (!skillName.trim()) {
+            alert('Please enter a skill name');
             return;
         }
 
         try {
             setLoading(true);
+            
+            // Step 1: Create the skill in the skills table (or get existing)
+            let skillId;
+            try {
+                const createResponse = await apiClient.post('/skills', {
+                    skillName: skillName.trim(),
+                    category,
+                });
+                // The backend should return the created skill with its id
+                skillId = createResponse.data?.skill?.id || createResponse.data?.id;
+            } catch (createErr) {
+                // If skill already exists, try to find it
+                if (createErr.response?.status === 409 || createErr.response?.data?.error?.includes('already exists')) {
+                    const allSkillsResponse = await apiClient.get('/skills');
+                    const existingSkill = (allSkillsResponse.data.skills || []).find(
+                        s => s.skillName.toLowerCase() === skillName.trim().toLowerCase()
+                    );
+                    if (existingSkill) {
+                        skillId = existingSkill.id;
+                    } else {
+                        throw new Error('Failed to find or create skill');
+                    }
+                } else {
+                    throw createErr;
+                }
+            }
+
+            if (!skillId) {
+                // Fallback: try to fetch the skill we just created
+                const allSkillsResponse = await apiClient.get('/skills');
+                const found = (allSkillsResponse.data.skills || []).find(
+                    s => s.skillName.toLowerCase() === skillName.trim().toLowerCase()
+                );
+                if (found) {
+                    skillId = found.id;
+                } else {
+                    throw new Error('Could not find the skill after creation');
+                }
+            }
+
+            // Step 2: Add the skill to the user's profile
             await apiClient.post('/skills/my-skills', {
-                skillId: parseInt(selectedSkill),
+                skillId: parseInt(skillId),
                 proficiencyLevel,
             });
-            setSelectedSkill('');
+
+            // Reset form and refresh
+            setSkillName('');
+            setCategory('Programming');
             setProficiencyLevel('Beginner');
             setShowAddToProfile(false);
-            fetchMySkills(); // Refresh list
+            fetchMySkills();
         } catch (err) {
             console.error('Failed to add skill to profile:', err);
-            alert('Failed to add skill to profile. Please try again.');
+            alert(err.response?.data?.error || 'Failed to add skill. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -207,34 +214,40 @@ const SkillsPage = () => {
                     </div>
                 )}
 
-                {/* Action Buttons */}
+                {/* Action Button */}
                 <div className="flex gap-4 mb-6">
                     <Button onClick={() => setShowAddToProfile(!showAddToProfile)} className="flex-1 flex items-center justify-center gap-2">
                         <Icon name="Plus" size={17} strokeWidth={2} /> Add Skill to Profile
                     </Button>
-                    <Button onClick={() => setShowAddSkill(!showAddSkill)} variant="outline" className="flex-1 flex items-center justify-center gap-2">
-                        <Icon name="Sparkles" size={17} strokeWidth={2} /> Create New Skill
-                    </Button>
                 </div>
 
-                {/* Add to Profile Form */}
+                {/* Add Skill Form — Manual text input instead of dropdown */}
                 {showAddToProfile && (
                     <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 mb-6">
                         <h2 className="text-xl font-semibold text-[#111111] dark:text-white mb-4">Add Skill to Your Profile</h2>
-                        <form onSubmit={handleAddToProfile}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <form onSubmit={handleAddSkillToProfile}>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Select Skill</label>
-                                    <select
-                                        value={selectedSkill}
-                                        onChange={(e) => setSelectedSkill(e.target.value)}
+                                    <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Skill Name</label>
+                                    <input
+                                        type="text"
+                                        value={skillName}
+                                        onChange={(e) => setSkillName(e.target.value)}
                                         className="w-full px-4 py-2.5 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111]/30 transition-all"
+                                        placeholder="e.g., React, Python, Docker..."
                                         required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Category</label>
+                                    <select
+                                        value={category}
+                                        onChange={(e) => setCategory(e.target.value)}
+                                        className="w-full px-4 py-2.5 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111]/30 transition-all"
                                     >
-                                        <option value="">Choose a skill...</option>
-                                        {allSkills.map((skill) => (
-                                            <option key={skill.id} value={skill.id}>
-                                                {skill.skillName} ({skill.category})
+                                        {categories.map((cat) => (
+                                            <option key={cat} value={cat}>
+                                                {cat}
                                             </option>
                                         ))}
                                     </select>
@@ -262,50 +275,6 @@ const SkillsPage = () => {
                                     type="button"
                                     variant="outline"
                                     onClick={() => setShowAddToProfile(false)}
-                                >
-                                    Cancel
-                                </Button>
-                            </div>
-                        </form>
-                    </div>
-                )}
-
-                {/* Create New Skill Form */}
-                {showAddSkill && (
-                    <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 mb-6">
-                        <h2 className="text-xl font-semibold text-[#111111] dark:text-white mb-4">Create New Skill</h2>
-                        <form onSubmit={handleAddNewSkill}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <Input
-                                    label="Skill Name"
-                                    value={newSkill.skillName}
-                                    onChange={(e) => setNewSkill({ ...newSkill, skillName: e.target.value })}
-                                    placeholder="e.g., React, Python, Communication"
-                                    required
-                                />
-                                <div>
-                                    <label className="block text-sm font-medium text-[#404040] dark:text-[#A1A1A1] mb-2">Category</label>
-                                    <select
-                                        value={newSkill.category}
-                                        onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
-                                        className="w-full px-4 py-2.5 border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.1)] rounded-xl bg-white dark:bg-[#1F2023] text-[#111111] dark:text-white focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111]/30 transition-all"
-                                    >
-                                        {categories.map((cat) => (
-                                            <option key={cat} value={cat}>
-                                                {cat}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="flex gap-3">
-                                <Button type="submit" disabled={loading}>
-                                    {loading ? 'Creating...' : 'Create Skill'}
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => setShowAddSkill(false)}
                                 >
                                     Cancel
                                 </Button>

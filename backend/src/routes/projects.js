@@ -15,17 +15,49 @@ router.get('/', requireAuth, async (req, res) => {
             .where(eq(projects.userId, req.user.id))
             .orderBy(desc(projects.createdAt));
 
-        // For backward compatibility, convert to frontend format
-        const projectsWithSkills = userProjects.map(project => ({
+        // Map for frontend compatibility
+        const projectsWithData = userProjects.map(project => ({
             ...project,
-            githubUrl: project.repoUrl, // Map for frontend
-            technologies: [], // Will be populated later with skills
+            githubUrl: project.repoUrl,
+            technologies: project.technologies || [],
         }));
 
-        res.json(projectsWithSkills);
+        res.json(projectsWithData);
     } catch (error) {
         console.error('Error fetching projects:', error);
         res.status(500).json({ error: 'Failed to fetch projects' });
+    }
+});
+
+// Get a single project by ID
+router.get('/:id', requireAuth, async (req, res) => {
+    try {
+        const projectId = parseInt(req.params.id);
+        
+        const [project] = await db
+            .select()
+            .from(projects)
+            .where(
+                and(
+                    eq(projects.id, projectId),
+                    eq(projects.userId, req.user.id)
+                )
+            );
+
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        const response = {
+            ...project,
+            githubUrl: project.repoUrl,
+            technologies: project.technologies || [],
+        };
+
+        res.json(response);
+    } catch (error) {
+        console.error('Error fetching project:', error);
+        res.status(500).json({ error: 'Failed to fetch project' });
     }
 });
 
@@ -40,6 +72,7 @@ router.post('/', requireAuth, async (req, res) => {
             description: description || null,
             repoUrl: repoUrl || githubUrl || null, // Accept both field names
             liveUrl: liveUrl || null,
+            technologies: technologies || [],
             status: status || 'in-progress',
             completedAt: status === 'completed' ? new Date() : null,
         };
@@ -53,10 +86,10 @@ router.post('/', requireAuth, async (req, res) => {
         const response = {
             ...newProject,
             githubUrl: newProject.repoUrl,
-            technologies: technologies || [],
+            technologies: newProject.technologies || [],
         };
 
-        res.status(201).json({ message: 'Project created successfully', project: response });
+        res.status(201).json(response);
     } catch (error) {
         console.error('Error creating project:', error);
         res.status(500).json({ error: 'Failed to create project' });
@@ -74,6 +107,7 @@ router.put('/:id', requireAuth, async (req, res) => {
             description: description || null,
             repoUrl: repoUrl || githubUrl || null,
             liveUrl: liveUrl || null,
+            technologies: technologies || [],
             status: status || 'in-progress',
             completedAt: status === 'completed' ? new Date() : null,
             updatedAt: new Date(),
@@ -98,10 +132,10 @@ router.put('/:id', requireAuth, async (req, res) => {
         const response = {
             ...updatedProject,
             githubUrl: updatedProject.repoUrl,
-            technologies: technologies || [],
+            technologies: updatedProject.technologies || [],
         };
 
-        res.json({ message: 'Project updated successfully', project: response });
+        res.json(response);
     } catch (error) {
         console.error('Error updating project:', error);
         res.status(500).json({ error: 'Failed to update project' });

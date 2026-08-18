@@ -44,7 +44,7 @@ router.get('/my-skills', requireAuth, async (req, res) => {
     }
 });
 
-// Add a new skill to the master list
+// Add a new skill to the master list (or return existing)
 router.post('/', requireAuth, async (req, res) => {
     try {
         const { skillName, category } = req.body;
@@ -53,10 +53,20 @@ router.post('/', requireAuth, async (req, res) => {
             return res.status(400).json({ error: 'Skill name is required' });
         }
 
+        // Check if skill already exists (case-insensitive)
+        const allSkills = await db.select().from(skills);
+        const existing = allSkills.find(
+            s => s.skillName.toLowerCase() === skillName.trim().toLowerCase()
+        );
+
+        if (existing) {
+            return res.json({ message: 'Skill already exists', skill: existing });
+        }
+
         const [skill] = await db
             .insert(skills)
             .values({
-                skillName,
+                skillName: skillName.trim(),
                 category: category || 'Other',
             })
             .returning();
@@ -64,6 +74,16 @@ router.post('/', requireAuth, async (req, res) => {
         res.json({ message: 'Skill created successfully', skill });
     } catch (error) {
         console.error('Error creating skill:', error);
+        // Handle unique constraint violation
+        if (error.code === '23505') {
+            const allSkills = await db.select().from(skills);
+            const existing = allSkills.find(
+                s => s.skillName.toLowerCase() === req.body.skillName.trim().toLowerCase()
+            );
+            if (existing) {
+                return res.json({ message: 'Skill already exists', skill: existing });
+            }
+        }
         res.status(500).json({ error: 'Failed to create skill' });
     }
 });
