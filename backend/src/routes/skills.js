@@ -6,6 +6,20 @@ import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Map between string labels and integer values stored in DB
+const PROFICIENCY_TO_INT = { 'Beginner': 1, 'Intermediate': 2, 'Advanced': 3, 'Expert': 4 };
+const INT_TO_PROFICIENCY = { 1: 'Beginner', 2: 'Intermediate', 3: 'Advanced', 4: 'Expert' };
+
+function proficiencyToInt(level) {
+    if (typeof level === 'number') return level;
+    return PROFICIENCY_TO_INT[level] || 1;
+}
+
+function intToProficiency(val) {
+    if (typeof val === 'string' && PROFICIENCY_TO_INT[val]) return val;
+    return INT_TO_PROFICIENCY[val] || 'Beginner';
+}
+
 // Get all available skills
 router.get('/', async (req, res) => {
     try {
@@ -37,7 +51,13 @@ router.get('/my-skills', requireAuth, async (req, res) => {
             .where(eq(studentSkills.studentId, req.user.id))
             .orderBy(skills.category, skills.skillName);
 
-        res.json({ skills: userSkills });
+        // Convert integer proficiency back to string labels for frontend
+        const mapped = userSkills.map(s => ({
+            ...s,
+            proficiencyLevel: intToProficiency(s.proficiencyLevel),
+        }));
+
+        res.json({ skills: mapped });
     } catch (error) {
         console.error('Error fetching user skills:', error);
         res.status(500).json({ error: 'Failed to fetch user skills' });
@@ -97,6 +117,8 @@ router.post('/my-skills', requireAuth, async (req, res) => {
             return res.status(400).json({ error: 'Skill ID is required' });
         }
 
+        const profInt = proficiencyToInt(proficiencyLevel);
+
         // Check if user already has this skill
         const [existing] = await db
             .select()
@@ -111,7 +133,7 @@ router.post('/my-skills', requireAuth, async (req, res) => {
             // Update proficiency level
             [userSkill] = await db
                 .update(studentSkills)
-                .set({ proficiencyLevel: proficiencyLevel || 'Beginner' })
+                .set({ proficiencyLevel: profInt })
                 .where(and(
                     eq(studentSkills.studentId, req.user.id),
                     eq(studentSkills.skillId, skillId)
@@ -124,7 +146,7 @@ router.post('/my-skills', requireAuth, async (req, res) => {
                 .values({
                     studentId: req.user.id,
                     skillId,
-                    proficiencyLevel: proficiencyLevel || 'Beginner',
+                    proficiencyLevel: profInt,
                 })
                 .returning();
         }
@@ -146,9 +168,11 @@ router.put('/my-skills/:skillId', requireAuth, async (req, res) => {
             return res.status(400).json({ error: 'Proficiency level is required' });
         }
 
+        const profInt = proficiencyToInt(proficiencyLevel);
+
         const [userSkill] = await db
             .update(studentSkills)
-            .set({ proficiencyLevel })
+            .set({ proficiencyLevel: profInt })
             .where(and(
                 eq(studentSkills.studentId, req.user.id),
                 eq(studentSkills.skillId, skillId)

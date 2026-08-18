@@ -79,7 +79,7 @@ export async function generateRecommendations(userData) {
     try {
         const { skills, education, experience, interests, projects, academicData } = userData;
 
-        const prompt = `You are an expert career counselor. Analyze this user's profile and provide personalized career recommendations.
+        const prompt = `You are an expert career counselor specializing in the Indian tech job market. Analyze this user's profile and provide personalized career recommendations.
 
 User Profile:
 - Skills: ${skills?.join(', ') || 'Not specified'}
@@ -95,11 +95,11 @@ Generate comprehensive recommendations in JSON format with this exact structure:
     {
       "id": "role-id",
       "title": "Job Role Title",
-      "matchScore": 85,
+      "score": 85,
       "description": "Why this role suits the user",
-      "requiredSkills": ["skill1", "skill2"],
-      "salaryRange": "$XX,000 - $XX,000",
-      "growthPotential": "High|Medium",
+      "skills": ["skill1", "skill2"],
+      "salary": "₹XL - ₹YL per annum",
+      "demand": "High|Medium|Very High",
       "reasoning": "Detailed explanation of why this role is recommended"
     }
   ],
@@ -108,25 +108,32 @@ Generate comprehensive recommendations in JSON format with this exact structure:
       "id": "skill-id",
       "name": "Skill Name",
       "category": "Technical|Soft|Domain",
-      "priority": "High|Medium|Low",
-      "description": "Why learn this skill",
-      "learningPath": "Brief guidance on how to learn",
-      "estimatedTime": "Time to acquire skill"
+      "currentLevel": 50,
+      "targetLevel": 85,
+      "resources": ["Resource 1", "Resource 2"],
+      "description": "Why learn this skill"
     }
   ],
   "companies": [
     {
       "id": "company-id",
       "name": "Company Name",
-      "type": "Startup|Mid-size|Enterprise",
-      "culture": "Brief culture description",
-      "whyGoodFit": "Why this company matches user's profile",
-      "openRoles": ["role1", "role2"]
+      "logo": "emoji icon",
+      "domain": "Company domain",
+      "matchScore": 90,
+      "notes": "Why this company matches user profile",
+      "openRoles": 5
     }
   ]
 }
 
-Provide 5-8 role recommendations, 8-12 skill recommendations, and 5-7 company suggestions. Be specific and realistic. Return ONLY valid JSON, no markdown formatting.`;
+IMPORTANT RULES:
+- All salaries MUST be in Indian Rupees (INR) using ₹ symbol and "L" for lakhs (e.g., "₹6L - ₹15L" for entry level, "₹12L - ₹25L" for mid-level)
+- Use realistic Indian market salary ranges. Entry-level: ₹4L-₹12L, Mid-level: ₹10L-₹25L, Senior: ₹20L-₹45L
+- Include Indian companies like TCS, Infosys, Wipro, Flipkart, Razorpay, Zerodha, PhonePe, CRED, along with MNCs
+- Provide 4-6 role recommendations, 6-8 skill recommendations, and 5-7 company suggestions
+- Be specific and realistic for the Indian job market
+- Return ONLY valid JSON, no markdown formatting.`;
 
         const completion = await openai.chat.completions.create({
             model: MODEL,

@@ -24,19 +24,20 @@ const ProjectsPage = () => {
         status: 'in-progress',
     });
 
+    const fetchProjects = async () => {
+        try {
+            setProjectsLoading(true);
+            const response = await apiClient.get('/projects');
+            setProjects(response.data || []);
+            setProjectsLoading(false);
+        } catch (error) {
+            console.error('Failed to fetch projects:', error);
+            setProjectsError(error.message || 'Failed to load projects');
+            setProjectsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                setProjectsLoading(true);
-                const response = await apiClient.get('/projects');
-                setProjects(response.data || []);
-                setProjectsLoading(false);
-            } catch (error) {
-                console.error('Failed to fetch projects:', error);
-                setProjectsError(error.message || 'Failed to load projects');
-                setProjectsLoading(false);
-            }
-        };
         fetchProjects();
     }, []);
 
@@ -62,21 +63,15 @@ const ProjectsPage = () => {
             };
 
             if (editingProject) {
-                const response = await apiClient.put(`/projects/${editingProject.id}`, projectData);
-                const updatedProject = response.data;
-                const updatedList = projectsList.map((p) =>
-                    p.id === editingProject.id ? updatedProject : p
-                );
-                setProjects(updatedList);
+                await apiClient.put(`/projects/${editingProject.id}`, projectData);
             } else {
-                const response = await apiClient.post('/projects', projectData);
-                const newProject = response.data;
-                setProjects([...projectsList, newProject]);
+                await apiClient.post('/projects', projectData);
             }
             setShowAddForm(false);
             setEditingProject(null);
             resetForm();
-            setProjectsLoading(false);
+            // Re-fetch from server to get fresh data with technologies
+            await fetchProjects();
         } catch (error) {
             console.error('Failed to save project:', error);
             setProjectsError(error.message || 'Failed to save project');

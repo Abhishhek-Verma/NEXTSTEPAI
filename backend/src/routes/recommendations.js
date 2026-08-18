@@ -54,7 +54,7 @@ router.post('/generate', requireAuth, async (req, res) => {
         const [user] = await db
             .select()
             .from(users)
-            .where(eq(users.clerkId, req.user.id));
+            .where(eq(users.id, req.user.id));
 
         const [userOnboarding] = await db
             .select()
