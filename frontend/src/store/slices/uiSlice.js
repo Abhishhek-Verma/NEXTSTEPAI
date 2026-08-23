@@ -1,24 +1,7 @@
 export const uiSlice = (set, get) => ({
-    theme: 'light',
     toasts: [],
     dialogs: {
         confirmDelete: { open: false, itemId: null, onConfirm: null },
-    },
-
-    setTheme: (theme) => {
-        set({ theme });
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        localStorage.setItem('theme', theme);
-    },
-
-    toggleTheme: () => {
-        const currentTheme = get().theme;
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        get().setTheme(newTheme);
     },
 
     addToast: (toast) => {
