@@ -6,6 +6,7 @@ import App from './App';
 import './styles/index.css';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const clerkJSUrl = import.meta.env.VITE_CLERK_JS_URL || 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
 
 if (!clerkPubKey) {
     throw new Error('Missing Clerk Publishable Key');
@@ -47,7 +48,7 @@ enableMocking().then(() => {
 
     createRoot(document.getElementById('root')).render(
         <React.StrictMode>
-            <ClerkProvider publishableKey={clerkPubKey}>
+            <ClerkProvider publishableKey={clerkPubKey} clerkJSUrl={clerkJSUrl}>
                 <QueryClientProvider client={queryClient}>
                     <App />
                 </QueryClientProvider>
