@@ -13,9 +13,8 @@
   [![LPU Inference: Groq](https://img.shields.io/badge/LPU_Inference-Groq_Cloud-F55036?style=for-the-badge&logo=fastapi&logoColor=white)](https://groq.com/)
   [![Auth: Clerk](https://img.shields.io/badge/Auth-Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)](https://clerk.com/)
 
-  ---
-
-  🌐 **Live Production Deployment**: [https://nextstepai.co.in](https://nextstepai.co.in)
+  🌐 **Live Frontend**: [https://nextstepai.co.in](https://nextstepai.co.in)  
+  ⚡ **Live API Service**: [https://nextstepai-051p.onrender.com](https://nextstepai-051p.onrender.com)
 
 </div>
 
