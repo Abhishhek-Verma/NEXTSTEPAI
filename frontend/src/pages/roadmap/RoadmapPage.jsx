@@ -55,16 +55,28 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
             }`}
         >
             <div className="flex items-start justify-between mb-2">
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-[#EFE9E3] border border-[#D9CFC7] rounded-full text-xs font-semibold text-[#000000]">
-                    <Icon name={taskTypeIcons[task.taskType] || 'BookOpen'} size={14} /> {task.taskType.toUpperCase()}
-                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                    <span className="flex items-center gap-1.5 px-3 py-1 bg-[#EFE9E3] dark:bg-[#262422] border border-[#D9CFC7] dark:border-[rgba(217,207,199,0.15)] rounded-full text-xs font-semibold text-[#000000] dark:text-white">
+                        <Icon name={taskTypeIcons[task.taskType] || 'BookOpen'} size={14} /> {task.taskType ? task.taskType.toUpperCase() : 'TASK'}
+                    </span>
+                    {task.phase && (
+                        <span className="px-2.5 py-0.5 bg-[#D9CFC7]/40 dark:bg-white/10 rounded-full text-[11px] font-medium text-[#555555] dark:text-[#A1A1A1]">
+                            {task.phase}
+                        </span>
+                    )}
+                    {task.estimatedWeeks && (
+                        <span className="text-[11px] text-[#555555] dark:text-[#A1A1A1]">
+                            ⏱ {task.estimatedWeeks}w
+                        </span>
+                    )}
+                </div>
                 <div className="flex items-center gap-2">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleComplete(task.id);
                         }}
-                        className={`text-lg transition-transform hover:scale-110 ${task.completed ? 'text-[#000000]' : 'text-[#555555]'}`}
+                        className={`text-lg transition-transform hover:scale-110 ${task.completed ? 'text-[#000000] dark:text-white' : 'text-[#555555]'}`}
                         title={task.completed ? 'Mark incomplete' : 'Mark complete'}
                     >
                         <Icon name={task.completed ? "CheckSquare" : "Square"} size={18} />
@@ -74,7 +86,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
                             e.stopPropagation();
                             onEdit(task);
                         }}
-                        className="text-[#555555] hover:text-[#000000] transition-colors p-1"
+                        className="text-[#555555] hover:text-[#000000] dark:hover:text-white transition-colors p-1"
                         title="Edit task"
                     >
                         <Icon name="Edit2" size={16} />
@@ -84,18 +96,48 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
                             e.stopPropagation();
                             onDelete(task.id);
                         }}
-                        className="text-[#555555] hover:text-[#000000] transition-colors p-1"
+                        className="text-[#555555] hover:text-[#000000] dark:hover:text-white transition-colors p-1"
                         title="Delete task"
                     >
                         <Icon name="Trash2" size={16} />
                     </button>
                 </div>
             </div>
-            <p className={`text-[#000000] dark:text-white text-sm font-medium mb-2 leading-relaxed ${task.completed ? 'line-through text-[#555555] dark:text-[#666]' : ''}`}>
+            {task.title && (
+                <h4 className={`text-sm font-semibold text-[#000000] dark:text-white mb-1 ${task.completed ? 'line-through opacity-60' : ''}`}>
+                    {task.title}
+                </h4>
+            )}
+            <p className={`text-[#333333] dark:text-[#DDD] text-sm font-normal mb-3 leading-relaxed ${task.completed ? 'line-through text-[#555555] dark:text-[#666]' : ''}`}>
                 {task.description}
             </p>
+            {task.skills && Array.isArray(task.skills) && task.skills.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                    {task.skills.map((s, idx) => (
+                        <span key={idx} className="px-2 py-0.5 bg-[#EFE9E3]/70 dark:bg-white/5 border border-[#D9CFC7]/60 dark:border-white/10 rounded text-[11px] text-[#444] dark:text-[#BBB]">
+                            {s}
+                        </span>
+                    ))}
+                </div>
+            )}
+            {task.resources && Array.isArray(task.resources) && task.resources.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2 pt-2 border-t border-[#D9CFC7]/40 dark:border-white/10">
+                    {task.resources.map((res, idx) => (
+                        <a
+                            key={idx}
+                            href={res.url || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] dark:text-[#60A5FA] hover:underline"
+                        >
+                            <Icon name="ExternalLink" size={11} /> {res.title || res.name || 'Resource'}
+                        </a>
+                    ))}
+                </div>
+            )}
             {task.dueDate && (
-                <p className="text-xs text-[#555555]">Due: {task.dueDate}</p>
+                <p className="text-xs text-[#555555] mt-2">Due: {task.dueDate}</p>
             )}
         </div>
     );

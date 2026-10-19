@@ -59,7 +59,7 @@ router.post('/generate', requireAuth, async (req, res) => {
         const [user] = await db
             .select()
             .from(users)
-            .where(eq(users.clerkId, req.user.id));
+            .where(eq(users.id, req.user.id));
 
         const [userOnboarding] = await db
             .select()
@@ -75,7 +75,7 @@ router.post('/generate', requireAuth, async (req, res) => {
         const userData = {
             targetRole,
             currentSkills: userOnboarding?.skills || [],
-            education: userOnboarding?.currentEducation || academicData?.degree || 'Not specified',
+            education: userOnboarding?.currentEducation || academicData?.details || 'Not specified',
             experience: userOnboarding?.experience || 'Beginner',
             interests: userOnboarding?.interests || [],
         };
@@ -118,13 +118,18 @@ router.post('/generate', requireAuth, async (req, res) => {
                 .returning();
         }
 
-        // Insert roadmap items as separate rows
+        // Insert roadmap items as separate rows with rich attributes preserved
         const items = aiRoadmap.items || [];
         const itemsToInsert = items.map((item, index) => ({
             roadmapId: roadmap.id,
             sequenceNo: index + 1,
-            taskType: item.type || item.taskType || 'task',
+            phase: item.phase || null,
+            title: item.title || null,
+            taskType: item.taskType || item.type || 'learn',
             description: item.description || item.title || '',
+            skills: item.skills || [],
+            resources: item.resources || [],
+            estimatedWeeks: item.estimatedWeeks ? Number(item.estimatedWeeks) : null,
             completed: false,
             dueDate: item.dueDate || null,
         }));

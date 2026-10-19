@@ -70,6 +70,7 @@ export const recommendations = pgTable('recommendations', {
     recType: varchar('rec_type', { length: 100 }), // role, skill, course, certification, etc.
     content: text('content'),
     score: decimal('score', { precision: 5, scale: 2 }),
+    confidence: decimal('confidence', { precision: 5, scale: 2 }).default('1.00'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -79,6 +80,8 @@ export const roadmaps = pgTable('roadmaps', {
     id: serial('id').primaryKey(),
     userId: integer('user_id').notNull().unique().references(() => users.id, { onDelete: 'cascade' }),
     title: varchar('title', { length: 255 }).notNull(),
+    description: text('description'),
+    targetRole: varchar('target_role', { length: 100 }),
     generatedAt: timestamp('generated_at').defaultNow(),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
@@ -138,8 +141,13 @@ export const roadmapItems = pgTable('roadmap_items', {
     id: serial('id').primaryKey(),
     roadmapId: integer('roadmap_id').notNull().references(() => roadmaps.id, { onDelete: 'cascade' }),
     sequenceNo: integer('sequence_no').notNull(),
+    phase: varchar('phase', { length: 100 }),
+    title: varchar('title', { length: 255 }),
     taskType: varchar('task_type', { length: 50 }), // course, project, certification, skill, etc.
     description: text('description'),
+    skills: jsonb('skills').default([]),
+    resources: jsonb('resources').default([]),
+    estimatedWeeks: integer('estimated_weeks'),
     completed: boolean('completed').default(false),
     dueDate: timestamp('due_date'),
     createdAt: timestamp('created_at').defaultNow(),

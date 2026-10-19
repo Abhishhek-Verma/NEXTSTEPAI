@@ -1,6 +1,6 @@
 /**
  * User Data Service
- * Efficiently fetches complete user profile with all related data
+ * Efficiently fetches complete user profile with all related data matching current normalized schema
  */
 
 import db from '../db/index.js';
@@ -12,6 +12,7 @@ import {
     projects, 
     recommendations, 
     roadmaps, 
+    roadmapItems,
     onboardingData 
 } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
@@ -36,53 +37,81 @@ export async function fetchCompleteUserProfile(userId) {
         // Fetch all related data in parallel for efficiency
         const [
             academics,
-            codingProfile,
-            psychometric,
+            codingRows,
+            psychometrics,
             userProjects,
-            recommendation,
-            roadmap,
+            recRows,
+            roadmapRows,
             onboarding
         ] = await Promise.all([
             // Academic records (multiple)
-            db.select()
-                .from(academicRecords)
-                .where(eq(academicRecords.userId, userId)),
+            db.select().from(academicRecords).where(eq(academicRecords.userId, userId)),
             
-            // Coding profile (single)
-            db.select()
-                .from(codingProfiles)
-                .where(eq(codingProfiles.userId, userId))
-                .then(rows => rows[0] || null),
+            // Coding profiles (multiple rows: one per platform)
+            db.select().from(codingProfiles).where(eq(codingProfiles.userId, userId)),
             
-            // Psychometric test (single)
-            db.select()
-                .from(psychometricTests)
-                .where(eq(psychometricTests.userId, userId))
-                .then(rows => rows[0] || null),
+            // Psychometric test (latest)
+            db.select().from(psychometricTests).where(eq(psychometricTests.userId, userId)),
             
             // Projects (multiple)
-            db.select()
-                .from(projects)
-                .where(eq(projects.userId, userId)),
+            db.select().from(projects).where(eq(projects.userId, userId)),
             
-            // Recommendations (single)
-            db.select()
-                .from(recommendations)
-                .where(eq(recommendations.userId, userId))
-                .then(rows => rows[0] || null),
+            // Recommendations (multiple rows)
+            db.select().from(recommendations).where(eq(recommendations.userId, userId)),
             
             // Roadmap (single)
-            db.select()
-                .from(roadmaps)
-                .where(eq(roadmaps.userId, userId))
-                .then(rows => rows[0] || null),
+            db.select().from(roadmaps).where(eq(roadmaps.userId, userId)),
             
             // Onboarding data (single)
-            db.select()
-                .from(onboardingData)
-                .where(eq(onboardingData.userId, userId))
-                .then(rows => rows[0] || null)
+            db.select().from(onboardingData).where(eq(onboardingData.userId, userId)).then(rows => rows[0] || null)
         ]);
+
+        // Transform coding profiles into platform dictionary
+        const platformMap = {
+            github: null,
+            leetcode: null,
+            codeforces: null,
+            codechef: null,
+        };
+        codingRows.forEach(row => {
+            if (row.platform) {
+                platformMap[row.platform] = {
+                    profileUrl: row.profileUrl,
+                    metrics: row.metrics || {},
+                };
+            }
+        });
+
+        // Fetch roadmap items if roadmap exists
+        const roadmapRecord = roadmapRows[0] || null;
+        let roadmapItemsList = [];
+        if (roadmapRecord) {
+            roadmapItemsList = await db
+                .select()
+                .from(roadmapItems)
+                .where(eq(roadmapItems.roadmapId, roadmapRecord.id))
+                .orderBy(roadmapItems.sequenceNo);
+        }
+
+        // Group recommendations
+        const latestPsych = psychometrics.length > 0 ? psychometrics[psychometrics.length - 1] : null;
+        const groupedRecs = {
+            roles: recRows.filter(r => r.recType === 'role').map(r => {
+                let parsed = {};
+                try { parsed = JSON.parse(r.content); } catch (e) {}
+                return { id: r.id, ...parsed, score: r.score, confidence: r.confidence, generatedAt: r.generatedAt };
+            }),
+            skills: recRows.filter(r => r.recType === 'skill').map(r => {
+                let parsed = {};
+                try { parsed = JSON.parse(r.content); } catch (e) {}
+                return { id: r.id, ...parsed, score: r.score, confidence: r.confidence, generatedAt: r.generatedAt };
+            }),
+            companies: recRows.filter(r => r.recType === 'company').map(r => {
+                let parsed = {};
+                try { parsed = JSON.parse(r.content); } catch (e) {}
+                return { id: r.id, ...parsed, score: r.score, confidence: r.confidence, generatedAt: r.generatedAt };
+            }),
+        };
 
         // Construct complete user profile object
         const completeProfile = {
@@ -101,21 +130,13 @@ export async function fetchCompleteUserProfile(userId) {
             academic: {
                 records: academics.map(record => ({
                     id: record.id,
-                    degree: record.degree,
-                    institution: record.institution,
-                    major: record.major,
                     semester: record.semester,
-                    gpa: parseFloat(record.gpa),
-                    maxGpa: parseFloat(record.maxGpa),
-                    startDate: record.startDate,
-                    endDate: record.endDate,
-                    isCurrentlyEnrolled: record.isCurrentlyEnrolled,
-                    additionalInfo: record.additionalInfo,
+                    gpa: record.gpa ? parseFloat(record.gpa) : null,
+                    details: record.details,
                     createdAt: record.createdAt
                 })),
                 summary: {
                     totalRecords: academics.length,
-                    currentInstitution: academics.find(r => r.isCurrentlyEnrolled)?.institution || null,
                     highestGpa: academics.length > 0 
                         ? Math.max(...academics.map(r => parseFloat(r.gpa) || 0))
                         : 0
@@ -123,36 +144,10 @@ export async function fetchCompleteUserProfile(userId) {
             },
             
             coding: {
-                profile: codingProfile || null,
-                platforms: codingProfile ? {
-                    github: {
-                        username: codingProfile.githubUsername,
-                        profileUrl: codingProfile.githubProfileUrl,
-                        metrics: codingProfile.githubMetrics
-                    },
-                    leetcode: {
-                        username: codingProfile.leetcodeUsername,
-                        profileUrl: codingProfile.leetcodeProfileUrl,
-                        metrics: codingProfile.leetcodeMetrics
-                    },
-                    codeforces: {
-                        handle: codingProfile.codeforcesHandle,
-                        profileUrl: codingProfile.codeforcesProfileUrl,
-                        metrics: codingProfile.codeforcesMetrics
-                    },
-                    codechef: {
-                        handle: codingProfile.codechefHandle,
-                        profileUrl: codingProfile.codechefProfileUrl,
-                        metrics: codingProfile.codechefMetrics
-                    }
-                } : null,
+                profiles: codingRows,
+                platforms: platformMap,
                 summary: {
-                    platformsConnected: codingProfile ? [
-                        codingProfile.githubUsername ? 'github' : null,
-                        codingProfile.leetcodeUsername ? 'leetcode' : null,
-                        codingProfile.codeforcesHandle ? 'codeforces' : null,
-                        codingProfile.codechefHandle ? 'codechef' : null
-                    ].filter(Boolean) : []
+                    platformsConnected: Object.keys(platformMap).filter(k => !!platformMap[k])
                 }
             },
             
@@ -161,66 +156,57 @@ export async function fetchCompleteUserProfile(userId) {
                     id: project.id,
                     title: project.title,
                     description: project.description,
-                    technologies: project.technologies,
-                    githubUrl: project.githubUrl,
+                    technologies: project.technologies || [],
+                    repoUrl: project.repoUrl,
                     liveUrl: project.liveUrl,
                     imageUrl: project.imageUrl,
                     status: project.status,
-                    startDate: project.startDate,
-                    endDate: project.endDate,
-                    featured: project.featured,
+                    completedAt: project.completedAt,
                     createdAt: project.createdAt
                 })),
                 summary: {
                     total: userProjects.length,
                     completed: userProjects.filter(p => p.status === 'completed').length,
                     inProgress: userProjects.filter(p => p.status === 'in-progress').length,
-                    featured: userProjects.filter(p => p.featured).length
                 }
             },
             
-            psychometric: psychometric ? {
-                testName: psychometric.testName,
-                traits: psychometric.traits,
-                score: psychometric.score,
-                progress: psychometric.progress,
-                responses: psychometric.responses,
-                takenAt: psychometric.takenAt,
+            psychometric: latestPsych ? {
+                testName: latestPsych.testName,
+                traits: latestPsych.traits || {},
+                takenAt: latestPsych.takenAt,
                 analysis: {
-                    completed: psychometric.progress === 100,
-                    topTraits: psychometric.traits 
-                        ? Object.entries(psychometric.traits)
-                            .sort((a, b) => b[1] - a[1])
+                    completed: true,
+                    topTraits: latestPsych.traits 
+                        ? Object.entries(latestPsych.traits)
+                            .sort((a, b) => Number(b[1]) - Number(a[1]))
                             .slice(0, 5)
                             .map(([trait, score]) => ({ trait, score }))
                         : []
                 }
             } : null,
             
-            recommendations: recommendation ? {
-                roles: recommendation.roles,
-                skills: recommendation.skills,
-                companies: recommendation.companies,
-                savedRoles: recommendation.savedRoles,
-                generatedAt: recommendation.generatedAt,
+            recommendations: {
+                roles: groupedRecs.roles,
+                skills: groupedRecs.skills,
+                companies: groupedRecs.companies,
                 summary: {
-                    rolesCount: recommendation.roles ? recommendation.roles.length : 0,
-                    skillsCount: recommendation.skills ? recommendation.skills.length : 0,
-                    companiesCount: recommendation.companies ? recommendation.companies.length : 0
+                    rolesCount: groupedRecs.roles.length,
+                    skillsCount: groupedRecs.skills.length,
+                    companiesCount: groupedRecs.companies.length
                 }
-            } : null,
+            },
             
-            roadmap: roadmap ? {
-                title: roadmap.title,
-                description: roadmap.description,
-                targetRole: roadmap.targetRole,
-                items: roadmap.items,
-                generatedAt: roadmap.generatedAt,
+            roadmap: roadmapRecord ? {
+                id: roadmapRecord.id,
+                title: roadmapRecord.title,
+                description: roadmapRecord.description,
+                targetRole: roadmapRecord.targetRole,
+                items: roadmapItemsList,
+                generatedAt: roadmapRecord.generatedAt,
                 summary: {
-                    totalItems: roadmap.items ? roadmap.items.length : 0,
-                    completedItems: roadmap.items 
-                        ? roadmap.items.filter(item => item.completed).length 
-                        : 0
+                    totalItems: roadmapItemsList.length,
+                    completedItems: roadmapItemsList.filter(item => item.completed).length 
                 }
             } : null,
             
@@ -238,11 +224,11 @@ export async function fetchCompleteUserProfile(userId) {
             profileCompletion: calculateProfileCompletion({
                 user,
                 academics,
-                codingProfile,
-                psychometric,
+                codingRows,
+                latestPsych,
                 userProjects,
-                recommendation,
-                roadmap,
+                recRows,
+                roadmapRecord,
                 onboarding
             })
         };
@@ -262,11 +248,11 @@ function calculateProfileCompletion(data) {
         { name: 'Basic Info', weight: 10, complete: !!(data.user.firstName && data.user.lastName) },
         { name: 'Onboarding', weight: 15, complete: !!data.onboarding },
         { name: 'Academic', weight: 15, complete: data.academics.length > 0 },
-        { name: 'Coding Profile', weight: 20, complete: !!data.codingProfile },
+        { name: 'Coding Profile', weight: 20, complete: data.codingRows.length > 0 },
         { name: 'Projects', weight: 15, complete: data.userProjects.length > 0 },
-        { name: 'Psychometric', weight: 10, complete: !!data.psychometric },
-        { name: 'Recommendations', weight: 10, complete: !!data.recommendation },
-        { name: 'Roadmap', weight: 5, complete: !!data.roadmap }
+        { name: 'Psychometric', weight: 10, complete: !!data.latestPsych },
+        { name: 'Recommendations', weight: 10, complete: data.recRows.length > 0 },
+        { name: 'Roadmap', weight: 5, complete: !!data.roadmapRecord }
     ];
 
     const completedWeight = sections
@@ -282,24 +268,6 @@ function calculateProfileCompletion(data) {
         })),
         missingSection: sections.filter(s => !s.complete).map(s => s.name)
     };
-}
-
-/**
- * Fetch user by Clerk ID (for authentication)
- * @param {string} clerkId - Clerk user ID
- * @returns {Promise<Object>} Complete user profile
- */
-export async function fetchUserByClerkId(clerkId) {
-    const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.clerkId, clerkId));
-
-    if (!user) {
-        throw new Error('User not found');
-    }
-
-    return fetchCompleteUserProfile(user.id);
 }
 
 /**
@@ -328,6 +296,5 @@ export async function fetchBasicUserProfile(userId) {
 
 export default {
     fetchCompleteUserProfile,
-    fetchUserByClerkId,
     fetchBasicUserProfile
 };

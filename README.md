@@ -1,287 +1,298 @@
 <div align="center">
 
-  <img src="./frontend/public/logo.jpeg" alt="NextStepAI Logo" width="100" style="border-radius: 16px;" />
+  <img src="./frontend/public/logo.jpeg" alt="NextStepAI Logo" width="110" style="border-radius: 20px;" />
 
   # NextStepAI
-
-  **Data-Driven Career Guidance, Coding Analytics & Personalized Roadmap Platform**
+  ### A Multi-Modal Hybrid Intelligence Framework for Holistic Career Trajectory Planning
 
   [![Live Site](https://img.shields.io/badge/Live_Production-nextstepai.co.in-00E676?style=for-the-badge&logo=googlechrome&logoColor=white)](https://nextstepai.co.in)
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
   [![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
   [![React](https://img.shields.io/badge/React-v18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech/)
-  [![Clerk](https://img.shields.io/badge/Auth-Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)](https://clerk.com/)
+  [![Database: Neon](https://img.shields.io/badge/PostgreSQL-Neon_Serverless-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech/)
+  [![LPU Inference: Groq](https://img.shields.io/badge/LPU_Inference-Groq_Cloud-F55036?style=for-the-badge&logo=fastapi&logoColor=white)](https://groq.com/)
+  [![Auth: Clerk](https://img.shields.io/badge/Auth-Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)](https://clerk.com/)
 
   ---
 
-  **Live Production Link**: [https://nextstepai.co.in](https://nextstepai.co.in)
+  🌐 **Live Production Deployment**: [https://nextstepai.co.in](https://nextstepai.co.in)
 
 </div>
 
 ---
 
-> [!IMPORTANT]
-> ### AI Training Model Status — Custom Model Under Active Development
-> The **proprietary ML/AI Training Model**, which serves as the **main brain of NextStepAI**, is currently **under active training and processing**. 
-> Once fully trained, this model will autonomously ingest multi-dimensional candidate data (including live coding profiles across platforms, academic performance, skill matrices, project complexity, and psychometric traits) to generate hyper-personalized step-by-step career roadmaps, skill gap predictions, and tailored career trajectory recommendations. In the interim, the platform leverages Google Gemini AI integration and specialized analytical heuristics to power live insights.
+## 📌 Abstract & Research Foundation
+
+Traditional career counseling relies on static academic marks (CGPA) or keyword-matching resume parsers that fail to capture the multidimensional nature of human potential. **NextStepAI** introduces an autonomous, bias-mitigated, and privacy-centered architecture based on **Multi-Modal Machine Learning** to democratize personalized career trajectory planning.
+
+The platform synthesizes four distinct modalities:
+1. **Academic Performance ($V_A$)**: Normalization across standard grading scales (CGPA / GPA) with structured course-level proficiency.
+2. **Practical Coding Engine ($S_P$)**: Real-time API telemetry and non-linear logarithmic difficulty scoring across **LeetCode, CodeChef, Codeforces, and GitHub**.
+3. **Psychometric & Aptitude Profiling ($V_{\text{Psy}}$)**: Digital psychometrics mapping situational traits into the standard 5-dimensional Big Five **OCEAN** vector $[O, C, E, A, N]$.
+4. **Hybrid Recommendation Core**: Combines Content-Based Cosine Similarity with Collaborative Filtering through **Dynamic $\lambda$ Hybridization** to resolve the cold-start challenge.
+
+> **Academic Citation**:
+> *Verma, A., Maan, S., Maurya, A., Rauniya, A., Dubey, G., & Sharma, A. "NextStepAI: A Multi-Modal Hybrid Intelligence Framework for Holistic Career Trajectory Planning." Department of Computer Science, Krishna Institute of Engineering & Technology (KIET), Ghaziabad, Delhi-NCR, India.*
 
 ---
 
-## Overview
+## 🏛️ System Architecture
 
-**NextStepAI** is an all-in-one, intelligent career planning platform designed to bridge the gap between candidate skills and industry demands. By unifying academic records, platform-wide coding profiles (**GitHub, LeetCode, Codeforces, CodeChef**), project portfolios, technical skill metrics, and psychometric assessments, NextStepAI provides students and developer professionals with data-driven career recommendations and structured learning roadmaps.
+The NextStepAI system employs a **modular microservices architecture** operating on a two-tier paradigm: a deterministic mathematical core and a fast generative explanation layer.
+
+```
++--------------------------------------------------------------------------------------------------+
+| 1. MULTI-SOURCE DATA INGESTION                                                                    |
+|    - Academic Transcripts (GPA / Course Records)                                                  |
+|    - Competitive Coding APIs (LeetCode, Codeforces, CodeChef Metrics)                            |
+|    - Open-Source Telemetry (GitHub Commits, Stars, Language Diversity)                             |
+|    - Psychometric Assessment Engine (Situational Work-Style Traits)                              |
++--------------------------------------------------------------------------------------------------+
+                                               |
+                                               v
++--------------------------------------------------------------------------------------------------+
+| 2. MULTI-MODAL FEATURE EXTRACTION & NORMALIZATION (mathEngine.js)                                 |
+|    - Module A: Academic Score Normalization -> V_A in [0, 1]                                      |
+|    - Module B: Practical Skill Score -> S_P in [0, 1] (Equation 1)                                |
+|    - Module C: Big Five Psychometric Vector -> V_Psy = [O, C, E, A, N]                           |
+|    - Project Evidence Score -> V_Proj in [0, 1]                                                  |
+|    => Unified Candidate Vector: U = [V_A, S_P, V_Psy, V_Proj]                                    |
++--------------------------------------------------------------------------------------------------+
+                                               |
+                                               v
++--------------------------------------------------------------------------------------------------+
+| 3. HYBRID FUSION & INCLINATION ENGINE                                                             |
+|    - Career Representation Catalog: Canonical Industry Vectors (C_j)                             |
+|    - Content-Based Filtering: Cosine Similarity Score_CBF(U, C_j) (Equation 2)                    |
+|    - Dynamic Hybridization: Score_Final = lambda * Score_CBF + (1 - lambda) * Score_CF (Eq 3)     |
+|    - Track Classifier: Predicts Track T (Product Engineering, R&D/Systems, Corporate Tech)       |
+|    - Pairwise Deletion Confidence Layer: Quantifies measurement certainty                        |
++--------------------------------------------------------------------------------------------------+
+                                               |
+                                               v
++--------------------------------------------------------------------------------------------------+
+| 4. FAST GENERATIVE EXPLANATION & MILESTONE DAG LAYER (ai.js)                                     |
+|    - Powered by Groq Cloud LPU Inference (llama-3.3-70b-versatile @ 500+ tok/s, 100% Free Tier)  |
+|    - Grounded Explanation: Receives pre-computed decision object, writes evidence-backed rationale |
+|    - Generative Milestone DAG: Outputs structured learning roadmap (phases, weeks, resources)     |
++--------------------------------------------------------------------------------------------------+
+                                               |
+                                               v
++--------------------------------------------------------------------------------------------------+
+| 5. INTERACTIVE DASHBOARD & PRESENTATION                                                           |
+|    - Live Vector Breakdown Radar & Cards | Interactive Drag-and-Drop Roadmap | Career Matches     |
++--------------------------------------------------------------------------------------------------+
+```
 
 ---
 
-## Key Features
+## 📐 Mathematical Formulations
 
-- **Multi-Platform Coding Stats Aggregator**: Seamlessly connect and sync profile statistics, problem-solving counts, contest ratings, and contribution metrics from **GitHub**, **LeetCode**, **Codeforces**, and **CodeChef**.
-- **AI-Generated Career Roadmaps**: Step-by-step milestone planning tailored to target career roles (e.g., Full Stack Engineer, AI/ML Specialist, DevOps Architect).
-- **Career & Skill Recommendations**: Data-backed suggestions highlighting top role fits, priority skills to acquire, and target hiring companies.
-- **Skill Gap Analysis**: In-depth evaluation identifying missing competencies required to unlock specific career paths.
-- **Psychometric Evaluation**: Comprehensive personality and work-style assessment to evaluate career compatibility and soft-skill profiles.
-- **Academic & Portfolio Tracking**: Manage SGPA/CGPA history, academic milestones, and showcase technical projects with live links and tech stack tags.
-- **Enterprise-Grade Security & Authentication**: Powered by Clerk for passwordless and OAuth authentication, combined with rate-limiting, CORS policies, and Zod input validation.
-- **Modern UI/UX**: Built with React 18, Vite, and Tailwind CSS, featuring responsive design and micro-animations.
+### 1. Practical Skill Score ($S_P$) — Equation (1)
+$$S_P = \alpha \left(\frac{R_{\text{current}}}{R_{\text{max\_goal}}}\right) + \beta \left( \sum_{d \in \{E,M,H\}} w_d \cdot \log(1 + N_d) \right) + \gamma (G_{\text{act}})$$
+
+- **$R_{\text{current}} / R_{\text{max\_goal}}$**: Average contest rating across competitive platforms normalized by platform-specific ceilings (LeetCode: $2400$, Codeforces: $2400$, CodeChef: $2200$).
+- **Difficulty Log-Sum**: Weights the count of solved problems by complexity ($w_{\text{easy}} = 1.0, w_{\text{med}} = 2.0, w_{\text{hard}} = 4.0$), normalized by saturation ceiling base ($35.0$).
+- **$G_{\text{act}}$**: Normalized GitHub activity and repository contribution velocity.
+- **Calibrated Hyperparameters**: $\alpha = 0.40, \beta = 0.40, \gamma = 0.20$.
+
+### 2. Content-Based Cosine Similarity — Equation (2)
+$$\text{Score}_{\text{CBF}}(U, C_j) = \frac{U \cdot C_j}{\|U\| \cdot \|C_j\|} = \frac{\sum_{k=1}^D U_k \cdot C_{jk}}{\sqrt{\sum_{k=1}^D U_k^2} \sqrt{\sum_{k=1}^D C_{jk}^2}}$$
+
+- Pairwise deletion handles unmeasured dimensions without penalizing the candidate with false zeroes.
+
+### 3. Dynamic Hybridization & Cold-Start — Equation (3)
+$$\text{Score}_{\text{Final}} = \lambda \cdot \text{Score}_{\text{CBF}} + (1 - \lambda) \cdot \text{Score}_{\text{CF}}$$
+$$\lambda(n) = \max\left(0.5, 0.5 + 0.5 \cdot e^{-0.25 \cdot n}\right)$$
+
+- For new candidates with zero historical interaction data ($n = 0$), $\lambda \to 1.0$ (cold-start mitigation). As portfolio interactions and milestones accumulate, $\lambda$ decays gracefully to incorporate community collaborative success vectors.
+
+### 4. Confidence Estimation
+$$\text{Confidence} = \max\left(0.30, 1.0 - \frac{\text{droppedDimensions}}{\text{totalDimensions}}\right)$$
 
 ---
 
-## Repository & Project Structure
+## 📊 Experimental Evaluation (Paper Benchmark)
+
+In Section 4 of the research paper, NextStepAI was evaluated against **5,000 anonymized candidate profiles** using standard Information Retrieval metrics: **Precision@5**, **Precision@10**, and **Normalized Discounted Cumulative Gain (NDCG)**.
+
+### Performance Comparison
+
+| Model Architecture | Precision@5 | Precision@10 | NDCG |
+| :--- | :---: | :---: | :---: |
+| **Baseline 1: Academic-Only Model** *(CGPA-centric)* | 0.62 | 0.58 | 0.65 |
+| **Baseline 2: Resume Parser Model** *(Keyword/Text)* | 0.71 | 0.67 | 0.74 |
+| **NextStepAI (Multi-Modal Hybrid Architecture)** | **0.91** | **0.89** | **0.92** |
+
+> *Reproduce benchmark data locally by running `node backend/benchmark/evaluate.js`.*
+
+---
+
+## 📂 Repository Structure
 
 ```
 NEXTSTEPAI/
-├── backend/                      # Node.js + Express API Server
-│   ├── drizzle/                  # Drizzle ORM database migrations
+├── backend/
+│   ├── benchmark/
+│   │   └── evaluate.js              # 5,000-cohort empirical evaluation harness (Table 1)
 │   ├── src/
-│   │   ├── db/                   # Database schema (Drizzle ORM) & Neon Postgres client
-│   │   ├── middleware/           # Auth validation (Clerk) & Zod request validation
-│   │   ├── routes/               # Express API endpoints
-│   │   │   ├── academic.js       # Academic records CRUD
-│   │   │   ├── coding.js         # Coding platform profile sync & stats
-│   │   │   ├── onboarding.js     # User initial setup flow
-│   │   │   ├── projects.js       # Portfolio projects management
-│   │   │   ├── psychometric.js   # Psychometric test processing
-│   │   │   ├── recommendations.js# AI career suggestions
-│   │   │   ├── roadmap.js        # Step-by-step career milestone generator
-│   │   │   ├── skills.js         # Technical skills inventory
-│   │   │   └── user.js           # Profile & account settings
-│   │   ├── services/             # Core business logic & external integrations
-│   │   │   ├── ai.js             # Google Gemini AI roadmap & analytical engine
-│   │   │   ├── userProfile.js    # Data aggregation service
-│   │   │   └── platforms/        # Real-time profile scrapers & GraphQL clients
-│   │   │       ├── codechef.js   # CodeChef rating & problem solver
-│   │   │       ├── codeforces.js # Codeforces contest & rating fetcher
-│   │   │       ├── github.js     # GitHub repository & commit analyzer
-│   │   │       └── leetcode.js   # LeetCode submission & stats fetcher
-│   │   └── index.js              # API Server entry point & CORS configuration
-│   ├── drizzle.config.js         # Drizzle ORM configuration
-│   ├── migrate-schema.js         # Schema migration utility
-│   ├── render.yaml               # Backend Render deployment setup
-│   └── package.json              # Backend dependencies & scripts
+│   │   ├── db/
+│   │   │   ├── index.js             # Neon PostgreSQL serverless client
+│   │   │   └── schema.js            # Normalized Drizzle ORM schema (roadmaps, recs, etc.)
+│   │   ├── middleware/
+│   │   │   ├── auth.js              # Clerk JWT bearer token authentication
+│   │   │   └── validation.js        # Zod input validation schemas
+│   │   ├── routes/
+│   │   │   ├── academic.js          # Academic records CRUD & normalization
+│   │   │   ├── analysis.js          # Live AI career analysis & track classifier endpoint
+│   │   │   ├── coding.js            # Platform sync (GitHub, LeetCode, CF, CC)
+│   │   │   ├── onboarding.js        # Candidate onboarding profile setup
+│   │   │   ├── projects.js          # Portfolio projects & live demo links
+│   │   │   ├── psychometric.js      # Psychometric traits assessment
+│   │   │   ├── recommendations.js   # Multi-modal hybrid recommendation generator
+│   │   │   ├── roadmap.js           # Career milestone DAG generator & item tracker
+│   │   │   ├── skills.js            # Technical & soft skills matrix
+│   │   │   └── user.js              # User profile & stats
+│   │   ├── services/
+│   │   │   ├── ai.js                # Groq Cloud LPU engine (llama-3.3-70b-versatile)
+│   │   │   ├── careersCatalog.js    # Canonical 4D career target vectors (C_j)
+│   │   │   ├── mathEngine.js        # Deterministic math engine (Eq 1, 2, 3, V_A, S_P)
+│   │   │   ├── userProfile.js       # Profile aggregation service
+│   │   │   └── platforms/           # Platform API clients (GraphQL & scrapers)
+│   │   │       ├── codechef.js      # CodeChef profile scraper
+│   │   │       ├── codeforces.js    # Codeforces API client
+│   │   │       ├── github.js        # GitHub REST API & contribution calculator
+│   │   │       └── leetcode.js      # LeetCode GraphQL client
+│   │   └── index.js                 # Express server bootstrap & security headers
+│   ├── apply-migrations.js          # Database schema migration executor
+│   ├── test-mathEngine.js           # 18-step deterministic math engine unit tests
+│   ├── test-db.js                   # Neon Postgres connectivity & FK constraint tests
+│   ├── render.yaml                  # Render cloud infrastructure-as-code spec
+│   ├── package.json                 # Backend dependencies (groq-sdk, drizzle, neon)
+│   └── .env.example                 # Backend environment variable template
 │
-├── frontend/                     # React 18 + Vite Web Application
-│   ├── public/                   # Favicons & static branding assets
+├── frontend/
 │   ├── src/
-│   │   ├── api/                  # Axios API client setup & endpoint methods
-│   │   ├── components/           # UI layout, Sidebar, Navbar, & reusable cards
-│   │   ├── pages/                # Application routes & views
-│   │   │   ├── academic/         # Academic record management page
-│   │   │   ├── analyze/          # Skill gap & profile analytics view
-│   │   │   ├── auth/             # Login & Registration pages (Clerk integrated)
-│   │   │   ├── coding/           # Multi-platform coding stats dashboard
-│   │   │   ├── landing-page/     # Public hero & landing experience
-│   │   │   ├── onboarding/       # User profile setup & career targeting wizard
-│   │   │   ├── profile/          # Account profile & target role settings
-│   │   │   ├── projects/         # Portfolio & project showcase builder
-│   │   │   ├── psychometric/     # Personality assessment questionnaire & results
-│   │   │   ├── recommendations/  # AI career role match suggestions
-│   │   │   ├── roadmap/          # Interactive milestone roadmap view
-│   │   │   └── skills/           # Technical skills matrix builder
-│   │   ├── store/                # Zustand global state stores
-│   │   ├── styles/               # Tailwind CSS & global design system
-│   │   ├── utils/                # Helper functions & data formatters
-│   │   ├── App.jsx               # Main React entry component
-│   │   ├── main.jsx              # Application bootstrap with Query & Auth Providers
-│   │   └── Routes.jsx            # React Router v6 route configuration
-│   ├── netlify.toml              # Netlify SPA redirect rules
-│   ├── tailwind.config.js        # Tailwind styling system tokens
-│   ├── vite.config.js            # Vite build configuration
-│   └── package.json              # Frontend dependencies & scripts
+│   │   ├── api/client.js            # Axios client with Clerk auth interceptors
+│   │   ├── components/              # Reusable UI component library (cards, modals)
+│   │   ├── pages/
+│   │   │   ├── academic/            # Academic grades & coursework management
+│   │   │   ├── analyze/             # Live Track Inclination & Vector Breakdown UI
+│   │   │   ├── coding/              # Competitive coding & GitHub telemetry view
+│   │   │   ├── landing-page/        # Hero page & interactive marketing experience
+│   │   │   ├── onboarding/          # Candidate goal onboarding wizard
+│   │   │   ├── profile/             # Profile settings & target tracks
+│   │   │   ├── projects/            # Practical project showcase builder
+│   │   │   ├── psychometric/        # Psychometric assessment & radar charts
+│   │   │   ├── recommendations/     # Recommended roles, skill gaps & target companies
+│   │   │   └── roadmap/             # Drag-and-drop learning milestone DAG
+│   │   ├── store/                   # Zustand state management slices
+│   │   └── App.jsx                  # Root application router
+│   ├── tailwind.config.js           # Custom design tokens & palette
+│   └── package.json                 # Frontend dependencies (React 18, Vite, Recharts)
 │
-├── QUICKSTART.md                 # Detailed step-by-step setup guide
-└── README.md                     # Main repository documentation
+└── README.md                        # Project documentation & academic report
 ```
 
 ---
 
-## Tech Stack
+## 🛠️ Technology Stack
 
-### Frontend
-- **Framework**: React 18
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS, PostCSS, Lucide Icons
-- **State Management**: Zustand
-- **Data Fetching**: React Query (TanStack Query), Axios
-- **Authentication**: Clerk React SDK
-- **Routing**: React Router v6
-- **Hosting**: Netlify (Live at [nextstepai.co.in](https://nextstepai.co.in))
-
-### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: Neon PostgreSQL (Serverless Postgres)
-- **ORM**: Drizzle ORM
-- **AI Integration**: Google Gemini 1.5 Flash SDK
-- **Auth Verification**: Clerk Node SDK
-- **Validation**: Zod
-- **Scrapers / Fetchers**: Cheerio, Axios, GraphQL queries
-- **Security**: Helmet, CORS, Express Rate Limit
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend** | React 18, Vite, Zustand | Responsive client SPA with fluid micro-interactions |
+| **Styling & Icons** | Tailwind CSS, Lucide React, Recharts | Data visualizations (radar charts, progress indicators) |
+| **Backend Runtime** | Node.js (v18+), Express.js | High-throughput asynchronous REST API |
+| **Database** | Neon PostgreSQL (Serverless) | Scalable relational storage & ACID persistence |
+| **ORM** | Drizzle ORM | Type-safe SQL query builder and migrations |
+| **AI Inference** | Groq Cloud LPU (`llama-3.3-70b-versatile`) | Ultra-fast (500+ tok/s), $0-cost explanation generation |
+| **Authentication** | Clerk Auth SDK | Passwordless, Google/GitHub OAuth, JWT verification |
+| **Scrapers & APIs** | Cheerio, Axios, GraphQL | Real-time LeetCode, Codeforces, CodeChef, GitHub telemetry |
+| **Deployment** | Render (Backend) + Netlify (Frontend) | Global edge CDN and autoscaling container hosting |
 
 ---
 
-## API Endpoints Overview
+## ⚙️ Environment Variables (Ready for Render & Local Setup)
 
-All protected endpoints require a valid Clerk JWT Bearer Token in the `Authorization` header.
+Copy and paste the block below directly into your local `backend/.env` or into **Render Dashboard $\to$ Environment Variables**:
 
-| Category | Method | Endpoint | Description |
-| :--- | :--- | :--- | :--- |
-| **Health** | `GET` | `/health` | Server status check |
-| **User** | `GET` | `/api/user/profile` | Fetch aggregate user profile & target role |
-| **User** | `PUT` | `/api/user/profile` | Update target role and personal details |
-| **Academic** | `GET` | `/api/academic` | Get user academic history & GPA records |
-| **Academic** | `POST` | `/api/academic` | Save/update academic performance |
-| **Coding** | `GET` | `/api/coding` | Retrieve connected platform handles & stats |
-| **Coding** | `POST` | `/api/coding/sync` | Trigger live scraping & stats update (GitHub, LeetCode, Codeforces, CodeChef) |
-| **Projects** | `GET` | `/api/projects` | Fetch candidate portfolio projects |
-| **Projects** | `POST` | `/api/projects` | Add or update project details |
-| **Skills** | `GET` | `/api/skills` | Fetch technical skill inventory |
-| **Skills** | `POST` | `/api/skills` | Add/update skill levels and categories |
-| **Psychometric**| `GET` | `/api/psychometric` | Fetch psychometric evaluation results |
-| **Psychometric**| `POST` | `/api/psychometric/submit` | Submit psychometric test responses |
-| **AI Insights** | `POST` | `/api/recommendations/generate` | Generate career match recommendations |
-| **AI Roadmap** | `POST` | `/api/roadmap/generate` | Generate step-by-step career milestones |
-
----
-
-## Database Architecture
-
-The application uses **Neon PostgreSQL** managed through **Drizzle ORM**.
-
-```sql
-users (id, clerk_id, email, full_name, target_role, bio...)
-  ├── academic_records (1:many)   --> Degree, institution, SGPA/CGPA, year
-  ├── coding_profiles  (1:1)      --> GitHub, LeetCode, Codeforces, CodeChef handles & cached metrics
-  ├── projects         (1:many)   --> Project title, description, live link, repo link, tech stack
-  ├── skills           (1:many)   --> Skill name, proficiency level, category
-  ├── psychometric_tests(1:1)     --> Work style scores, domain traits, analysis output
-  ├── recommendations  (1:1)      --> Matched roles, key skill gaps, target companies
-  └── roadmaps         (1:1)      --> Generated milestone phases, resources, progress status
-```
-
----
-
-## Local Development Setup
-
-Follow these steps to run **NextStepAI** locally on your machine.
-
-### Prerequisites
-- **Node.js**: `v18.x` or higher
-- **npm**: `v9.x` or higher
-- Account on [Neon Database](https://neon.tech)
-- Account on [Clerk Authentication](https://clerk.com)
-- API key from [Google AI Studio](https://aistudio.google.com/)
-
----
-
-### 1. Backend Setup
-
-```bash
-# Navigate to backend directory
-cd backend
-
-# Install dependencies
-npm install
-
-# Create environment configuration file
-cp .env.example .env
-```
-
-Configure your `.env` file in `/backend`:
 ```env
+# Server Configuration
 PORT=3000
-NODE_ENV=development
-DATABASE_URL=postgresql://user:password@ep-xxxx.neon.tech/nextstep?sslmode=require
+NODE_ENV=production
+
+# Neon PostgreSQL Database URL
+DATABASE_URL=postgresql://user:password@ep-xxxxx.neon.tech/neondb?sslmode=require
+
+# Clerk Authentication (Get from https://dashboard.clerk.com)
 CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
-GEMINI_API_KEY=your_gemini_api_key
-ALLOWED_ORIGINS=http://localhost:5173
-```
 
-Push schema to Neon PostgreSQL:
-```bash
-npm run db:push
-```
+# Groq Cloud API (100% Free Tier - Get key from https://console.groq.com/keys)
+GROQ_API_KEY=gsk_your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
 
-Start the backend development server:
-```bash
-npm run dev
+# Optional Fallback Provider
+OPENAI_API_KEY=
+
+# GitHub API Token (Get classic token from https://github.com/settings/tokens)
+GITHUB_TOKEN=ghp_your_github_token_here
+
+# CORS Origins
+ALLOWED_ORIGINS=https://nextstepai.co.in,http://localhost:5173,http://localhost:3000
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
 ```
 
 ---
 
-### 2. Frontend Setup
+## 🚀 Quick Setup & Local Execution
 
+### 1. Clone the Repository
 ```bash
-# Navigate to frontend directory
-cd frontend
+git clone https://github.com/Abhishhek-Verma/NEXTSTEPAI.git
+cd NEXTSTEPAI
+```
 
-# Install dependencies
-npm install
-
-# Create environment configuration file
+### 2. Configure Backend
+```bash
+cd backend
 cp .env.example .env
+# Fill in your DATABASE_URL, CLERK keys, and GROQ_API_KEY in .env
+
+npm install
+node apply-migrations.js    # Applies database schema updates safely
+npm run dev                 # Starts Express server on http://localhost:3000
 ```
 
-Configure your `.env` file in `/frontend`:
-```env
-VITE_API_BASE_URL=http://localhost:3000/api
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
-```
-
-Start the frontend development server:
+### 3. Configure Frontend
 ```bash
-npm run dev
+cd ../frontend
+npm install
+npm run dev                 # Starts Vite dev server on http://localhost:5173
 ```
 
-Open `http://localhost:5173` in your browser to interact with the application.
+### 4. Run Automated Verification Tests
+```bash
+cd ../backend
+node test-mathEngine.js     # Validates mathematical engine formulas (18/18 PASS)
+node benchmark/evaluate.js  # Runs 5,000-cohort empirical benchmark
+```
 
 ---
 
-## Security Practices
+## 🌍 Social & Economic Impact (UN SDGs)
 
-- **Authentication**: All API requests verified via Clerk JWT tokens.
-- **Input Sanitization**: Request parameters validated using Zod schemas.
-- **Rate Limiting**: Protected endpoints enforce strict request throttling.
-- **HTTP Headers**: Enhanced headers enabled via `helmet`.
-- **CORS Protection**: Access restricted strictly to configured origins.
+- **UN SDG 4 (Quality Education)**: Bridges the career guidance gap by providing democratized, data-backed roadmaps to students regardless of institutional privilege or socio-economic background.
+- **UN SDG 8 (Decent Work & Economic Growth)**: Eliminates frictional talent mismatch by aligning candidate competencies directly with industry demands.
 
 ---
 
-## License
+## 📄 License & Attribution
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+Distributed under the **MIT License**. See `LICENSE` for details.
 
----
-
-## Support & Contact
-
-- **Live Site**: [https://nextstepai.co.in](https://nextstepai.co.in)
-- **Issues**: For bugs or feature requests, please open a [GitHub Issue](../../issues).
-
----
-
-<p align="center">
-  <strong>NextStepAI Platform</strong>
-</p>
-
+Developed with ❤️ by the **NextStepAI Research & Engineering Team** at **KIET Group of Institutions**.
+For live usage, visit [https://nextstepai.co.in](https://nextstepai.co.in).
