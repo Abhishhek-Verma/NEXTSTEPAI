@@ -20,12 +20,17 @@ const RecommendationsPage = () => {
         { id: 'companies', label: 'Target Companies', iconName: 'Building2' },
     ];
 
+    const [isGenerating, setIsGenerating] = useState(false);
+
     const handleGenerateRecommendations = async () => {
         try {
+            setIsGenerating(true);
             await generateRecommendations();
-            alert('Recommendations generated successfully!');
         } catch (error) {
+            console.error('Failed to generate recommendations:', error);
             alert('Failed to generate recommendations. Please try again.');
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -39,124 +44,10 @@ const RecommendationsPage = () => {
         }
     };
 
-    // Use actual data from store or fallback to empty arrays
+    // Use actual dynamic data from store
     const roles = recommendations.roles || [];
     const skills = recommendations.skills || [];
     const companies = recommendations.companies || [];
-
-    // Fallback data for demonstration
-    const mockRoles = [
-        {
-            id: 1,
-            title: 'Full Stack Developer',
-            description: 'Build end-to-end web applications using modern frameworks like React, Node.js, and databases.',
-            score: 92,
-            salary: '₹6L - ₹15L',
-            demand: 'High',
-            skills: ['React', 'Node.js', 'PostgreSQL', 'AWS'],
-        },
-        {
-            id: 2,
-            title: 'Backend Engineer',
-            description: 'Design and develop scalable server-side systems, APIs, and microservices.',
-            score: 88,
-            salary: '₹8L - ₹18L',
-            demand: 'High',
-            skills: ['Python', 'Java', 'System Design', 'Databases'],
-        },
-        {
-            id: 3,
-            title: 'DevOps Engineer',
-            description: 'Automate deployment pipelines and manage cloud infrastructure.',
-            score: 85,
-            salary: '₹7L - ₹20L',
-            demand: 'Very High',
-            skills: ['Docker', 'Kubernetes', 'AWS', 'CI/CD'],
-        },
-        {
-            id: 4,
-            title: 'Data Engineer',
-            description: 'Build data pipelines and warehouses for analytics and ML.',
-            score: 78,
-            salary: '₹8L - ₹22L',
-            demand: 'High',
-            skills: ['Python', 'Spark', 'SQL', 'Airflow'],
-        },
-    ];
-
-    const mockSkills = [
-        {
-            id: 1,
-            name: 'React',
-            category: 'Frontend',
-            currentLevel: 70,
-            targetLevel: 90,
-            resources: ['Official Docs', 'Frontend Masters', 'React Patterns'],
-        },
-        {
-            id: 2,
-            name: 'Node.js',
-            category: 'Backend',
-            currentLevel: 80,
-            targetLevel: 95,
-            resources: ['NodeSchool', 'Express.js Guide'],
-        },
-        {
-            id: 3,
-            name: 'System Design',
-            category: 'Architecture',
-            currentLevel: 50,
-            targetLevel: 80,
-            resources: ['Designing Data-Intensive Applications', 'System Design Primer'],
-        },
-        {
-            id: 4,
-            name: 'PostgreSQL',
-            category: 'Database',
-            currentLevel: 60,
-            targetLevel: 85,
-            resources: ['PostgreSQL Tutorial', 'Database Internals'],
-        },
-    ];
-
-    const mockCompanies = [
-        {
-            id: 1,
-            name: 'Google',
-            logo: '🔵',
-            domain: 'Search, Cloud, AI',
-            matchScore: 95,
-            notes: 'Excellent match for your technical profile. Strong focus on algorithms and system design.',
-            openRoles: 12,
-        },
-        {
-            id: 2,
-            name: 'Microsoft',
-            logo: '🟦',
-            domain: 'Cloud, Enterprise Software',
-            matchScore: 92,
-            notes: 'Great opportunities in backend engineering and cloud services.',
-            openRoles: 8,
-        },
-        {
-            id: 3,
-            name: 'Amazon',
-            logo: '🟠',
-            domain: 'E-commerce, AWS, Logistics',
-            matchScore: 88,
-            notes: 'Strong demand for full-stack and DevOps roles.',
-            openRoles: 15,
-        },
-        {
-            id: 4,
-            name: 'Meta',
-            logo: '🔷',
-            domain: 'Social Media, VR/AR',
-            matchScore: 85,
-            notes: 'Focus on scalable systems and user experience.',
-            openRoles: 6,
-        },
-    ];
 
     return (
         <div className="min-h-screen">
@@ -232,200 +123,286 @@ const RecommendationsPage = () => {
                 {/* Roles Tab */}
                 {activeTab === 'roles' && (
                     <div className="space-y-6">
-                        {(roles.length > 0 ? roles : mockRoles).map((role) => (
-                            <div
-                                key={role.id}
-                                className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8 hover:-translate-y-0.5 transition-all duration-300"
-                            >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-xl font-semibold text-[#111111] dark:text-white">
-                                                {role.title}
-                                            </h3>
-                                            <span className="badge-success">
-                                                {role.score}% Match
-                                            </span>
-                                        </div>
-                                        <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mb-4 text-sm leading-relaxed">
-                                            {role.description}
-                                        </p>
-                                    </div>
-                                    <button
-                                        onClick={() => toggleSaveRole(role.id)}
-                                        className={`ml-4 text-2xl transition-transform hover:scale-110 p-2 rounded-full hover:bg-[#F8F7F3] dark:hover:bg-[#2a2b2e] ${
-                                            isRoleSaved(role.id) ? 'text-[#EF4444]' : 'text-[#909090]'
-                                        }`}
-                                    >
-                                        {isRoleSaved(role.id) ? '❤️' : '🤍'}
-                                    </button>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                                    <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-4">
-                                        <p className="text-xs text-[#909090]">Salary Range</p>
-                                        <p className="text-lg font-semibold text-[#111111] dark:text-white mt-0.5">
-                                            {role.salary}
-                                        </p>
-                                    </div>
-                                    <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-4">
-                                        <p className="text-xs text-[#909090]">Market Demand</p>
-                                        <p className="text-lg font-semibold text-[#166534] dark:text-[#D4F2E3] mt-0.5">
-                                            {role.demand}
-                                        </p>
-                                    </div>
-                                    <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-4">
-                                        <p className="text-xs text-[#909090]">Skills Required</p>
-                                        <p className="text-lg font-semibold text-[#111111] dark:text-white mt-0.5">
-                                            {role.skills.length}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="mb-6">
-                                    <p className="text-xs text-[#909090] mb-2 font-medium">Key Skills:</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {role.skills.map((skill, index) => (
-                                            <span
-                                                key={index}
-                                                className="badge-info"
-                                            >
-                                                {skill}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-3">
-                                    <Button onClick={() => navigate('/roadmap')} className="flex-1">
-                                        Get Roadmap for This Role
-                                    </Button>
-                                    <Button variant="outline" className="flex-1">
-                                        Learn More
-                                    </Button>
-                                </div>
+                        {recommendations.loading || isGenerating ? (
+                            <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-12 text-center animate-pulse">
+                                <Icon name="Sparkles" size={36} className="text-[#C9B59C] mx-auto mb-3 animate-spin" />
+                                <h3 className="text-lg font-bold text-[#111111] dark:text-white mb-1">
+                                    Calculating Your Multimodal Career Matches...
+                                </h3>
+                                <p className="text-sm text-[#6B6B6B] dark:text-[#A1A1A1]">
+                                    Synthesizing your academic records, coding telemetry, and projects.
+                                </p>
                             </div>
-                        ))}
+                        ) : roles.length > 0 ? (
+                            roles.map((role) => (
+                                <div
+                                    key={role.id || role.title}
+                                    className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8 hover:-translate-y-0.5 transition-all duration-300"
+                                >
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                                <h3 className="text-xl font-semibold text-[#111111] dark:text-white">
+                                                    {role.title}
+                                                </h3>
+                                                <span className="badge-success">
+                                                    {role.score}% Match
+                                                </span>
+                                                {role.confidence && (
+                                                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#EFE9E3] dark:bg-white/10 text-[#555555] dark:text-[#A1A1A1]">
+                                                        {Math.round(parseFloat(role.confidence) * 100)}% Confidence
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mb-4 text-sm leading-relaxed">
+                                                {role.description}
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => toggleSaveRole(role.id)}
+                                            className={`ml-4 text-2xl transition-transform hover:scale-110 p-2 rounded-full hover:bg-[#F8F7F3] dark:hover:bg-[#2a2b2e] ${
+                                                isRoleSaved(role.id) ? 'text-[#EF4444]' : 'text-[#909090]'
+                                            }`}
+                                        >
+                                            {isRoleSaved(role.id) ? '❤️' : '🤍'}
+                                        </button>
+                                    </div>
+
+                                    {role.reasoning && (
+                                        <div className="bg-[#FAF9F6] dark:bg-[#262422] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-3.5 mb-5 text-xs text-[#555555] dark:text-[#BBB] leading-relaxed">
+                                            💡 <strong>Match Rationale:</strong> {role.reasoning}
+                                        </div>
+                                    )}
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                        <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-4">
+                                            <p className="text-xs text-[#909090]">Salary Range</p>
+                                            <p className="text-lg font-semibold text-[#111111] dark:text-white mt-0.5">
+                                                {role.salary || '₹8L - ₹18L'}
+                                            </p>
+                                        </div>
+                                        <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-4">
+                                            <p className="text-xs text-[#909090]">Market Demand</p>
+                                            <p className="text-lg font-semibold text-[#166534] dark:text-[#D4F2E3] mt-0.5">
+                                                {role.demand || 'High'}
+                                            </p>
+                                        </div>
+                                        <div className="bg-[#FAF9F6] dark:bg-[#2a2b2e] border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] rounded-xl p-4">
+                                            <p className="text-xs text-[#909090]">Skills Required</p>
+                                            <p className="text-lg font-semibold text-[#111111] dark:text-white mt-0.5">
+                                                {Array.isArray(role.skills) ? role.skills.length : 4}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {Array.isArray(role.skills) && role.skills.length > 0 && (
+                                        <div className="mb-6">
+                                            <p className="text-xs text-[#909090] mb-2 font-medium">Key Skills:</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {role.skills.map((skill, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="badge-info"
+                                                    >
+                                                        {skill}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-3">
+                                        <Button 
+                                            onClick={() => navigate('/roadmap', { state: { targetRole: role.title } })} 
+                                            className="flex-1"
+                                        >
+                                            Get Roadmap for This Role →
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-12 text-center">
+                                <Icon name="Briefcase" size={40} className="text-[#C9B59C] mx-auto mb-3" />
+                                <h3 className="text-lg font-semibold text-[#111111] dark:text-white mb-2">
+                                    No Career Recommendations Yet
+                                </h3>
+                                <p className="text-sm text-[#6B6B6B] dark:text-[#A1A1A1] max-w-md mx-auto mb-6">
+                                    Generate personalized career matches calculated from your GPA, coding platform handle metrics, and projects.
+                                </p>
+                                <Button onClick={handleGenerateRecommendations} loading={isGenerating}>
+                                    Generate AI Recommendations
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 )}
 
                 {/* Skills Tab */}
                 {activeTab === 'skills' && (
                     <div className="space-y-6">
-                        {(skills.length > 0 ? skills : mockSkills).map((skill) => (
-                            <div
-                                key={skill.id}
-                                className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8"
-                            >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-[#111111] dark:text-white mb-1">
-                                            {skill.name}
-                                        </h3>
-                                        <span className="text-xs text-[#909090]">
-                                            {skill.category}
+                        {skills.length > 0 ? (
+                            skills.map((skill) => (
+                                <div
+                                    key={skill.id || skill.name}
+                                    className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8"
+                                >
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-[#111111] dark:text-white mb-1">
+                                                {skill.name}
+                                            </h3>
+                                            <span className="text-xs text-[#909090]">
+                                                {skill.category || 'Technical'}
+                                            </span>
+                                        </div>
+                                        <span className="badge-ai">
+                                            Gap: {(skill.targetLevel || 85) - (skill.currentLevel || 40)}%
                                         </span>
                                     </div>
-                                    <span className="badge-ai">
-                                        Gap: {skill.targetLevel - skill.currentLevel}%
-                                    </span>
-                                </div>
 
-                                <div className="mb-4">
-                                    <div className="flex justify-between text-xs mb-1.5">
-                                        <span className="text-[#6B6B6B]">Current Level</span>
-                                        <span className="font-semibold text-[#111111] dark:text-white">
-                                            {skill.currentLevel}%
-                                        </span>
-                                    </div>
-                                    <div className="w-full bg-[#F8F7F3] dark:bg-[rgba(255,255,255,0.06)] rounded-full h-2.5">
-                                        <div
-                                            className="bg-[#111111] dark:bg-white h-2.5 rounded-full"
-                                            style={{ width: `${skill.currentLevel}%` }}
-                                        />
-                                    </div>
-                                </div>
+                                    {skill.description && (
+                                        <p className="text-sm text-[#555555] dark:text-[#BBB] mb-4">
+                                            {skill.description}
+                                        </p>
+                                    )}
 
-                                <div className="mb-6">
-                                    <div className="flex justify-between text-xs mb-1.5">
-                                        <span className="text-[#6B6B6B]">Target Level</span>
-                                        <span className="font-semibold text-[#111111] dark:text-white">
-                                            {skill.targetLevel}%
-                                        </span>
+                                    <div className="mb-4">
+                                        <div className="flex justify-between text-xs mb-1.5">
+                                            <span className="text-[#6B6B6B]">Current Proficiency</span>
+                                            <span className="font-semibold text-[#111111] dark:text-white">
+                                                {skill.currentLevel || 40}%
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-[#F8F7F3] dark:bg-[rgba(255,255,255,0.06)] rounded-full h-2.5">
+                                            <div
+                                                className="bg-[#111111] dark:bg-white h-2.5 rounded-full"
+                                                style={{ width: `${skill.currentLevel || 40}%` }}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="w-full bg-[#F8F7F3] dark:bg-[rgba(255,255,255,0.06)] rounded-full h-2.5">
-                                        <div
-                                            className="bg-[#10B981] h-2.5 rounded-full"
-                                            style={{ width: `${skill.targetLevel}%` }}
-                                        />
+
+                                    <div className="mb-6">
+                                        <div className="flex justify-between text-xs mb-1.5">
+                                            <span className="text-[#6B6B6B]">Target Industry Standard</span>
+                                            <span className="font-semibold text-[#111111] dark:text-white">
+                                                {skill.targetLevel || 85}%
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-[#F8F7F3] dark:bg-[rgba(255,255,255,0.06)] rounded-full h-2.5">
+                                            <div
+                                                className="bg-[#10B981] h-2.5 rounded-full"
+                                                style={{ width: `${skill.targetLevel || 85}%` }}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="mb-6">
-                                    <p className="text-xs text-[#909090] mb-2 font-medium">
-                                        Recommended Resources:
-                                    </p>
-                                    <ul className="space-y-1.5">
-                                        {skill.resources.map((resource, index) => (
-                                            <li
-                                                key={index}
-                                                className="text-sm text-[#404040] dark:text-[#A1A1A1] hover:text-[#111111] dark:hover:text-white transition-colors cursor-pointer"
-                                            >
-                                                • {resource}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                    {Array.isArray(skill.resources) && skill.resources.length > 0 && (
+                                        <div className="mb-6">
+                                            <p className="text-xs text-[#909090] mb-2 font-medium">
+                                                Recommended Resources:
+                                            </p>
+                                            <ul className="space-y-1.5">
+                                                {skill.resources.map((resource, index) => (
+                                                    <li
+                                                        key={index}
+                                                        className="text-sm text-[#404040] dark:text-[#A1A1A1] hover:text-[#111111] dark:hover:text-white transition-colors"
+                                                    >
+                                                        • {typeof resource === 'string' ? resource : resource.title || resource.name}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
 
-                                <Button variant="outline" className="w-full">
-                                    Add to Learning Path
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={() => navigate('/roadmap', { state: { targetRole: `${skill.name} Specialist` } })}
+                                        className="w-full"
+                                    >
+                                        Add to Learning Roadmap →
+                                    </Button>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-12 text-center">
+                                <Icon name="Target" size={40} className="text-[#C9B59C] mx-auto mb-3" />
+                                <h3 className="text-lg font-semibold text-[#111111] dark:text-white mb-2">
+                                    No Skill Recommendations Yet
+                                </h3>
+                                <p className="text-sm text-[#6B6B6B] dark:text-[#A1A1A1] max-w-md mx-auto mb-6">
+                                    Click below to analyze your skill gaps against market requirements.
+                                </p>
+                                <Button onClick={handleGenerateRecommendations} loading={isGenerating}>
+                                    Generate AI Recommendations
                                 </Button>
                             </div>
-                        ))}
+                        )}
                     </div>
                 )}
 
                 {/* Companies Tab */}
                 {activeTab === 'companies' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {(companies.length > 0 ? companies : mockCompanies).map((company) => (
-                            <div
-                                key={company.id}
-                                className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8 hover:-translate-y-0.5 transition-all duration-300"
-                            >
-                                <div className="flex items-start gap-4 mb-4">
-                                    <div className="text-4xl p-3 bg-[#FAF9F6] dark:bg-[#2a2b2e] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)]">{company.logo}</div>
-                                    <div className="flex-1">
-                                        <h3 className="text-xl font-semibold text-[#111111] dark:text-white mb-1">
-                                            {company.name}
-                                        </h3>
-                                        <p className="text-xs text-[#909090]">
-                                            {company.domain}
-                                        </p>
+                        {companies.length > 0 ? (
+                            companies.map((company) => (
+                                <div
+                                    key={company.id || company.name}
+                                    className="bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-6 lg:p-8 hover:-translate-y-0.5 transition-all duration-300"
+                                >
+                                    <div className="flex items-start gap-4 mb-4">
+                                        <div className="text-2xl p-3 bg-[#FAF9F6] dark:bg-[#2a2b2e] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.06)] flex items-center justify-center min-w-[52px]">
+                                            <Icon name="Building2" size={24} className="text-[#111111] dark:text-white" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-xl font-semibold text-[#111111] dark:text-white mb-1">
+                                                {company.name}
+                                            </h3>
+                                            <p className="text-xs text-[#909090]">
+                                                {company.domain}
+                                            </p>
+                                        </div>
+                                        <span className="badge-success">
+                                            {company.matchScore || 90}% Match
+                                        </span>
                                     </div>
-                                    <span className="badge-success">
-                                        {company.matchScore}% Match
-                                    </span>
-                                </div>
 
-                                <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mb-4 text-sm leading-relaxed">
-                                    {company.notes}
-                                </p>
-
-                                <div className="card-pastel-blue rounded-xl p-4 mb-6">
-                                    <p className="text-xs text-[#1E40AF]">
-                                        🎯 <strong>{company.openRoles}</strong> open roles matching your profile
+                                    <p className="text-[#6B6B6B] dark:text-[#A1A1A1] mb-4 text-sm leading-relaxed">
+                                        {company.notes}
                                     </p>
-                                </div>
 
-                                <div className="flex gap-3">
-                                    <Button className="flex-1">View Jobs</Button>
-                                    <Button variant="outline" className="flex-1">
-                                        Company Info
-                                    </Button>
+                                    {company.openRoles && (
+                                        <div className="card-pastel-blue rounded-xl p-4 mb-6">
+                                            <p className="text-xs text-[#1E40AF]">
+                                                🎯 <strong>{company.openRoles}</strong> relevant open engineering positions
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-3">
+                                        <Button 
+                                            onClick={() => navigate('/roadmap', { state: { targetRole: `Engineer at ${company.name}` } })}
+                                            className="flex-1"
+                                        >
+                                            Prepare for {company.name} →
+                                        </Button>
+                                    </div>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="col-span-full bg-white dark:bg-[#1F2023] rounded-2xl border border-[#E8E5DF] dark:border-[rgba(255,255,255,0.08)] shadow-card p-12 text-center">
+                                <Icon name="Building2" size={40} className="text-[#C9B59C] mx-auto mb-3" />
+                                <h3 className="text-lg font-semibold text-[#111111] dark:text-white mb-2">
+                                    No Target Companies Yet
+                                </h3>
+                                <p className="text-sm text-[#6B6B6B] dark:text-[#A1A1A1] max-w-md mx-auto mb-6">
+                                    Discover companies actively hiring developers with your exact profile distribution.
+                                </p>
+                                <Button onClick={handleGenerateRecommendations} loading={isGenerating}>
+                                    Generate AI Recommendations
+                                </Button>
                             </div>
-                        ))}
+                        )}
                     </div>
                 )}
             </div>

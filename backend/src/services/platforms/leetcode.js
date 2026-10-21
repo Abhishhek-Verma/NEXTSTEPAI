@@ -3,8 +3,17 @@
  * Fetches user profile and problem-solving statistics
  */
 
-export async function fetchLeetCodeProfile(username) {
+export async function fetchLeetCodeProfile(rawUsername) {
     try {
+        const username = String(rawUsername || '')
+            .replace(/^https?:\/\/(www\.)?leetcode\.com\/(u\/)?/i, '')
+            .replace(/\/.*$/, '')
+            .trim();
+
+        if (!username) {
+            throw new Error('Valid LeetCode ID is required');
+        }
+
         // LeetCode GraphQL endpoint
         const graphqlUrl = 'https://leetcode.com/graphql';
         

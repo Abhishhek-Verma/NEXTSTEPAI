@@ -20,14 +20,16 @@ const AcademicPage = () => {
 
     // Fetch academic records from database on mount
     useEffect(() => {
+        setAcademicsError(null);
         const fetchRecords = async () => {
             try {
                 setAcademicsLoading(true);
                 const response = await apiClient.get('/academic/records');
                 setAcademicRecords(response.data.records || []);
             } catch (error) {
-                console.error('Failed to fetch academic records:', error);
-                setAcademicsError(error.message || 'Failed to load academic records');
+                console.warn('Initial fetch of academic records skipped/failed:', error.message);
+                setAcademicsLoading(false);
+                // Do not display automatic error banner on initial mount when user hasn't taken any action
             }
         };
 

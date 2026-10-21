@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     DndContext,
     closestCenter,
@@ -72,31 +72,37 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
                 </div>
                 <div className="flex items-center gap-2">
                     <button
+                        type="button"
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleComplete(task.id);
                         }}
-                        className={`text-lg transition-transform hover:scale-110 ${task.completed ? 'text-[#000000] dark:text-white' : 'text-[#555555]'}`}
+                        className={`text-lg transition-transform hover:scale-110 p-1 rounded-md ${task.completed ? 'text-[#000000] dark:text-white' : 'text-[#555555]'}`}
                         title={task.completed ? 'Mark incomplete' : 'Mark complete'}
                     >
                         <Icon name={task.completed ? "CheckSquare" : "Square"} size={18} />
                     </button>
                     <button
+                        type="button"
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                             e.stopPropagation();
                             onEdit(task);
                         }}
-                        className="text-[#555555] hover:text-[#000000] dark:hover:text-white transition-colors p-1"
+                        className="text-[#555555] hover:text-[#000000] dark:hover:text-white transition-colors p-1 rounded-md"
                         title="Edit task"
                     >
                         <Icon name="Edit2" size={16} />
                     </button>
                     <button
+                        type="button"
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                             e.stopPropagation();
                             onDelete(task.id);
                         }}
-                        className="text-[#555555] hover:text-[#000000] dark:hover:text-white transition-colors p-1"
+                        className="text-[#555555] hover:text-[#E53E3E] dark:hover:text-[#FC8181] transition-colors p-1 rounded-md"
                         title="Delete task"
                     >
                         <Icon name="Trash2" size={16} />
@@ -137,7 +143,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
                 </div>
             )}
             {task.dueDate && (
-                <p className="text-xs text-[#555555] mt-2">Due: {task.dueDate}</p>
+                <p className="text-xs text-[#555555] mt-2">Due: {new Date(task.dueDate).toLocaleDateString()}</p>
             )}
         </div>
     );
@@ -145,6 +151,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
 
 const RoadmapPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const {
         roadmap,
         fetchRoadmap,
@@ -160,16 +167,28 @@ const RoadmapPage = () => {
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [showGenerateModal, setShowGenerateModal] = useState(false);
+    const [generating, setGenerating] = useState(false);
     const [targetRole, setTargetRole] = useState('');
     const [editingTask, setEditingTask] = useState(null);
-    const [formData, setFormData] = useState({
+
+    const initialFormData = {
+        title: '',
         taskType: 'learn',
+        phase: 'Foundation',
+        estimatedWeeks: 2,
+        skills: '',
         description: '',
         dueDate: '',
-    });
+    };
+
+    const [formData, setFormData] = useState(initialFormData);
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -179,10 +198,17 @@ const RoadmapPage = () => {
         fetchRoadmap();
     }, []);
 
+    useEffect(() => {
+        if (location.state?.targetRole) {
+            setTargetRole(location.state.targetRole);
+            setShowGenerateModal(true);
+        }
+    }, [location.state]);
+
     const handleDragEnd = (event) => {
         const { active, over } = event;
 
-        if (active.id !== over.id) {
+        if (active && over && active.id !== over.id) {
             const oldIndex = roadmap.items.findIndex((item) => item.id === active.id);
             const newIndex = roadmap.items.findIndex((item) => item.id === over.id);
             const newItems = arrayMove(roadmap.items, oldIndex, newIndex);
@@ -190,31 +216,52 @@ const RoadmapPage = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (editingTask) {
-            updateRoadmapItem(editingTask.id, formData);
-            setEditingTask(null);
-        } else {
-            addRoadmapItem(formData);
+        try {
+            const payload = {
+                title: formData.title.trim() || formData.description.slice(0, 40),
+                description: formData.description.trim(),
+                taskType: formData.taskType,
+                phase: formData.phase,
+                estimatedWeeks: parseInt(formData.estimatedWeeks) || 1,
+                skills: typeof formData.skills === 'string'
+                    ? formData.skills.split(',').map(s => s.trim()).filter(Boolean)
+                    : formData.skills,
+                dueDate: formData.dueDate || null,
+            };
+
+            if (editingTask) {
+                await updateRoadmapItem(editingTask.id, payload);
+                setEditingTask(null);
+            } else {
+                await addRoadmapItem(payload);
+            }
+            setFormData(initialFormData);
+            setShowAddForm(false);
+        } catch (error) {
+            console.error('Error saving roadmap item:', error);
+            alert('Failed to save task. Please try again.');
         }
-        setFormData({ taskType: 'learn', description: '', dueDate: '' });
-        setShowAddForm(false);
     };
 
     const handleEdit = (task) => {
         setEditingTask(task);
         setFormData({
-            taskType: task.taskType,
-            description: task.description,
-            dueDate: task.dueDate || '',
+            title: task.title || '',
+            taskType: task.taskType || 'learn',
+            phase: task.phase || 'Foundation',
+            estimatedWeeks: task.estimatedWeeks || 2,
+            skills: Array.isArray(task.skills) ? task.skills.join(', ') : (task.skills || ''),
+            description: task.description || '',
+            dueDate: task.dueDate ? String(task.dueDate).slice(0, 10) : '',
         });
         setShowAddForm(true);
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this task?')) {
-            deleteRoadmapItem(id);
+            await deleteRoadmapItem(id);
         }
     };
 
@@ -225,11 +272,15 @@ const RoadmapPage = () => {
         }
 
         try {
+            setGenerating(true);
             await generateRoadmap(targetRole);
             setShowGenerateModal(false);
             setTargetRole('');
         } catch (error) {
+            console.error('Generation error:', error);
             alert('Failed to generate roadmap. Please try again.');
+        } finally {
+            setGenerating(false);
         }
     };
 
@@ -307,11 +358,11 @@ const RoadmapPage = () => {
                                 className="mb-6"
                             />
                             <div className="flex gap-3 justify-end">
-                                <Button variant="outline" onClick={() => setShowGenerateModal(false)}>
+                                <Button variant="outline" disabled={generating} onClick={() => setShowGenerateModal(false)}>
                                     Cancel
                                 </Button>
-                                <Button onClick={handleGenerate}>
-                                    Generate
+                                <Button onClick={handleGenerate} loading={generating} disabled={generating}>
+                                    {generating ? 'Generating...' : 'Generate'}
                                 </Button>
                             </div>
                         </div>
@@ -320,36 +371,79 @@ const RoadmapPage = () => {
 
                 {/* Add/Edit Form */}
                 {showAddForm && (
-                    <div className="bg-[#EFE9E3] dark:bg-[#262422] rounded-2xl p-6 mb-8 border border-[#D9CFC7]">
+                    <div className="bg-[#EFE9E3] dark:bg-[#262422] rounded-2xl p-6 mb-8 border border-[#D9CFC7] shadow-sm">
                         <h3 className="text-xl font-semibold text-[#000000] dark:text-white mb-4">
-                            {editingTask ? 'Edit Task' : 'Add New Task'}
+                            {editingTask ? 'Edit Milestone Task' : 'Add New Task Manually'}
                         </h3>
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-[#555555] dark:text-[#A1A1A1] uppercase mb-2">
-                                    Task Type
-                                </label>
-                                <select
-                                    value={formData.taskType}
-                                    onChange={(e) => setFormData({ ...formData, taskType: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-[#D9CFC7] rounded-xl bg-white text-[#000000] text-sm focus:ring-2 focus:ring-[#C9B59C]"
-                                >
-                                    <option value="learn">Learn</option>
-                                    <option value="build">Build</option>
-                                    <option value="apply">Apply</option>
-                                </select>
+                            <Input
+                                label="Task Title"
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                placeholder="e.g., Advanced DSA & Problem Solving"
+                                required
+                            />
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-[#555555] dark:text-[#A1A1A1] uppercase mb-2">
+                                        Task Type
+                                    </label>
+                                    <select
+                                        value={formData.taskType}
+                                        onChange={(e) => setFormData({ ...formData, taskType: e.target.value })}
+                                        className="w-full px-4 py-2.5 border border-[#D9CFC7] rounded-xl bg-white dark:bg-[#1C1B1A] text-[#000000] dark:text-white text-sm focus:ring-2 focus:ring-[#C9B59C]"
+                                    >
+                                        <option value="learn">Learn</option>
+                                        <option value="build">Build</option>
+                                        <option value="apply">Apply</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-[#555555] dark:text-[#A1A1A1] uppercase mb-2">
+                                        Phase
+                                    </label>
+                                    <select
+                                        value={formData.phase}
+                                        onChange={(e) => setFormData({ ...formData, phase: e.target.value })}
+                                        className="w-full px-4 py-2.5 border border-[#D9CFC7] rounded-xl bg-white dark:bg-[#1C1B1A] text-[#000000] dark:text-white text-sm focus:ring-2 focus:ring-[#C9B59C]"
+                                    >
+                                        <option value="Foundation">Foundation</option>
+                                        <option value="Intermediate">Intermediate</option>
+                                        <option value="Advanced">Advanced</option>
+                                        <option value="Production">Production</option>
+                                    </select>
+                                </div>
+
+                                <Input
+                                    label="Estimated Weeks"
+                                    type="number"
+                                    min="1"
+                                    max="52"
+                                    value={formData.estimatedWeeks}
+                                    onChange={(e) => setFormData({ ...formData, estimatedWeeks: e.target.value })}
+                                    placeholder="e.g., 2"
+                                />
                             </div>
 
                             <Input
                                 label="Description"
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                placeholder="e.g., Complete React documentation"
+                                placeholder="Describe the specific objectives or exercises..."
                                 required
                             />
 
                             <Input
-                                label="Due Date"
+                                label="Skills (comma-separated)"
+                                value={formData.skills}
+                                onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                                placeholder="e.g., Binary Trees, Dynamic Programming, LeetCode"
+                            />
+
+                            <Input
+                                label="Target Due Date (Optional)"
                                 type="date"
                                 value={formData.dueDate}
                                 onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
@@ -357,7 +451,7 @@ const RoadmapPage = () => {
 
                             <div className="flex gap-3 justify-end pt-2">
                                 <Button type="submit">
-                                    {editingTask ? 'Update Task' : 'Add Task'}
+                                    {editingTask ? 'Update Task' : 'Save Task to Roadmap'}
                                 </Button>
                                 <Button
                                     type="button"
@@ -365,7 +459,7 @@ const RoadmapPage = () => {
                                     onClick={() => {
                                         setShowAddForm(false);
                                         setEditingTask(null);
-                                        setFormData({ taskType: 'learn', description: '', dueDate: '' });
+                                        setFormData(initialFormData);
                                     }}
                                 >
                                     Cancel

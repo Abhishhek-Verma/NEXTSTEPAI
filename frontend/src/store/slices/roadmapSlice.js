@@ -67,13 +67,30 @@ export const roadmapSlice = (set, get) => ({
             roadmap: { ...state.roadmap, ...roadmap, loading: false, error: null },
         })),
 
-    addRoadmapItem: (item) =>
-        set((state) => ({
-            roadmap: {
-                ...state.roadmap,
-                items: [...state.roadmap.items, { ...item, id: Date.now() }],
-            },
-        })),
+    addRoadmapItem: async (item) => {
+        try {
+            const response = await apiClient.post('/roadmap/items', item);
+            const savedItem = response.data?.item || { ...item, id: Date.now() };
+
+            set((state) => ({
+                roadmap: {
+                    ...state.roadmap,
+                    items: [...state.roadmap.items, savedItem],
+                },
+            }));
+            return savedItem;
+        } catch (error) {
+            console.error('Failed to save roadmap item to database:', error);
+            const fallbackItem = { ...item, id: Date.now() };
+            set((state) => ({
+                roadmap: {
+                    ...state.roadmap,
+                    items: [...state.roadmap.items, fallbackItem],
+                },
+            }));
+            return fallbackItem;
+        }
+    },
 
     // Update roadmap item (with API call)
     updateRoadmapItem: async (id, updates) => {
@@ -92,22 +109,39 @@ export const roadmapSlice = (set, get) => ({
             await apiClient.put(`/roadmap/items/${id}`, updates);
         } catch (error) {
             console.error('Failed to update roadmap item:', error);
-            // Optionally revert the change or show error
         }
     },
 
-    deleteRoadmapItem: (id) =>
-        set((state) => ({
-            roadmap: {
-                ...state.roadmap,
-                items: state.roadmap.items.filter((item) => item.id !== id),
-            },
-        })),
+    deleteRoadmapItem: async (id) => {
+        try {
+            set((state) => ({
+                roadmap: {
+                    ...state.roadmap,
+                    items: state.roadmap.items.filter((item) => item.id !== id),
+                },
+            }));
 
-    reorderRoadmapItems: (items) =>
+            await apiClient.delete(`/roadmap/items/${id}`);
+        } catch (error) {
+            console.error('Failed to delete roadmap item from backend:', error);
+        }
+    },
+
+    reorderRoadmap: async (items) => {
         set((state) => ({
             roadmap: { ...state.roadmap, items },
-        })),
+        }));
+
+        try {
+            await apiClient.post('/roadmap/reorder', { items });
+        } catch (error) {
+            console.error('Failed to persist reorder to backend:', error);
+        }
+    },
+
+    reorderRoadmapItems: (items) => {
+        get().reorderRoadmap(items);
+    },
 
     // Toggle item complete (with API call)
     toggleItemComplete: async (id) => {

@@ -177,10 +177,10 @@ router.post('/fetch/github', requireAuth, async (req, res) => {
 // Fetch and update LeetCode data
 router.post('/fetch/leetcode', requireAuth, async (req, res) => {
     try {
-        const { username } = req.body;
+        const username = req.body.username || req.body.leetcode_id;
 
         if (!username) {
-            return res.status(400).json({ error: 'LeetCode username is required' });
+            return res.status(400).json({ error: 'LeetCode ID is required' });
         }
 
         // Fetch data from LeetCode
