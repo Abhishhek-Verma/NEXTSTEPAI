@@ -170,12 +170,17 @@ router.put('/my-skills/:skillId', requireAuth, async (req, res) => {
 
         const profInt = proficiencyToInt(proficiencyLevel);
 
+        const parsedSkillId = parseInt(skillId);
+        if (isNaN(parsedSkillId)) {
+            return res.status(400).json({ error: 'Invalid skill ID' });
+        }
+
         const [userSkill] = await db
             .update(studentSkills)
             .set({ proficiencyLevel: profInt })
             .where(and(
                 eq(studentSkills.studentId, req.user.id),
-                eq(studentSkills.skillId, skillId)
+                eq(studentSkills.skillId, parsedSkillId)
             ))
             .returning();
 
@@ -194,12 +199,16 @@ router.put('/my-skills/:skillId', requireAuth, async (req, res) => {
 router.delete('/my-skills/:skillId', requireAuth, async (req, res) => {
     try {
         const { skillId } = req.params;
+        const parsedSkillId = parseInt(skillId);
+        if (isNaN(parsedSkillId)) {
+            return res.status(400).json({ error: 'Invalid skill ID' });
+        }
 
         await db
             .delete(studentSkills)
             .where(and(
                 eq(studentSkills.studentId, req.user.id),
-                eq(studentSkills.skillId, skillId)
+                eq(studentSkills.skillId, parsedSkillId)
             ));
 
         res.json({ message: 'Skill removed from profile successfully' });

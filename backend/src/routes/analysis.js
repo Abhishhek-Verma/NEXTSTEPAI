@@ -13,25 +13,17 @@ const router = express.Router();
  */
 router.get('/profile', requireAuth, async (req, res) => {
     try {
-        const [academicData] = await db
-            .select()
-            .from(academicRecords)
-            .where(eq(academicRecords.userId, req.user.id));
-
-        const userProjects = await db
-            .select()
-            .from(projects)
-            .where(eq(projects.userId, req.user.id));
-
-        const userCodingProfiles = await db
-            .select()
-            .from(codingProfiles)
-            .where(eq(codingProfiles.userId, req.user.id));
-
-        const userPsychometrics = await db
-            .select()
-            .from(psychometricTests)
-            .where(eq(psychometricTests.userId, req.user.id));
+        const [
+            [academicData],
+            userProjects,
+            userCodingProfiles,
+            userPsychometrics
+        ] = await Promise.all([
+            db.select().from(academicRecords).where(eq(academicRecords.userId, req.user.id)),
+            db.select().from(projects).where(eq(projects.userId, req.user.id)),
+            db.select().from(codingProfiles).where(eq(codingProfiles.userId, req.user.id)),
+            db.select().from(psychometricTests).where(eq(psychometricTests.userId, req.user.id)),
+        ]);
 
         const latestPsych = userPsychometrics.length > 0 ? userPsychometrics[userPsychometrics.length - 1] : null;
 

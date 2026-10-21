@@ -30,8 +30,14 @@ router.get('/profile', requireAuth, async (req, res) => {
 
         profiles.forEach(profile => {
             if (profile.platform && platformsData.hasOwnProperty(profile.platform)) {
+                let identifier = profile.metrics?.username || profile.metrics?.handle || '';
+                if (!identifier && profile.profileUrl) {
+                    const match = profile.profileUrl.match(/\/([^\/?#]+)\/?$/);
+                    if (match) identifier = match[1];
+                }
                 platformsData[profile.platform] = {
-                    username: profile.metrics?.username || '',
+                    username: identifier,
+                    handle: identifier,
                     profileUrl: profile.profileUrl || '',
                     metrics: profile.metrics || {},
                 };

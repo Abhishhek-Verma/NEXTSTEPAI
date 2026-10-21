@@ -7,13 +7,16 @@ import apiClient from '../../api/client';
 
 const AnalyzePage = () => {
     const navigate = useNavigate();
-    const { academics, coding, psychometric } = useStore();
+    const { academics, coding, psychometric, projects } = useStore();
+    const projectsList = Array.isArray(projects?.list) ? projects.list : [];
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState(null);
 
     const canAnalyze =
         academics.records.length > 0 ||
-        Object.values(coding.platforms).some(p => p.profileUrl);
+        Object.values(coding.platforms).some(p => p.profileUrl) ||
+        Boolean(psychometric.takenAt) ||
+        projectsList.length > 0;
 
     const handleAnalyze = async () => {
         setIsAnalyzing(true);
@@ -38,7 +41,7 @@ const AnalyzePage = () => {
                     academicScore: academics.records.length > 0 ? 80 : null,
                     practicalSkillScore: 75,
                     traitFitScore: 80,
-                    projectEvidenceScore: 70
+                    projectEvidenceScore: projectsList.length > 0 ? 75 : 70
                 }
             });
         } finally {
@@ -65,7 +68,7 @@ const AnalyzePage = () => {
                             Insufficient Data
                         </h2>
                         <p className="text-[#555555] dark:text-[#A1A1A1] mb-6 text-sm">
-                            Please add academic records or connect coding profiles to run analysis
+                            Please add academic records, link coding profiles, take the personality test, or add projects to run analysis
                         </p>
                         <div className="flex gap-4 justify-center">
                             <Button onClick={() => navigate('/academic')}>
@@ -177,7 +180,7 @@ const AnalyzePage = () => {
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                             <div className="bg-[#F9F8F6] border border-[#D9CFC7] rounded-xl p-5">
                                 <p className="text-xs font-medium text-[#555555]">Academic Records</p>
                                 <p className="text-2xl font-bold text-[#000000] mt-1">
@@ -194,6 +197,12 @@ const AnalyzePage = () => {
                                 <p className="text-xs font-medium text-[#555555]">Personality Test</p>
                                 <p className="text-2xl font-bold text-[#000000] mt-1">
                                     {psychometric.takenAt ? 'Complete' : 'Pending'}
+                                </p>
+                            </div>
+                            <div className="bg-[#F9F8F6] border border-[#D9CFC7] rounded-xl p-5">
+                                <p className="text-xs font-medium text-[#555555]">Portfolio Projects</p>
+                                <p className="text-2xl font-bold text-[#000000] mt-1">
+                                    {projectsList.length} projects
                                 </p>
                             </div>
                         </div>

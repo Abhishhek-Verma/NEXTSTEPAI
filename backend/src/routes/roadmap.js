@@ -56,20 +56,15 @@ router.post('/generate', requireAuth, async (req, res) => {
         }
 
         // Gather user data from various sources
-        const [user] = await db
-            .select()
-            .from(users)
-            .where(eq(users.id, req.user.id));
-
-        const [userOnboarding] = await db
-            .select()
-            .from(onboardingData)
-            .where(eq(onboardingData.userId, req.user.id));
-
-        const [academicData] = await db
-            .select()
-            .from(academicRecords)
-            .where(eq(academicRecords.userId, req.user.id));
+        const [
+            [user],
+            [userOnboarding],
+            [academicData]
+        ] = await Promise.all([
+            db.select().from(users).where(eq(users.id, req.user.id)),
+            db.select().from(onboardingData).where(eq(onboardingData.userId, req.user.id)),
+            db.select().from(academicRecords).where(eq(academicRecords.userId, req.user.id)),
+        ]);
 
         // Prepare user data for AI
         const userData = {

@@ -14,6 +14,25 @@ const CodingPage = () => {
     const [error, setError] = useState(null);
     const [manualValues, setManualValues] = useState({});
 
+    // Hydrate coding profiles from database on mount
+    useEffect(() => {
+        const fetchCodingProfile = async () => {
+            try {
+                const response = await apiClient.get('/coding/profile');
+                if (response.data?.profile?.platforms) {
+                    Object.entries(response.data.profile.platforms).forEach(([plat, data]) => {
+                        if (data && (data.profileUrl || data.username || data.handle || (data.metrics && Object.keys(data.metrics).length > 0))) {
+                            updatePlatform(plat, data);
+                        }
+                    });
+                }
+            } catch (err) {
+                console.debug('Failed to load coding profile:', err);
+            }
+        };
+        fetchCodingProfile();
+    }, []);
+
     // Clear manual input fields when switching tabs
     useEffect(() => {
         setManualValues({});
@@ -217,7 +236,7 @@ const CodingPage = () => {
                 };
             case 'leetcode':
                 return {
-                    problemsSolved: data.problemsSolved?.total || 0,
+                    problemsSolved: (typeof data.problemsSolved === 'object' ? data.problemsSolved?.total : data.problemsSolved) || 0,
                     contestRating: data.contestStats?.rating || 0,
                     contestsAttended: data.contestStats?.attended || 0,
                     easy: data.problemsSolved?.easy || 0,
@@ -379,7 +398,7 @@ const CodingPage = () => {
                                 <h3 className="text-lg font-semibold text-[#000000] dark:text-white">
                                     Metrics (Auto-fetched from API)
                                 </h3>
-                                {platformData.metrics?.lastFetched && (
+                                {platformData.metrics?.lastFetched && !isNaN(new Date(platformData.metrics.lastFetched).getTime()) && (
                                     <span className="text-xs text-[#555555]">
                                         Last updated: {new Date(platformData.metrics.lastFetched).toLocaleDateString()}
                                     </span>

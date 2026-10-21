@@ -174,11 +174,13 @@ export function computePracticalSkillScore(codingProfiles) {
 export function extractPsychometricVector(traits) {
     if (!traits || Object.keys(traits).length === 0) return null;
 
-    // Helper to extract average trait score normalized to [0, 1] (input is on 1-5 scale)
+    // Helper to extract average trait score normalized to [0, 1] (handles both 1-5 scale and already-normalized 0-1)
     const getAvg = (keys) => {
         const found = keys.map(k => traits[k]).filter(v => typeof v === 'number' && !isNaN(v));
         if (found.length === 0) return 0.5; // Neutral prior
-        return clamp((found.reduce((a, b) => a + b, 0) / found.length) / 5.0, 0, 1);
+        const avg = found.reduce((a, b) => a + b, 0) / found.length;
+        const normalized = avg > 1.0 ? avg / 5.0 : avg;
+        return clamp(normalized, 0, 1);
     };
 
     // OCEAN Dimensions mapping:

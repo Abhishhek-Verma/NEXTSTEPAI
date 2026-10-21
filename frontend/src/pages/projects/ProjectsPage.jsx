@@ -88,7 +88,9 @@ const ProjectsPage = () => {
             description: project.description || '',
             repoUrl: project.githubUrl || project.repoUrl || '',
             liveUrl: project.liveUrl || '',
-            techStack: project.technologies ? project.technologies.join(', ') : '',
+            techStack: Array.isArray(project.technologies) 
+                ? project.technologies.join(', ') 
+                : (typeof project.technologies === 'string' ? project.technologies : ''),
             status: project.status || 'in-progress',
         });
         setShowAddForm(true);
@@ -102,12 +104,12 @@ const ProjectsPage = () => {
             const updatedList = projectsList.filter((p) => p.id !== id);
             setProjects(updatedList);
             if (selectedProject?.id === id) setSelectedProject(null);
-            setProjectsLoading(false);
         } catch (error) {
             console.error('Failed to delete project:', error);
             setProjectsError(error.message || 'Failed to delete project');
-            setProjectsLoading(false);
             alert('Failed to delete project. Please try again.');
+        } finally {
+            setProjectsLoading(false);
         }
     };
 
@@ -145,7 +147,7 @@ const ProjectsPage = () => {
                                             {selectedProject.status === 'completed' || selectedProject.completedAt ? 'Completed' : 'In Progress'}
                                         </span>
                                     </div>
-                                    {selectedProject.completedAt && (
+                                    {selectedProject.completedAt && !isNaN(new Date(selectedProject.completedAt).getTime()) && (
                                         <p className="text-xs text-[#555555] flex items-center gap-1.5">
                                             <Icon name="Calendar" size={13} />
                                             Completed: {new Date(selectedProject.completedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -399,7 +401,7 @@ const ProjectsPage = () => {
                                             </span>
                                         )}
                                     </div>
-                                    {project.completedAt && (
+                                    {project.completedAt && !isNaN(new Date(project.completedAt).getTime()) && (
                                         <p className="text-xs text-[#555555] mb-4">
                                             Completed: {new Date(project.completedAt).toLocaleDateString()}
                                         </p>

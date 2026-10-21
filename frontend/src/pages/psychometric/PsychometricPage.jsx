@@ -21,8 +21,9 @@ const PsychometricPage = () => {
         const fetchResults = async () => {
             try {
                 const response = await apiClient.get('/psychometric/results');
-                if (response.data && response.data.takenAt) {
-                    setPsychometric(response.data);
+                const testData = response.data?.test || response.data;
+                if (testData && testData.takenAt) {
+                    setPsychometric(testData);
                 }
             } catch (error) {
                 console.error('Failed to fetch psychometric results:', error);
@@ -108,6 +109,8 @@ const PsychometricPage = () => {
         } catch (error) {
             console.error('Failed to save psychometric results:', error);
             alert('Failed to save test results. Please try again.');
+        } finally {
+            setPsychLoading(false);
         }
     };
 
@@ -240,10 +243,15 @@ const PsychometricPage = () => {
     // Show previous results
     if (showPreviousResults && psychometric.traits) {
         const previousTraitsData = Object.entries(psychometric.traits).map(([key, value]) => ({
-            trait: key.replace(/([A-Z])/g, ' $1').trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(''),
-            score: value * 100,
+            trait: key.replace(/([A-Z])/g, ' $1').trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+            score: typeof value === 'number' ? (value <= 1 ? value * 100 : value) : 0,
         }));
-        const avgScore = psychometric.score || 0;
+        const traitVals = Object.values(psychometric.traits);
+        const avgPercentage = psychometric.score 
+            ? (psychometric.score <= 5 ? (psychometric.score / 5) * 100 : psychometric.score)
+            : (traitVals.length > 0 
+                ? (traitVals.reduce((sum, v) => sum + (typeof v === 'number' ? (v <= 1 ? v * 100 : v) : 0), 0) / traitVals.length)
+                : 0);
 
         return (
             <div className="min-h-screen py-12 px-4">
@@ -269,7 +277,7 @@ const PsychometricPage = () => {
                             <div className="mt-6 text-center">
                                 <div className="inline-block bg-[#111111] dark:bg-white rounded-full px-6 py-3 text-white dark:text-[#111111]">
                                     <span className="text-sm font-medium">Overall Score: </span>
-                                    <span className="text-2xl font-bold">{Math.round((avgScore / 5) * 100)}%</span>
+                                    <span className="text-2xl font-bold">{Math.round(avgPercentage)}%</span>
                                 </div>
                             </div>
                         </CardContent>

@@ -12,35 +12,21 @@ const router = express.Router();
 // Helper function to dynamically compute, personalize, and persist recommendations
 async function computeAndSaveRecommendations(userId) {
     // Gather multi-source data across all modalities
-    const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, userId));
-
-    const [userOnboarding] = await db
-        .select()
-        .from(onboardingData)
-        .where(eq(onboardingData.userId, userId));
-
-    const [academicData] = await db
-        .select()
-        .from(academicRecords)
-        .where(eq(academicRecords.userId, userId));
-
-    const userProjects = await db
-        .select()
-        .from(projects)
-        .where(eq(projects.userId, userId));
-
-    const userCodingProfiles = await db
-        .select()
-        .from(codingProfiles)
-        .where(eq(codingProfiles.userId, userId));
-
-    const userPsychometrics = await db
-        .select()
-        .from(psychometricTests)
-        .where(eq(psychometricTests.userId, userId));
+    const [
+        [user],
+        [userOnboarding],
+        [academicData],
+        userProjects,
+        userCodingProfiles,
+        userPsychometrics
+    ] = await Promise.all([
+        db.select().from(users).where(eq(users.id, userId)),
+        db.select().from(onboardingData).where(eq(onboardingData.userId, userId)),
+        db.select().from(academicRecords).where(eq(academicRecords.userId, userId)),
+        db.select().from(projects).where(eq(projects.userId, userId)),
+        db.select().from(codingProfiles).where(eq(codingProfiles.userId, userId)),
+        db.select().from(psychometricTests).where(eq(psychometricTests.userId, userId)),
+    ]);
 
     const latestPsych = userPsychometrics.length > 0 ? userPsychometrics[userPsychometrics.length - 1] : null;
 

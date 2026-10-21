@@ -16,7 +16,7 @@ const ProfilePage = () => {
     // Transform psychometric traits for radar chart
     const psychTraits = Object.entries(psychometric.traits || {}).map(([key, value]) => ({
         trait: key.replace(/([A-Z])/g, ' $1').trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-        score: Math.round(value * 100),
+        score: Math.round(typeof value === 'number' ? (value <= 1 ? value * 100 : value) : 0),
     }));
 
     // Platform completion stats
