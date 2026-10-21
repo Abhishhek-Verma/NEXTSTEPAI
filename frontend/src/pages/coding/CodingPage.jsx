@@ -49,8 +49,7 @@ const CodingPage = () => {
             ),
             color: 'bg-[#000000] text-white dark:bg-white dark:text-[#000000]',
             fields: [
-                { key: 'username', label: 'Username', placeholder: 'johndoe' },
-                { key: 'profileUrl', label: 'Profile URL', placeholder: 'https://github.com/johndoe' },
+                { key: 'username', label: 'GitHub Username', placeholder: 'e.g., torvalds (or paste github.com URL)' },
             ],
             metrics: [
                 { key: 'totalRepos', label: 'Total Repositories', iconName: 'Folder' },
@@ -68,8 +67,7 @@ const CodingPage = () => {
             ),
             color: 'bg-[#C9B59C] text-[#000000]',
             fields: [
-                { key: 'username', label: 'LeetCode ID', placeholder: 'e.g., Rauni_aadi127' },
-                { key: 'profileUrl', label: 'Profile URL', placeholder: 'https://leetcode.com/Rauni_aadi127' },
+                { key: 'username', label: 'LeetCode Username / ID', placeholder: 'e.g., Rauni_aadi127 (or paste leetcode.com URL)' },
             ],
             metrics: [
                 { key: 'problemsSolved', label: 'Total Questions Solved', iconName: 'CheckCircle2' },
@@ -87,8 +85,7 @@ const CodingPage = () => {
             ),
             color: 'bg-[#EFE9E3] text-[#000000] border border-[#D9CFC7]',
             fields: [
-                { key: 'handle', label: 'Handle', placeholder: 'johndoe' },
-                { key: 'profileUrl', label: 'Profile URL', placeholder: 'https://codeforces.com/profile/johndoe' },
+                { key: 'handle', label: 'Codeforces Handle', placeholder: 'e.g., tourist (or paste codeforces.com URL)' },
             ],
             metrics: [
                 { key: 'problemsSolved', label: 'Total Questions Solved', iconName: 'CheckCircle2' },
@@ -107,8 +104,7 @@ const CodingPage = () => {
             ),
             color: 'bg-[#C9B59C] text-[#000000]',
             fields: [
-                { key: 'handle', label: 'Handle', placeholder: 'johndoe' },
-                { key: 'profileUrl', label: 'Profile URL', placeholder: 'https://codechef.com/users/johndoe' },
+                { key: 'handle', label: 'CodeChef Handle', placeholder: 'e.g., chef_123 (or paste codechef.com URL)' },
             ],
             metrics: [
                 { key: 'problemsSolved', label: 'Total Questions Solved', iconName: 'CheckCircle2' },
@@ -121,53 +117,46 @@ const CodingPage = () => {
     const activePlatform = platforms.find((p) => p.id === activeTab);
     const platformData = coding.platforms[activeTab] || {};
 
-    const handleInputChange = (field, value) => {
-        let updates = { [field]: value };
+    const extractPlatformIdentifier = (raw, platform) => {
+        if (!raw) return '';
+        let val = String(raw).trim();
+        if (platform === 'github') {
+            val = val.replace(/^(https?:\/\/)?(www\.)?github\.com\//i, '');
+        } else if (platform === 'leetcode') {
+            val = val.replace(/^(https?:\/\/)?(www\.)?leetcode\.com\/(u\/)?/i, '');
+        } else if (platform === 'codeforces') {
+            val = val.replace(/^(https?:\/\/)?(www\.)?codeforces\.com\/(profile\/)?/i, '');
+        } else if (platform === 'codechef') {
+            val = val.replace(/^(https?:\/\/)?(www\.)?codechef\.com\/(users\/)?/i, '');
+        }
+        return val.replace(/[?#].*$/, '').replace(/\/+$/, '').trim();
+    };
 
-        if (activeTab === 'leetcode') {
-            if (field === 'username') {
-                const cleanId = value.replace(/^https?:\/\/(www\.)?leetcode\.com\/(u\/)?/i, '').replace(/\/.*$/, '').trim();
-                updates = {
-                    username: cleanId,
-                    profileUrl: cleanId ? `https://leetcode.com/${cleanId}` : ''
-                };
-            } else if (field === 'profileUrl') {
-                const cleanId = value.replace(/^https?:\/\/(www\.)?leetcode\.com\/(u\/)?/i, '').replace(/\/.*$/, '').trim();
-                updates = {
-                    profileUrl: value,
-                    username: cleanId || platformData.username || ''
-                };
-            }
-        } else if (activeTab === 'github') {
-            if (field === 'username') {
-                const clean = value.replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\/.*$/, '').trim();
-                updates = {
-                    username: clean,
-                    profileUrl: clean ? `https://github.com/${clean}` : ''
-                };
-            } else if (field === 'profileUrl') {
-                const clean = value.replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\/.*$/, '').trim();
-                updates = {
-                    profileUrl: value,
-                    username: clean || platformData.username || ''
-                };
-            }
-        } else if (activeTab === 'codeforces') {
-            if (field === 'handle') {
-                const clean = value.replace(/^https?:\/\/(www\.)?codeforces\.com\/profile\//i, '').replace(/\/.*$/, '').trim();
-                updates = {
-                    handle: clean,
-                    profileUrl: clean ? `https://codeforces.com/profile/${clean}` : ''
-                };
-            }
-        } else if (activeTab === 'codechef') {
-            if (field === 'handle') {
-                const clean = value.replace(/^https?:\/\/(www\.)?codechef\.com\/users\//i, '').replace(/\/.*$/, '').trim();
-                updates = {
-                    handle: clean,
-                    profileUrl: clean ? `https://codechef.com/users/${clean}` : ''
-                };
-            }
+    const getPlatformProfileUrl = (identifier, platform) => {
+        if (!identifier) return '';
+        if (platform === 'github') return `https://github.com/${identifier}`;
+        if (platform === 'leetcode') return `https://leetcode.com/${identifier}`;
+        if (platform === 'codeforces') return `https://codeforces.com/profile/${identifier}`;
+        if (platform === 'codechef') return `https://codechef.com/users/${identifier}`;
+        return '';
+    };
+
+    const handleInputChange = (field, value) => {
+        const clean = extractPlatformIdentifier(value, activeTab);
+        const profileUrl = getPlatformProfileUrl(clean, activeTab);
+        let updates = {};
+
+        if (activeTab === 'github' || activeTab === 'leetcode') {
+            updates = {
+                username: clean,
+                profileUrl: profileUrl
+            };
+        } else if (activeTab === 'codeforces' || activeTab === 'codechef') {
+            updates = {
+                handle: clean,
+                username: clean,
+                profileUrl: profileUrl
+            };
         }
 
         updatePlatform(activeTab, updates);
@@ -186,7 +175,8 @@ const CodingPage = () => {
 
         try {
             const usernameKey = activeTab === 'github' || activeTab === 'leetcode' ? 'username' : 'handle';
-            const username = platformData[usernameKey];
+            const rawVal = platformData[usernameKey] || '';
+            const username = extractPlatformIdentifier(rawVal, activeTab);
 
             if (!username) {
                 alert(`Please enter your ${activePlatform.name} ${activeTab === 'leetcode' ? 'LeetCode ID' : usernameKey} first`);
@@ -207,7 +197,7 @@ const CodingPage = () => {
                 
                 updatePlatform(activeTab, {
                     [usernameKey]: username,
-                    profileUrl: metrics.profileUrl || platformData.profileUrl || '',
+                    profileUrl: metrics.profileUrl || getPlatformProfileUrl(username, activeTab),
                     metrics: formatPlatformMetrics(activeTab, metrics)
                 });
 
@@ -368,13 +358,28 @@ const CodingPage = () => {
                         {/* Profile Fields */}
                         <div className="space-y-4 mb-8 max-w-xl">
                             {activePlatform.fields.map((field) => (
-                                <Input
-                                    key={field.key}
-                                    label={field.label}
-                                    value={platformData[field.key] || ''}
-                                    onChange={(e) => handleInputChange(field.key, e.target.value)}
-                                    placeholder={field.placeholder}
-                                />
+                                <div key={field.key} className="space-y-1.5">
+                                    <Input
+                                        label={field.label}
+                                        value={platformData[field.key] || ''}
+                                        onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                        placeholder={field.placeholder}
+                                    />
+                                    {platformData.profileUrl && (
+                                        <div className="text-xs text-[#555555] dark:text-[#A1A1A1] flex items-center gap-1.5 pt-0.5">
+                                            <Icon name="ExternalLink" size={13} className="text-[#C9B59C] flex-shrink-0" />
+                                            <span>Profile URL:</span>
+                                            <a 
+                                                href={platformData.profileUrl} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer" 
+                                                className="text-[#000000] dark:text-white font-semibold underline truncate max-w-sm hover:text-[#FF5722]"
+                                            >
+                                                {platformData.profileUrl}
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
                             ))}
                             <button 
                                 onClick={handleFetchProfile} 

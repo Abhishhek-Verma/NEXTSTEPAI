@@ -57,6 +57,30 @@ router.get('/profile', requireAuth, async (req, res) => {
     }
 });
 
+function sanitizePlatformIdentifier(raw, platform) {
+    if (!raw) return '';
+    let val = String(raw).trim();
+    if (platform === 'github') {
+        val = val.replace(/^(https?:\/\/)?(www\.)?github\.com\//i, '');
+    } else if (platform === 'leetcode') {
+        val = val.replace(/^(https?:\/\/)?(www\.)?leetcode\.com\/(u\/)?/i, '');
+    } else if (platform === 'codeforces') {
+        val = val.replace(/^(https?:\/\/)?(www\.)?codeforces\.com\/(profile\/)?/i, '');
+    } else if (platform === 'codechef') {
+        val = val.replace(/^(https?:\/\/)?(www\.)?codechef\.com\/(users\/)?/i, '');
+    }
+    return val.replace(/[?#].*$/, '').replace(/\/+$/, '').trim();
+}
+
+function constructProfileUrl(identifier, platform) {
+    if (!identifier) return null;
+    if (platform === 'github') return `https://github.com/${identifier}`;
+    if (platform === 'leetcode') return `https://leetcode.com/${identifier}`;
+    if (platform === 'codeforces') return `https://codeforces.com/profile/${identifier}`;
+    if (platform === 'codechef') return `https://codechef.com/users/${identifier}`;
+    return null;
+}
+
 // Save/update coding profile
 router.post('/profile', requireAuth, validate(codingProfileSchema), async (req, res) => {
     try {
@@ -64,7 +88,24 @@ router.post('/profile', requireAuth, validate(codingProfileSchema), async (req, 
 
         // Process each platform
         for (const [platformName, platformData] of Object.entries(platforms)) {
-            if (!platformData || !platformData.profileUrl) continue;
+            if (!platformData) continue;
+
+            const identifier = sanitizePlatformIdentifier(
+                platformData.username || platformData.handle,
+                platformName
+            );
+
+            let profileUrl = platformData.profileUrl;
+            if (!profileUrl && identifier) {
+                profileUrl = constructProfileUrl(identifier, platformName);
+            }
+
+            if (!profileUrl && !identifier) continue;
+
+            const metrics = {
+                ...(platformData.metrics || {}),
+                ...(identifier ? { username: identifier, handle: identifier } : {})
+            };
 
             // Check if profile exists for this platform
             const [existing] = await db
@@ -80,8 +121,8 @@ router.post('/profile', requireAuth, validate(codingProfileSchema), async (req, 
             const profileData = {
                 userId: req.user.id,
                 platform: platformName,
-                profileUrl: platformData.profileUrl || null,
-                metrics: platformData.metrics || {},
+                profileUrl: profileUrl || null,
+                metrics: metrics,
                 updatedAt: new Date(),
             };
 
@@ -118,10 +159,11 @@ router.post('/profile', requireAuth, validate(codingProfileSchema), async (req, 
 // Fetch and update GitHub data
 router.post('/fetch/github', requireAuth, async (req, res) => {
     try {
-        const { username } = req.body;
+        const rawUsername = req.body.username || '';
+        const username = sanitizePlatformIdentifier(rawUsername, 'github');
 
         if (!username) {
-            return res.status(400).json({ error: 'GitHub username is required' });
+            return res.status(400).json({ error: 'Valid GitHub username is required' });
         }
 
         // Fetch data from GitHub
@@ -183,10 +225,11 @@ router.post('/fetch/github', requireAuth, async (req, res) => {
 // Fetch and update LeetCode data
 router.post('/fetch/leetcode', requireAuth, async (req, res) => {
     try {
-        const username = req.body.username || req.body.leetcode_id;
+        const rawUsername = req.body.username || req.body.leetcode_id || '';
+        const username = sanitizePlatformIdentifier(rawUsername, 'leetcode');
 
         if (!username) {
-            return res.status(400).json({ error: 'LeetCode ID is required' });
+            return res.status(400).json({ error: 'Valid LeetCode ID or Username is required' });
         }
 
         // Fetch data from LeetCode
@@ -242,10 +285,11 @@ router.post('/fetch/leetcode', requireAuth, async (req, res) => {
 // Fetch and update Codeforces data
 router.post('/fetch/codeforces', requireAuth, async (req, res) => {
     try {
-        const { handle } = req.body;
+        const rawHandle = req.body.handle || req.body.username || '';
+        const handle = sanitizePlatformIdentifier(rawHandle, 'codeforces');
 
         if (!handle) {
-            return res.status(400).json({ error: 'Codeforces handle is required' });
+            return res.status(400).json({ error: 'Valid Codeforces handle is required' });
         }
 
         // Database caching: Check for recent data (5 minutes TTL)
@@ -318,10 +362,11 @@ router.post('/fetch/codeforces', requireAuth, async (req, res) => {
 // Fetch and update CodeChef data
 router.post('/fetch/codechef', requireAuth, async (req, res) => {
     try {
-        const { handle } = req.body;
+        const rawHandle = req.body.handle || req.body.username || '';
+        const handle = sanitizePlatformIdentifier(rawHandle, 'codechef');
 
         if (!handle) {
-            return res.status(400).json({ error: 'CodeChef handle is required' });
+            return res.status(400).json({ error: 'Valid CodeChef handle is required' });
         }
 
         // Database caching: Check for recent data (3 hours TTL for scraping)

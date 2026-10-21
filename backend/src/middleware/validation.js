@@ -41,22 +41,22 @@ export const codingProfileSchema = z.object({
     platforms: z.object({
         github: z.object({
             username: z.string().optional(),
-            profileUrl: z.string().url().optional(),
+            profileUrl: z.string().optional().nullable().or(z.literal('')),
             metrics: z.any().optional(),
         }).optional(),
         leetcode: z.object({
             username: z.string().optional(),
-            profileUrl: z.string().url().optional(),
+            profileUrl: z.string().optional().nullable().or(z.literal('')),
             metrics: z.any().optional(),
         }).optional(),
         codeforces: z.object({
             handle: z.string().optional(),
-            profileUrl: z.string().url().optional(),
+            profileUrl: z.string().optional().nullable().or(z.literal('')),
             metrics: z.any().optional(),
         }).optional(),
         codechef: z.object({
             handle: z.string().optional(),
-            profileUrl: z.string().url().optional(),
+            profileUrl: z.string().optional().nullable().or(z.literal('')),
             metrics: z.any().optional(),
         }).optional(),
     }),
